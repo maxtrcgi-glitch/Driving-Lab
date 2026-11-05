@@ -111,9 +111,10 @@ export class Highway{
    if(best>=0){car.targetLane=best;this.reserveLane(car,best);car.startOffset=car.offset;car.startLateralV=car.startLateralA=0;car.aborting=false;car.changing=car.changeDuration;car.cooldown=12+hash(car.id+this.trafficSeed+this.clock)*7;this.laneChanges++;const next=this.laneInfo(car,best,player,this._candidate);acc=Math.min(acc,this.accelerationFor(car,next.gap,next.leadSpeed));}
   }
   // Reserve both lanes throughout the manoeuvre; brake for either lead.
-  if(car.changing&&car.lane!==car.targetLane){const source=this.laneInfo(car,car.lane,player,this._candidate);acc=Math.min(acc,this.accelerationFor(car,source.gap,source.leadSpeed));}
+  let sourceEmergency=false;
+  if(car.changing&&car.lane!==car.targetLane){const source=this.laneInfo(car,car.lane,player,this._candidate),sourceAcc=this.accelerationFor(car,source.gap,source.leadSpeed),closing=Math.max(0,car.speed-source.leadSpeed);sourceEmergency=sourceAcc<-3&&((closing>.1&&source.gap/closing<1.5)||source.gap<4+car.speed*.65);acc=Math.min(acc,sourceAcc);}
   const closing=Math.max(0,car.speed-current.leadSpeed),ttc=closing>.1?current.gap/closing:Infinity;
-  const emergency=acc<-3&&(ttc<1.5||current.gap<4+car.speed*.65);
+  const emergency=sourceEmergency||acc<-3&&(ttc<1.5||current.gap<4+car.speed*.65);
   const decisionDt=car.lastDecisionAt>=0?clamp(this.clock-car.lastDecisionAt,0,.1):1/30;
   if(!emergency)acc=clamp(acc,car.acceleration-(car.jerkLimit??2.2)*decisionDt,car.acceleration+(car.jerkLimit??2.2)*decisionDt);
   car.lastDecisionAt=this.clock;car.emergencyBraking=emergency;car.acceleration=acc;car.braking=acc<-.7;

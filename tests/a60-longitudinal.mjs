@@ -14,5 +14,6 @@ const q=new Highway(86);q.reset();const ego=q.cars.find(x=>x.dir>0),lead=q.cars.
 q.cars=[ego,lead];Object.assign(ego,{s:0,lane:1,targetLane:1,offset:-7.4,speed:30,desired:35,changing:0,cooldown:100,acceleration:0});
 Object.assign(lead,{s:9,lane:1,targetLane:1,offset:-7.4,speed:0});
 q.decide(ego,null);assert.ok(ego.emergencyBraking);assert.ok(ego.acceleration<=-7);
+Object.assign(ego,{targetLane:0,changing:2,changeDuration:4,acceleration:0,lastDecisionAt:-1});q.decide(ego,null);assert.ok(ego.emergencyBraking);assert.ok(ego.acceleration<=-7,'Emergency lead in the source lane must bypass comfort smoothing');
 console.log({passed:true,seed:917,stableProfiles:true,frames:1200,emergencyAcceleration:ego.acceleration});
 
