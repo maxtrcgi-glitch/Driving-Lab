@@ -1,0 +1,67 @@
+// Deterministic endless road, road-space traffic and a floating render origin.
+// Traffic uses a lightweight planar model; only the player has node/beam dynamics.
+import {clamp} from './physics.js';
+export const LANE_WIDTH=3.6,LANES=[-3.8,-7.4,-11,3.8,7.4,11],CHUNK=200,MAX_TRAFFIC=120;
+export function hash(n){const x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x);}
+export class Highway{
+ constructor(seed=86){this.seed=seed;this.origin=0;this.cars=[];this.density=28;this.passes=0;this.contacts=0;this.topSpeed=0;this.distance=0;this.serial=0;this.clock=0;this.aiClock=0;this.spawnFailures=0;}
+ center(s){const p=this.seed*.731;return 95*(Math.sin(s/740+p)-Math.sin(p))+28*(Math.sin(s/2100+p*2)-Math.sin(p*2));}
+ gradient(s){const p=this.seed*.731;return 95/740*Math.cos(s/740+p)+28/2100*Math.cos(s/2100+p*2);}
+ curvature(s){const p=this.seed*.731;return -95/740**2*Math.sin(s/740+p)-28/2100**2*Math.sin(s/2100+p*2);}
+ height(s){return 5*Math.sin(s/950)+2*Math.sin(s/380);}
+ point(s,offset=0){const slope=this.gradient(s),norm=Math.hypot(1,slope);return {x:this.center(s)+offset/norm,y:this.height(s),z:s-offset*slope/norm-this.origin,yaw:Math.atan(slope)};}
+ project(x,z){const globalZ=z+this.origin;let s=globalZ;for(let i=0;i<3;i++){const dx=this.center(s)-x,g=this.gradient(s);s-=(s-globalZ+dx*g)/(1+g*g+dx*this.curvature(s));}const g=this.gradient(s),offset=((x-this.center(s))-(globalZ-s)*g)/Math.hypot(1,g);return {s,offset};}
+ terrain(x,z){const {s,offset}=this.project(x,z),a=Math.abs(offset);return {height:this.height(s),grip:a>=1.6&&a<=14?1:a<16?.72:.55,surface:a>=1.6&&a<=14?'asphalt':a<16?'gravel':'grass'};}
+ reset(seed=this.seed){this.seed=seed;this.origin=0;this.cars=[];this.clock=0;this.aiClock=1/30;this.spawnFailures=0;this.passes=0;this.contacts=0;this.topSpeed=0;this.distance=0;this.serial=0;this.setDensity(this.density,0);const lead=this.cars.filter(c=>c.lane===1&&c.s>0).sort((a,b)=>a.s-b.s)[0];const speed=lead?.speed??28;const rear=this.cars.filter(c=>c.lane===1&&c.s<0).sort((a,b)=>b.s-a.s)[0];if(rear)rear.speed=Math.min(rear.speed,speed);return {...this.point(0,LANES[1]),speed};}
+ setDensity(count,playerS,playerOffset=LANES[1]){this.playerOffset=playerOffset;this.density=clamp(Math.round(count),0,MAX_TRAFFIC);while(this.cars.length>this.density)this.cars.pop();let attempts=0;while(this.cars.length<this.density&&attempts++<500)this.spawn(playerS,true);}
+ spawn(playerS,initial=false,existing=null){
+  const id=existing?.id??this.serial++,lane=id%6,dir=lane<3?1:-1,r=hash(id+this.seed*99),truck=r>.8;
+  // Fill nearby slots first, including cars beside and behind the player.
+  const row=this.cars.filter(c=>c!==existing&&c.lane===lane).length,spacing=64,phase=[18,0,-18,8,-12,25][lane];
+  const ownLane=Math.abs(LANES[lane]-(this.playerOffset??LANES[1]))<2.8;
+  const slot=ownLane?(row%2===0?1+row/2:-(row+1)/2):(row===0?0:row%2===1?(row+1)/2:-(row/2));
+  // Recycle ahead-exiting cars behind, and behind-exiting cars ahead. The
+  // search is bounded and never inserts a car when every candidate is occupied.
+  let s=playerS+(initial?slot*spacing+phase:existing?.s>playerS+1200?-230+phase:850+hash(id*13+this.seed+this.clock)*250),found=false;
+  if(s<playerS-230||s>playerS+1160)s=playerS+Math.min(1100,Math.abs(slot)*spacing)+phase;
+  for(let tries=0;tries<160;tries++){
+   const playerClear=Math.abs(LANES[lane]-(this.playerOffset??LANES[1]))>2.8||Math.abs(s-playerS)>55;
+   if(playerClear&&this.cars.every(c=>c===existing||Math.abs(c.s-s)>46||(c.lane!==lane&&c.targetLane!==lane&&Math.abs(c.offset-LANES[lane])>2.6))){found=true;break;}
+   s+=12;if(s>playerS+1160)s=playerS-230+phase;
+  }
+  if(!found){this.spawnFailures++;return null;}
+  const speed=(truck?21:25)+hash(id*3+this.seed)*8+(lane%3===0?3:0),p=this.point(s,LANES[lane]);
+  const car={id,lane,targetLane:lane,offset:LANES[lane],dir,s,speed,desired:speed,truck,length:truck?6.8:4.55,width:truck?2.3:1.82,mass:truck?4200:1500,inertia:truck?19000:2600,x:p.x,z:p.z,y:p.y,yaw:p.yaw+(dir<0?Math.PI:0),vx:Math.sin(p.yaw)*speed*dir,vz:Math.cos(p.yaw)*speed*dir,yawRate:0,acceleration:0,braking:false,changing:0,cooldown:4+hash(id)*6,crashed:false,hitAt:-Infinity,passed:false,wasAhead:s>playerS+5,lastAhead:s-playerS};
+  if(existing)Object.assign(existing,car);else this.cars.push(car);return car;
+ }
+ gap(car,lane){let gap=Infinity,lead=null;for(const other of this.cars){if(other===car||other.dir!==car.dir)continue;if(other.lane!==lane&&other.targetLane!==lane)continue;const d=(other.s-car.s)*car.dir-(car.length+other.length)/2;if(d>0&&d<gap){gap=d;lead=other;}}return {gap,lead};}
+ safeLane(car,lane,player){if(lane<0||lane>5||Math.floor(lane/3)!==Math.floor(car.lane/3))return false;
+  for(const other of this.cars){if(other===car||other.lane!==lane&&other.targetLane!==lane)continue;const d=(other.s-car.s)*car.dir;if(d>=0&&d<Math.max(32,car.speed*1.3))return false;if(d<0&&-d<Math.max(26,other.speed*1.1+(other.speed-car.speed)*4))return false;}
+  if(Math.abs(player.offset-LANES[lane])<2.8&&Math.abs(player.s-car.s)<60)return false;return true;
+ }
+ step(dt,vehicle){
+  this.clock+=dt;const player=this.project(vehicle.x,vehicle.z);this.playerOffset=player.offset;this.distance=Math.max(this.distance,player.s);this.topSpeed=Math.max(this.topSpeed,vehicle.speed*3.6);
+  this.aiClock+=dt;const decide=this.aiClock>=1/30-1e-9;if(decide)this.aiClock=Math.max(0,this.aiClock-1/30);
+  for(const c of this.cars){
+   if(c.s<player.s-260||c.s>player.s+1200){this.spawn(player.s,false,c);continue;}
+   if(c.crashed){const speed=Math.hypot(c.vx,c.vz),factor=Math.max(0,1-(1.1+.002*speed*speed)*dt/Math.max(speed,.01));c.vx*=factor;c.vz*=factor;c.x+=c.vx*dt;c.z+=c.vz*dt;c.yaw+=c.yawRate*dt;c.yawRate*=Math.exp(-dt*1.3);const projected=this.project(c.x,c.z);c.s=projected.s;c.offset=projected.offset;c.speed=Math.hypot(c.vx,c.vz);c.y=this.height(c.s);continue;}
+   c.cooldown-=dt;if(decide){let {gap,lead}=this.gap(c,c.targetLane),leadSpeed=lead?.speed??c.speed;
+   const playerGap=(player.s-c.s)*c.dir-(c.length+4.3)/2;
+   if(Math.abs(player.offset-c.offset)<2.1&&playerGap>0&&playerGap<gap){gap=playerGap;leadSpeed=(vehicle.vx*Math.sin(c.yaw)+vehicle.vz*Math.cos(c.yaw));}
+   if(gap<55&&leadSpeed<c.desired-2&&c.cooldown<=0&&!c.changing){for(const lane of [c.lane-1,c.lane+1])if(this.safeLane(c,lane,player)&&this.gap(c,lane).gap>gap+20){c.targetLane=lane;c.startOffset=c.offset;c.changing=3.5;c.cooldown=10;break;}}
+   const desiredGap=8+c.speed*1.3+Math.max(0,c.speed*(c.speed-leadSpeed)/(2*Math.sqrt(1.5*3))),acc=clamp(1.5*(1-(c.speed/c.desired)**4-(desiredGap/Math.max(gap,.5))**2),-7,1.5);
+   c.acceleration=acc;c.braking=acc<-.7;}c.speed=Math.max(0,c.speed+c.acceleration*dt);c.s+=c.dir*c.speed*dt/Math.hypot(1,this.gradient(c.s));
+   if(c.changing){c.changing=Math.max(0,c.changing-dt);const t=1-c.changing/3.5,smooth=t*t*(3-2*t);c.offset=c.startOffset+(LANES[c.targetLane]-c.startOffset)*smooth;if(c.changing===0)c.lane=c.targetLane;}
+   const p=this.point(c.s,c.offset),oldX=c.x,oldZ=c.z;c.x=p.x;c.z=p.z;c.y=p.y;c.vx=(c.x-oldX)/dt;c.vz=(c.z-oldZ)/dt;c.yaw=Math.hypot(c.vx,c.vz)>.01?Math.atan2(c.vx,c.vz):p.yaw+(c.dir<0?Math.PI:0);c.yawRate=0;
+   const ahead=(c.s-player.s);if(ahead>5)c.wasAhead=true;if(c.dir>0&&c.wasAhead&&ahead<-5&&!c.passed&&this.clock-c.hitAt>5){c.passed=true;this.passes++;}c.lastAhead=ahead;
+  }
+ }
+ rebase(vehicle){if(Math.abs(vehicle.z)<2000)return 0;const shift=Math.trunc(vehicle.z/1000)*1000;this.origin+=shift;for(const n of vehicle.nodes)n.z-=shift;vehicle.syncPose();for(const c of this.cars)c.z-=shift;return shift;}
+ collide(vehicle){let hit=false;for(const c of this.cars){if(Math.abs(c.x-vehicle.x)>7||Math.abs(c.z-vehicle.z)>9)continue;
+  const sn=Math.sin(c.yaw),cs=Math.cos(c.yaw),r=c.width*.5;
+  for(const along of [-c.length*.5+r,0,c.length*.5-r])if(vehicle.collideCircle(c.x+sn*along,c.z+cs*along,r,c.truck?2.5:1.4,c)){hit=true;if(this.clock-c.hitAt>1)this.contacts++;c.hitAt=this.clock;c.crashed=true;}
+ }
+ const p=this.project(vehicle.x,vehicle.z);
+ for(const offset of [-14.2,-1.3,1.3,14.2])if(Math.abs(p.offset-offset)<3.2)for(const ds of [-2,-1,0,1,2]){const b=this.point(p.s+ds,offset);if(vehicle.collideCircle(b.x,b.z,.55,.85))hit=true;}
+ return hit;}
+}

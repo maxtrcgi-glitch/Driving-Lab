@@ -1,13 +1,14 @@
+import {baselineFile} from './support/baselines.mjs';
 // Real Highway dynamics, road-space driver. No player physics/GPU claims.
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
-import {execFileSync} from 'node:child_process';
+
 import {pathToFileURL} from 'node:url';
 import path from 'node:path';
 import {Highway,LANES} from '../dist/highway.js';
 const args=process.argv.slice(2),baseline=args.includes('--baseline'),quick=args.includes('--quick'),assertQuality=args.includes('--assert');
 const output=args.find(x=>x.startsWith('--out='))?.slice(6)||'/tmp/driving-lab-continuity';fs.mkdirSync(output,{recursive:true});
-const text=execFileSync('git',['show','before-traffic-continuity/v0.14A.3.2:dist/highway.js'],{encoding:'utf8'}).replace("'./physics.js'",JSON.stringify(pathToFileURL(path.resolve('dist/physics.js')).href));const {Highway:Old}=await import('data:text/javascript;base64,'+Buffer.from(text).toString('base64'));
+const text=baselineFile('before-traffic-continuity/v0.14A.3.2:dist/highway.js',{encoding:'utf8'}).replace("'./physics.js'",JSON.stringify(pathToFileURL(path.resolve('dist/physics.js')).href));const {Highway:Old}=await import('data:text/javascript;base64,'+Buffer.from(text).toString('base64'));
 const C=baseline?Old:Highway;const densities=quick?[18,28]:[18,28,42,72,120],speeds=quick?[200]:[80,120,160,200,250],seeds=quick?[917]:args.includes('--heldout')?[11347,99881]:[917,2027,8123],seconds=300,dt=1/30;
 function counts(h,s,v){const a=[0,0,0,0];let nearest=Infinity,nearestSpeed=0,pop=0,opposing=0;for(const c of h.cars){if(c.dir<0){opposing++;continue;}pop++;const d=c.s-s;if(d>0){if(d<=100)a[0]++;if(d<=250)a[1]++;if(d<=500)a[2]++;if(d<=1000)a[3]++;if(d<nearest){nearest=d;nearestSpeed=c.speed;}}}const delta=v-nearestSpeed;return {a,nearest,nearestSpeed,pop,opposing,nextPassTime:Number.isFinite(nearest)&&delta>0?nearest/delta:null,relativeSpeed:delta};}
 const rows=[],timeline=[];

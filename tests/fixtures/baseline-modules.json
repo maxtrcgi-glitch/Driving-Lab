@@ -1,0 +1,242 @@
+{
+  "refs": {
+    "gameplay-baseline/v0.14A.3.1": "8bc0030d27a6ba8f63263de098c6582d96f02d15",
+    "before-traffic-continuity/v0.14A.3.2": "663d77ec9486df218d96f8ef83472898366faebe",
+    "gameplay-baseline/v0.14A.4": "79d4c7ef5f49908e2d18f53e44985dec079e18b2",
+    "gameplay-baseline/v0.14A.4.1": "045763b78112d7850df61594ed39b18bc9dc523b",
+    "gameplay-baseline/v0.14A.4.2": "93e5e260977ca0b079ccd198e12ac9cc97fafa28",
+    "gameplay-baseline/v0.14A.5.1": "e843b6ba49bad8f1888c266ef0f9614f79a9f464"
+  },
+  "files": {
+    "gameplay-baseline/v0.14A.3.1:dist/highway.js": {
+      "source": "tests/fixtures/blobs/71cdb71bd0d8f4069bbcdc83d2ead57954ab8d2fc70dea8a89b17450b9d43e68.txt",
+      "sha256": "71cdb71bd0d8f4069bbcdc83d2ead57954ab8d2fc70dea8a89b17450b9d43e68",
+      "git_blob_sha": "f52f12d976be4cc9808d2c820e7acb90f32d88a0"
+    },
+    "before-traffic-continuity/v0.14A.3.2:dist/highway.js": {
+      "source": "tests/fixtures/blobs/f5cfe9277ee17150e3f04ce3da96eef5b73a1b276e344420564fa6a4c60d6f4d.txt",
+      "sha256": "f5cfe9277ee17150e3f04ce3da96eef5b73a1b276e344420564fa6a4c60d6f4d",
+      "git_blob_sha": "640bd6b851c296daf1a3e6b088f49b9f18b8d8eb"
+    },
+    "gameplay-baseline/v0.14A.4:dist/camera-rig.js": {
+      "source": "tests/fixtures/blobs/c3faa3612d1311f9aa6628b5db8f0d87effc914defe5742695b2f76dd1e40ac3.txt",
+      "sha256": "c3faa3612d1311f9aa6628b5db8f0d87effc914defe5742695b2f76dd1e40ac3",
+      "git_blob_sha": "ea253de7301fece73c8b7e0b3185b1f7758d5e36"
+    },
+    "gameplay-baseline/v0.14A.4:dist/camera-observation.js": {
+      "source": "dist/camera-observation.js",
+      "sha256": "09f60d66532993864b649fa49343356099283b579af6269d06874caaa4fce1f9",
+      "git_blob_sha": "2ae4881dba28a8f99ae5ff44ee4ee4f6f952127c"
+    },
+    "gameplay-baseline/v0.14A.4:dist/camera-settings.js": {
+      "source": "tests/fixtures/blobs/42e9dd29a7accafc66bc9db8cb62d1724d0372c682ec5368583dc348c0890cae.txt",
+      "sha256": "42e9dd29a7accafc66bc9db8cb62d1724d0372c682ec5368583dc348c0890cae",
+      "git_blob_sha": "2256914ebcade97a702212ed44257594886f979b"
+    },
+    "gameplay-baseline/v0.14A.4:dist/three.module.js": {
+      "source": "dist/three.module.js",
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+      "git_blob_sha": "477ca4dafa7af919a2b9818e01b5ae25198d4aa4"
+    },
+    "gameplay-baseline/v0.14A.4:dist/three.core.js": {
+      "source": "dist/three.core.js",
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20",
+      "git_blob_sha": "7dcd0fbcbc04b8d9a20ecb96c1ce344cb55150d5"
+    },
+    "gameplay-baseline/v0.14A.4:dist/physics.js": {
+      "source": "tests/fixtures/blobs/f8d88f3f77ed18d05897d0ab4706deb6e67ea94cd4f8376a1ab18fd8012212ad.txt",
+      "sha256": "f8d88f3f77ed18d05897d0ab4706deb6e67ea94cd4f8376a1ab18fd8012212ad",
+      "git_blob_sha": "77667cf1471920e6133736663f1bc507fda83817"
+    },
+    "gameplay-baseline/v0.14A.4:dist/vehicle-spec.js": {
+      "source": "dist/vehicle-spec.js",
+      "sha256": "bfb7a130a0a369f1d9315694238102891a71122bf6a4be12ca2ae6e621d85876",
+      "git_blob_sha": "5997792359a4de3d83ab491611ae63186c88a6d7"
+    },
+    "gameplay-baseline/v0.14A.4.1:dist/camera-rig.js": {
+      "source": "tests/fixtures/blobs/507732189327b0c4e82793f78f7e47a18b37ac004f241b628ecb782d1f596a85.txt",
+      "sha256": "507732189327b0c4e82793f78f7e47a18b37ac004f241b628ecb782d1f596a85",
+      "git_blob_sha": "5b6f6828735493709f2efb2fdefd163f7e6e80df"
+    },
+    "gameplay-baseline/v0.14A.4.1:dist/camera-observation.js": {
+      "source": "dist/camera-observation.js",
+      "sha256": "09f60d66532993864b649fa49343356099283b579af6269d06874caaa4fce1f9",
+      "git_blob_sha": "2ae4881dba28a8f99ae5ff44ee4ee4f6f952127c"
+    },
+    "gameplay-baseline/v0.14A.4.1:dist/camera-settings.js": {
+      "source": "tests/fixtures/blobs/42e9dd29a7accafc66bc9db8cb62d1724d0372c682ec5368583dc348c0890cae.txt",
+      "sha256": "42e9dd29a7accafc66bc9db8cb62d1724d0372c682ec5368583dc348c0890cae",
+      "git_blob_sha": "2256914ebcade97a702212ed44257594886f979b"
+    },
+    "gameplay-baseline/v0.14A.4.1:dist/three.module.js": {
+      "source": "dist/three.module.js",
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+      "git_blob_sha": "477ca4dafa7af919a2b9818e01b5ae25198d4aa4"
+    },
+    "gameplay-baseline/v0.14A.4.1:dist/three.core.js": {
+      "source": "dist/three.core.js",
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20",
+      "git_blob_sha": "7dcd0fbcbc04b8d9a20ecb96c1ce344cb55150d5"
+    },
+    "gameplay-baseline/v0.14A.4.2:dist/highway.js": {
+      "source": "tests/fixtures/blobs/b6c8870d548578cdaa1da3e09a6e22845676340ccdabd901a8eea05f2dfed2eb.txt",
+      "sha256": "b6c8870d548578cdaa1da3e09a6e22845676340ccdabd901a8eea05f2dfed2eb",
+      "git_blob_sha": "dc38b42ea0d841f9e6f438fc7f0b97abe3638a16"
+    },
+    "gameplay-baseline/v0.14A.4.2:dist/highway-world.js": {
+      "source": "tests/fixtures/blobs/42e696e2680c8569bde27887bcca462aefb1281475700a57e8c26b955ad0eda9.txt",
+      "sha256": "42e696e2680c8569bde27887bcca462aefb1281475700a57e8c26b955ad0eda9",
+      "git_blob_sha": "eff9a0f29a5bd43dd513ac6a6978e29f522686d7"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/THREE-LICENSE.txt": {
+      "source": "dist/THREE-LICENSE.txt",
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "git_blob_sha": "cf781430404b0ae0ba7d8dea3457a3515dd7c9b9"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/camera-observation.js": {
+      "source": "dist/camera-observation.js",
+      "sha256": "09f60d66532993864b649fa49343356099283b579af6269d06874caaa4fce1f9",
+      "git_blob_sha": "2ae4881dba28a8f99ae5ff44ee4ee4f6f952127c"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/camera-profiles.js": {
+      "source": "dist/camera-profiles.js",
+      "sha256": "87253a2e0a7c352e7dc2112deda8fcb3948bf5c209fc0c0e8f9813751c6f3d5e",
+      "git_blob_sha": "87d7c14e83792b989a2542a7d3528c931a211ea9"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/camera-rig.js": {
+      "source": "tests/fixtures/blobs/2d01d0b337ac7c293a59abea2261869c785c8f8e7434f83e17fc7b013cade3e4.txt",
+      "sha256": "2d01d0b337ac7c293a59abea2261869c785c8f8e7434f83e17fc7b013cade3e4",
+      "git_blob_sha": "5ec4ed1445c43fa7a4e9252f707cb4df61ec7b04"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/camera-road.js": {
+      "source": "dist/camera-road.js",
+      "sha256": "e344b0779015f6559e90c9bbc1d083848b7b0c0145bc49969f905f702b60d8a2",
+      "git_blob_sha": "c8d620b2133a7431d3f956520f2064710889115b"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/controls.js": {
+      "source": "dist/controls.js",
+      "sha256": "cefd72c0eed0f04912a50419a1dd70240557386d3adc6797d187168febe9b0f9",
+      "git_blob_sha": "1fee20c3b8bdb631204c87880d32d69c636d7756"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/course.js": {
+      "source": "dist/course.js",
+      "sha256": "b38663ea38a784ed83f601383bf3920c39a30bcd876bb719acab95b6ee571401",
+      "git_blob_sha": "fe4657984af4b9bed24a12ca22ce0b2f798a7ec8"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/driving-diagnostics.js": {
+      "source": "dist/driving-diagnostics.js",
+      "sha256": "2807d39da104bd94b95d38e26b5808e44070ee710225a489372dd4b6fc747ef4",
+      "git_blob_sha": "0fff269b8849903c62b0e5d6db22bfd4772f29a9"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/driving-experience.js": {
+      "source": "dist/driving-experience.js",
+      "sha256": "2f49adbcb82832df407a094a1257dad934feb979c734878527d554b0e3f59ffb",
+      "git_blob_sha": "24631c47d87b3d1116515f645f19b6e0b6ce409b"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/gr86-model.js": {
+      "source": "dist/gr86-model.js",
+      "sha256": "08d61f94d766b69ff4b167c41043151d3492656258ead9f25b700b918f816a22",
+      "git_blob_sha": "49663adc0138693dcbd6218b37635916f4de8f8b"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/highway-world.js": {
+      "source": "dist/highway-world.js",
+      "sha256": "c05f3227dd5143090211cd8eb2ebf85128ecae2ddfc81854cd1dbb99efadf3cb",
+      "git_blob_sha": "a9ff83b6ca11eb04decb51e91995662b33b71185"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/highway.js": {
+      "source": "dist/highway.js",
+      "sha256": "20d161dd33cc85363fbb0bc8c974e8fb7cee210094ddcdf9d812978817933934",
+      "git_blob_sha": "3cfcd2a17813fbea14bcbfbf4d9e46ada3a62653"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/icon-192.png": {
+      "source": "dist/icon-192.png",
+      "sha256": "32a007508fe8dd04f888621d87fefe345ea632104f46cd62849c6fc5912fc29b",
+      "git_blob_sha": "5e3acb8365d366bedd45028ea9a8b625fa0ed290"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/icon-512.png": {
+      "source": "dist/icon-512.png",
+      "sha256": "96139bf488f560345d3f5b17c8adef5efbb03608cb0d59cb38bd58fc1bd780d1",
+      "git_blob_sha": "9f7547b63b3b2101e2c59cddcc03c1f0005d8dea"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/manifest.webmanifest": {
+      "source": "dist/manifest.webmanifest",
+      "sha256": "2783851276f5ce6b7813687b5b7c942086ca1108cd907e1e8d233f8e5d03ce43",
+      "git_blob_sha": "684689b73a936b0b2409e32f68f6aa3b470c5bd6"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/physics.js": {
+      "source": "dist/physics.js",
+      "sha256": "ff645940b464935c58c4b5239c9254ad1879c5f802cf472c78fe3945a15384ad",
+      "git_blob_sha": "ea00aa7263d2481f6a4be59dc251220689e1e989"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/road-geometry.js": {
+      "source": "dist/road-geometry.js",
+      "sha256": "d20dd8ea1217bc311524cadd48a0fe538546f53b41e399c33071d60eda8b39f7",
+      "git_blob_sha": "7e283522ed7ea8ab77baa3eeadfc7fe8b8ebf124"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/sensors.js": {
+      "source": "dist/sensors.js",
+      "sha256": "5b1eb8a82152153a8a99a6d8fe6be2346e4f3fd8237a23b98a0d0e44058aac62",
+      "git_blob_sha": "668c6d378d298e0dda4f810b4e72aacf52cd97b1"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/slip-detector.js": {
+      "source": "dist/slip-detector.js",
+      "sha256": "a44583f8347a29c14becccc3337ef13183e426fdafd931d82456aee9e50dcd7d",
+      "git_blob_sha": "0b25443569d3e6535df2e4635544c18a77c90cc6"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/steering-legacy.js": {
+      "source": "dist/steering-legacy.js",
+      "sha256": "20c39d25caa40f07836e22e04ad148273be0e5849c0749c226411130a80326c0",
+      "git_blob_sha": "5a828711c19850b051e446dce29f4a17afeb4577"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/steering-predictor.js": {
+      "source": "dist/steering-predictor.js",
+      "sha256": "9fe2686aeb774f729797669e040d244d46abbbbd897dc585ad2af439d9ae960d",
+      "git_blob_sha": "a582516badc03323176b44c417d0b2226efde5a0"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/steering-reference.js": {
+      "source": "dist/steering-reference.js",
+      "sha256": "7adab61581d4a794dc21d813808ba5f4525e01bc82e9e25a1f4d77a772ed2353",
+      "git_blob_sha": "e7bb5c174209e024d7a2148cc739b9638a8aad0b"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/steering-trace.js": {
+      "source": "dist/steering-trace.js",
+      "sha256": "afc1c1be5fe5a81f4f887c443f6f52d4e2ea5afb7d218517e1ab33abc7b86f6c",
+      "git_blob_sha": "a1d7850c4f21c5ce01339acf49afa99441ecac61"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/telemetry.js": {
+      "source": "dist/telemetry.js",
+      "sha256": "ebfb3ed9a6193ef90a510006fa34819330d73537db8921e1a7846b4ae9cd5f1b",
+      "git_blob_sha": "99c51543f740d0f8d954a708afed36271d6913a0"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/three.core.js": {
+      "source": "dist/three.core.js",
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20",
+      "git_blob_sha": "7dcd0fbcbc04b8d9a20ecb96c1ce344cb55150d5"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/three.module.js": {
+      "source": "dist/three.module.js",
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+      "git_blob_sha": "477ca4dafa7af919a2b9818e01b5ae25198d4aa4"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/traffic-trace.js": {
+      "source": "dist/traffic-trace.js",
+      "sha256": "6364cb3135378b1a8aaad87cc53901051a5df1eb2d97ec944044925a06653551",
+      "git_blob_sha": "920364211829de41c1ff8e686832ca0652b838d0"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/vehicle-spec.js": {
+      "source": "dist/vehicle-spec.js",
+      "sha256": "bfb7a130a0a369f1d9315694238102891a71122bf6a4be12ca2ae6e621d85876",
+      "git_blob_sha": "5997792359a4de3d83ab491611ae63186c88a6d7"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/vehicle-state.js": {
+      "source": "dist/vehicle-state.js",
+      "sha256": "113855dfb51626949991cf33180dfcc4c9ec50f2e7046d7d7c7a8fc49e1033b3",
+      "git_blob_sha": "7e4a4386718bb02b4fc59187ec3f8125017b08b0"
+    },
+    "gameplay-baseline/v0.14A.5.1:dist/world.js": {
+      "source": "dist/world.js",
+      "sha256": "095d5f8cc539afc45332ed863bf96ec09e9911ed1ca0b2a23ab014694244dd8e",
+      "git_blob_sha": "5c92b52735ab993100a2eff80221579e59b2e275"
+    }
+  }
+}

@@ -6,7 +6,7 @@ Mobile driving simulator using JavaScript and Three.js/WebGL, packaged as a buil
 
 ## Run locally
 
-Requirements: Node.js 18+ (for tests) and any local static HTTP server.
+Requirements: Node.js 22+ (for tests) and any local static HTTP server.
 
 ```bash
 python3 -m http.server 8000 --directory dist
@@ -17,13 +17,13 @@ Open <http://localhost:8000>. Do **not** use `file://` for ESM imports. iPhone s
 ## Tests
 
 ```bash
-npm run check:seat
-npm run check:highway2
-npm run check:continuity
-npm run check
+npm ci
+npm run check:current
+npx playwright install --with-deps --only-shell chromium
+npm run check:browser
 ```
 
-Some test suites write generated diagnostics into `reports/` (ignored by Git). This repository includes the game sources, static distribution, and tests, not bulky historical archives or duplicated generated reports.
+Both current checks and the real-browser smoke must pass for the merge gate. No archive or historical Git tags are needed. `npm run check:legacy` preserves historical source-identity diagnostics and intentionally returns nonzero for known A52 differences; it is not an active gameplay requirement. See [TESTING.md](TESTING.md) for contracts, fixtures, CI jobs, reports and limitations.
 
 ## Versioning and workflow
 

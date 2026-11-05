@@ -1,0 +1,91 @@
+name: A52 Verification
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: a52-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  current:
+    name: Required current regression tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run check:current
+      - uses: actions/upload-artifact@v5
+        if: ${{ always() }}
+        with:
+          name: current-regression-reports
+          path: reports/
+          if-no-files-found: error
+
+  browser:
+    name: Required real Chromium WebGL smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps --only-shell chromium
+      - run: npm run check:browser
+      - uses: actions/upload-artifact@v5
+        if: ${{ always() }}
+        with:
+          name: chromium-webgl-smoke
+          path: reports/browser/
+          if-no-files-found: error
+
+  merge-gate:
+    name: Required merge gate
+    needs: [current, browser]
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require completed successful checks
+        env:
+          CURRENT_RESULT: ${{ needs.current.result }}
+          BROWSER_RESULT: ${{ needs.browser.result }}
+        run: test "$CURRENT_RESULT" = success && test "$BROWSER_RESULT" = success
+
+  historical:
+    name: Historical source identities (diagnostic, expected differences)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    # The job remains visibly failed when old identities differ; it is not a required merge check.
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - run: npm run check:legacy
+      - uses: actions/upload-artifact@v5
+        if: ${{ always() }}
+        with:
+          name: historical-identities-diagnostic
+          path: reports/legacy-identities.json
+          if-no-files-found: error

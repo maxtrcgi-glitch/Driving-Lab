@@ -1,11 +1,12 @@
+import {baselineFile} from './support/baselines.mjs';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {performance} from 'node:perf_hooks';
-import {execFileSync} from 'node:child_process';
+
 import {pathToFileURL} from 'node:url';
 import path from 'node:path';
 import {Highway} from '../dist/highway.js';
-const text=execFileSync('git',['show','gameplay-baseline/v0.14A.3.1:dist/highway.js'],{encoding:'utf8'}).replace("'./physics.js'",JSON.stringify(pathToFileURL(path.resolve('dist/physics.js')).href));const {Highway:Old}=await import('data:text/javascript;base64,'+Buffer.from(text).toString('base64'));
+const text=baselineFile('gameplay-baseline/v0.14A.3.1:dist/highway.js',{encoding:'utf8'}).replace("'./physics.js'",JSON.stringify(pathToFileURL(path.resolve('dist/physics.js')).href));const {Highway:Old}=await import('data:text/javascript;base64,'+Buffer.from(text).toString('base64'));
 const out=process.argv[2]||'/tmp/driving-lab-traffic-ai2';fs.mkdirSync(out,{recursive:true});
 const quantile=(a,q)=>a.sort((a,b)=>a-b)[Math.floor((a.length-1)*q)];
 function sim(H,density,frames,profile=false,crashes=0){const h=new H(86);h.density=density;h.reset(86,391);let s=0,totalDecision=0,totalContact=0,totalBarrier=0,decisionCalls=0,contactCalls=0,barrierCalls=0;

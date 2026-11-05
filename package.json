@@ -14,6 +14,19 @@
     "check:launch": "node tests/launch-validation.mjs",
     "check:head": "node tests/head-inertia.mjs && node tests/head-projection.mjs && node tests/head-lifecycle.mjs",
     "check:calibration": "node tests/camera-feel-audit.mjs && node tests/camera-calibration.mjs && node tests/camera-calibration-summary.mjs && node tests/camera-calibration-safety.mjs && node tests/camera-calibration-projection.mjs && node tests/camera-calibration-performance.mjs",
-    "check:highway2": "node tests/road-geometry.mjs && node tests/road-contacts.mjs && node tests/road-visual-frame.mjs && node tests/road-identity.mjs && node tests/traffic-ai2.mjs && node tests/traffic-continuity.mjs --assert --out=reports/A51/continuity && node tests/camera-rig.mjs reports/A51 && node --expose-gc tests/road-performance.mjs"
+    "check:highway2": "node tests/road-geometry.mjs && node tests/road-contacts.mjs && node tests/road-visual-frame.mjs && node tests/road-identity.mjs && node tests/traffic-ai2.mjs && node tests/traffic-continuity.mjs --assert --out=reports/A51/continuity && node tests/camera-rig.mjs reports/A51 && node --expose-gc tests/road-performance.mjs",
+    "check:syntax": "node tests/syntax.mjs",
+    "check:static": "node tests/static-audit.mjs",
+    "check:infrastructure": "node tests/infrastructure-contract.mjs",
+    "check:integration": "npm test --prefix integration/highway-visual-v1",
+    "check:current": "node tests/run-current.mjs",
+    "check:legacy": "node tests/legacy/identity-audits.mjs",
+    "check:browser": "node tests/browser-smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
