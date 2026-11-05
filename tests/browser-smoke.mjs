@@ -53,8 +53,8 @@ try {
   });
   stage('load');
   assert.equal((await page.goto(baseURL, {waitUntil: 'domcontentloaded'})).status(), 200);
-  await page.waitForFunction(() => window.drivingLab?.version === '0.14A.5.2');
-  assert.match(await page.title(), /v0\.14A\.5\.2.*Cockpit Seat Adjustment/);
+  await page.waitForFunction(() => window.drivingLab?.version === '0.14A.6.0');
+  assert.match(await page.title(), /v0\.14A\.6\.0.*Traffic AI 3.0/);
   assert.equal(await page.locator('#fatal').isVisible(), false);
   stage('webgl');
   result.webgl = await page.evaluate(() => {
@@ -99,7 +99,7 @@ try {
   });
   stage('reload');
   await page.reload({waitUntil: 'domcontentloaded'});
-  await page.waitForFunction(() => window.drivingLab?.version === '0.14A.5.2');
+  await page.waitForFunction(() => window.drivingLab?.version === '0.14A.6.0');
   const restored = await page.evaluate(() => ({height: window.drivingLab.cameraRig.settings.seatHeight, forward: window.drivingLab.cameraRig.settings.seatForward}));
   assert.deepEqual(restored, {height: -.10, forward: -.15});
   // Reopen the real controls and exercise Reset Position without rewriting state in evaluate().
@@ -126,3 +126,4 @@ try {
   await fs.writeFile(path.join(out, 'smoke.json'), JSON.stringify(result, null, 2));
   console.log(JSON.stringify(result, null, 2));
 }
+

@@ -144,7 +144,7 @@
       "git_blob_sha": "a9ff83b6ca11eb04decb51e91995662b33b71185"
     },
     "gameplay-baseline/v0.14A.5.1:dist/highway.js": {
-      "source": "dist/highway.js",
+      "source": "tests/fixtures/a52-highway.txt",
       "sha256": "20d161dd33cc85363fbb0bc8c974e8fb7cee210094ddcdf9d812978817933934",
       "git_blob_sha": "3cfcd2a17813fbea14bcbfbf4d9e46ada3a62653"
     },

@@ -1,3 +1,4 @@
+import {assertA52Integrity} from './support/integrity.mjs';
 import {baselineFile} from './support/baselines.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -56,6 +57,7 @@ for(const h of [seatLimits.height[0],0,seatLimits.height[1]])for(const z of [sea
 assert.equal(rays.length,0,'Near-origin cabin clearance');assert.ok(eye.y+.681+.15+.012>1.19,'Suggested height+15cm would leave roof envelope');assert.ok(eye.y+.681+.012>1.20-((eye.z+.20+.043)+.08)*(.24/.47),'Suggested forward+20cm would cross windscreen');
 // CPU comparison only, not iPhone/GPU. No new per-frame Vector allocation in the seat path.
 const benchmark=[];for(let repeat=0;repeat<3;repeat++){const v=new Vehicle();v.reset(0,0,0,30);const run=Class=>{const rig=make(Class,{...cameraDefaults,seatHeight:-.1,seatForward:-.1});rig.reset(v);const start=performance.now();for(let i=0;i<20000;i++){v.z+=30*DT;rig.step(v,DT,null);if(i%4===0)rig.apply(v,DT*4);}return (performance.now()-start)/20000;};const order=repeat%2?[CameraRig,Legacy]:[Legacy,CameraRig],result=new Map(order.map(Class=>[Class,run(Class)]));benchmark.push({legacyMsPerStep:result.get(Legacy),currentMsPerStep:result.get(CameraRig)});}
-const protectedFiles=fs.readdirSync('dist').filter(file=>!['camera-rig.js','camera-settings.js','app.js','index.html','style.css'].includes(file));for(const file of protectedFiles)assert.deepEqual(fs.readFileSync('dist/'+file),baselineFile('gameplay-baseline/v0.14A.5.1:dist/'+file,{maxBuffer:32*1024*1024}),file+' protected');
+assertA52Integrity();const protectedFiles=fs.readdirSync('dist').filter(file=>!['camera-rig.js','camera-settings.js','app.js','index.html','style.css','highway.js'].includes(file));for(const file of protectedFiles)assert.deepEqual(fs.readFileSync('dist/'+file),baselineFile('gameplay-baseline/v0.14A.5.1:dist/'+file,{maxBuffer:32*1024*1024}),file+' protected');
 const report={passed:true,fullPhysicsIdentityTicks:ticks,zeroOffsetLegacyCameraExact:true,dynamicsExactAtAllOffsets:true,maxWorldDeltaErrorM:maxDeltaError,chaseExact,storageMigration:true,storageFailureFallback:true,corruptionClamped:true,otherVehicleInterface:true,seatLimitsMetres:seatLimits,cabinExtremePoints:points.length,rayQueries:points.length*26,nearObstructions:rays,minRoofMarginM:minRoofMargin,minConservativeGlassMarginM:minGlassMargin,protectedFiles:protectedFiles.length,benchmark,nodeCPUOnly:true,iPhone:false,GPU:false,limitations:'Undamaged procedural cabin point/ray envelope, not full-frustum damaged-cabin proof or visual device acceptance. Observation retains calibrated vehicle-owned anchor to avoid seat slider causing false acceleration.'};
 fs.writeFileSync('reports/A52/seat-position.json',JSON.stringify(report,null,2));console.log(report);
+

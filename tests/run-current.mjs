@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {performance} from 'node:perf_hooks';
 
-export const requiredSuites = ['check:syntax', 'check:static', 'check:infrastructure', 'check', 'check:fast', 'check:predictor', 'check:shadow', 'check:seat', 'check:traffic-ai2', 'check:continuity', 'check:camera', 'check:launch', 'check:head', 'check:calibration', 'check:highway2', 'check:integration'];
+export const requiredSuites = ['check:syntax', 'check:static', 'check:infrastructure', 'check', 'check:fast', 'check:predictor', 'check:shadow', 'check:seat', 'check:traffic-ai2', 'check:continuity', 'check:camera', 'check:launch', 'check:head', 'check:calibration', 'check:highway2', 'check:integration', 'check:traffic-ai3'];
 fs.mkdirSync('reports/current', {recursive: true});
 const scripts = JSON.parse(fs.readFileSync('package.json')).scripts, results = [];
 // Continue independent suites to report all failures, but exit nonzero if any fails or times out.
@@ -19,3 +19,4 @@ for (const suite of requiredSuites) {
   fs.writeFileSync('reports/current/results.json', JSON.stringify({browserIncluded: false, required: true, results}, null, 2));
 }
 process.exitCode = results.every(result => result.status === 'PASS') ? 0 : 1;
+

@@ -21,7 +21,9 @@
     "check:integration": "npm test --prefix integration/highway-visual-v1",
     "check:current": "node tests/run-current.mjs",
     "check:legacy": "node tests/legacy/identity-audits.mjs",
-    "check:browser": "node tests/browser-smoke.mjs"
+    "check:browser": "node tests/browser-smoke.mjs",
+    "check:traffic-ai3": "node tests/a60-longitudinal.mjs && node tests/a60-lane-changes.mjs && node tests/a60-protected.mjs",
+    "bench:traffic-ai3": "node --expose-gc tests/a60-traffic-bench.mjs reports/A60/current-node.json"
   },
   "devDependencies": {
     "playwright": "1.62.1"
