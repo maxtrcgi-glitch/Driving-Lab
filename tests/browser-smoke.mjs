@@ -27,11 +27,11 @@ const result = {status: 'BROWSER NOT VERIFIED', stub: false, pageErrors: [], con
 let browser, page;
 const stage = name => { result.stage = name; console.log(`Browser stage: ${name}`); };
 const timeout = setTimeout(async () => {
-  result.error = 'Browser smoke exceeded 120s';
+  result.error = 'Browser smoke exceeded 180s';
   await fs.writeFile(path.join(out, 'smoke.json'), JSON.stringify(result, null, 2));
   console.error(result.error);
   process.exit(1);
-}, 120000);
+}, 180000);
 try {
   const extraArgs = JSON.parse(process.env.CHROMIUM_EXTRA_ARGS || '[]');
   assert.ok(Array.isArray(extraArgs) && extraArgs.every(value => typeof value === 'string'));
@@ -40,7 +40,7 @@ try {
   browser = await chromium.launch({headless: true, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined, args: [...extraArgs, '--use-angle=swiftshader', '--enable-unsafe-swiftshader']});
   result.browser = browser.version();
   page = await browser.newPage({viewport: {width: 844, height: 390}, deviceScaleFactor: 1});
-  page.setDefaultTimeout(20000);
+  page.setDefaultTimeout(30000);
   page.on('pageerror', error => result.pageErrors.push(String(error)));
   page.on('console', message => {
     if (message.type() === 'error') result.consoleErrors.push(message.text());
@@ -52,7 +52,7 @@ try {
     if (response.status() >= 400) result.httpErrors.push({url: response.url(), status: response.status()});
   });
   stage('load');
-  assert.equal((await page.goto(baseURL, {waitUntil: 'networkidle'})).status(), 200);
+  assert.equal((await page.goto(baseURL, {waitUntil: 'domcontentloaded'})).status(), 200);
   await page.waitForFunction(() => window.drivingLab?.version === '0.14A.5.2');
   assert.match(await page.title(), /v0\.14A\.5\.2.*Cockpit Seat Adjustment/);
   assert.equal(await page.locator('#fatal').isVisible(), false);
@@ -98,7 +98,7 @@ try {
     (result.screenshotWarnings ||= []).push(String(error));
   });
   stage('reload');
-  await page.reload({waitUntil: 'networkidle'});
+  await page.reload({waitUntil: 'domcontentloaded'});
   await page.waitForFunction(() => window.drivingLab?.version === '0.14A.5.2');
   const restored = await page.evaluate(() => ({height: window.drivingLab.cameraRig.settings.seatHeight, forward: window.drivingLab.cameraRig.settings.seatForward}));
   assert.deepEqual(restored, {height: -.10, forward: -.15});

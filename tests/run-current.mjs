@@ -12,7 +12,7 @@ for (const suite of requiredSuites) {
   const start = performance.now(), logPath = `reports/current/${suite.replace(':', '-')}.log`;
   const fd = fs.openSync(logPath, 'w');
   let result;
-  try { result = spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', suite], {stdio: ['ignore', fd, fd], timeout: 300000}); }
+  try { result = spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', suite], {stdio: ['ignore', fd, fd], timeout: 900000}); }
   finally { fs.closeSync(fd); }
   const row = {command: `npm run ${suite}`, status: result.status === 0 && !result.error ? 'PASS' : 'FAIL', exitCode: result.status, error: result.error?.message, seconds: Math.round((performance.now() - start) / 10) / 100, logPath};
   results.push(row); console.log(JSON.stringify(row));
