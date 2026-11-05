@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {GR86,engineTorqueAt} from '../dist/vehicle-spec.js';
+import {Vehicle,DT} from '../dist/physics.js';
+assert.ok(Math.abs(engineTorqueAt(3700)-250)<.001);
+assert.ok(Math.abs(engineTorqueAt(7000)*7000*Math.PI/30/1000-GR86.ratedPowerKW)<.001);
+const v=new Vehicle();assert.ok(Math.abs(v.wheels[0].z-v.wheels[2].z-GR86.wheelbase)<1e-9);assert.equal(v.wheels[1].x-v.wheels[0].x,GR86.frontTrack);assert.equal(v.wheels[3].x-v.wheels[2].x,GR86.rearTrack);
+for(let i=0;i<5/DT;i++)v.step(DT,{});
+const front=v.wheels.filter(w=>w.front).reduce((s,w)=>s+w.load,0),rear=v.wheels.filter(w=>!w.front).reduce((s,w)=>s+w.load,0);
+assert.ok(Math.abs(front/(front+rear)-.53)<.003,'Static axle distribution matches reference');
+v.reset();let zeroTo60mph=null;for(let i=0;i<12/DT;i++){v.step(DT,{gas:1});if(v.speed>=60*.44704){zeroTo60mph=i*DT;break;}}assert.ok(zeroTo60mph!==null&&zeroTo60mph<10,'Reference powertrain accelerates without instability');
+console.log(JSON.stringify({referencePowerKW:GR86.ratedPowerKW,staticFrontFraction:front/(front+rear),simulatedZeroTo60mphS:zeroTo60mph,manufacturerClaimZeroTo60mphS:6.1,note:'Powertrain anchors only; tires, assists and suspension remain estimates.'}));

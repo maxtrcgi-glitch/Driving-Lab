@@ -1,0 +1,15 @@
+# C0.2 — протокол до отложенных испытаний
+
+Калибровочная группа:11 фиксированных driver-input манёвров на60/120km/h, обе стороны. Начальное состояние только reset(speed)+0.4s settle; занос не задаётся искусственной beta/yaw. Сценарии — stimuli, не гарантированные ground-truth фазы. Менялись только test driver commands, не физика.
+
+raw в стенде — adapter demand на входе SteeringResponse, не сырой палец/gesture fraction. Это engine dynamics tests, не тест эргономики iPhone. Probe записывает финальный substep1/1920 перед интегрированием. Проверка alpha/force discrepancy касается W0 (зеркальные прогоны меняют геометрическую сторону воздействия), не обещает uniform bound всех колёс/поверхностей.
+
+Отложенная группа: те же семейства манёвров на90/160/200km/h, с timeScale.9/rawScale.9/handbrakeScale.8/gasScale1.1 относительно калибровочной команды. Это проверка переноса на скорости/waveforms, не независимость семейства сценариев/движка. Файл slip-detector.js/константы фиксируются Git-коммитом ДО первого heldout run. После этого пороги на его результатах не настраивать. Опубликовать все ошибки/UNKNOWN. Повтор разрешён только из-за инфраструктуры/ошибки стенда; факт повтора и неизменность алгоритма указывать.
+
+Разметка tests/slip-oracle.mjs независима от runtime estimator/detector imports и использует офлайн будущее0.35–0.5s: raw all-node COM velocity/heading, contact, damage, tyre force utilization/slip и plateau/side crossing. Пороги8°/2.5°/5°, future growth2° отличаются от runtime envelope. UNKNOWN — интервалы без убедительного proxy/инвалидность. Это независимый вычислительный proxy, НЕ экспертная разметка намерений водителя. Определение DRIFT_LIKE не доказывает контролируемость; RECOVERING не доказывает спасение траектории.
+
+Confusion matrix публиковать включая oracle UNKNOWN. События — contiguous proxy phase >=2 samples20Hz; match detector той же фазы в onset−0.2s…end+0.2s. Delay отрицателен, если detector сработал до более позднего proxy onset; не обещать такую же задержку на iPhone. Показать missed, false alert fraction на proxy NORMAL, coverage/UNKNOWN по скоростям, зеркальность, phase transitions. Event matching не one-to-one и не статистический population estimate.
+
+Reference validation: actual final substep hook до интегрирования, контактная плоскость, истинный all-node COM, M_y=(contact_z−COM_z)*F_x−(contact_x−COM_x)*F_z. Только tyre Fx/Fy, без normal load/rolling resistance/drag/internal forces; это не полный yaw equation. Runtime end-tick geometry и exact contact sample сравниваются отдельно. Local rack probe — замороженные hub velocities/contact/load с tyre relaxation50ms, НЕ rollout vehicle/реальное достижение угла. Знак изменения M_y*r показывает только изменение локального yaw damping, не правильность восстановления/траектории.
+
+Warning secondary-slide — наблюдаемый паттерн сближающейся beta с сохраняющимся rack/yaw/задней памятью; отдельно проверять совпадение с будущим opposite-side proxy в0.75s, ложные предупреждения и lead до actual raw direction crossing. Это НЕ гарантированный прогноз и не active prevention.

@@ -1,0 +1,299 @@
+{
+  "contractVersion": "1.0.0",
+  "gameplayBaseline": "0.14A.4.2",
+  "coordinateVersion": "legacy-global-z-v1",
+  "units": "m",
+  "chunkLengthS": 200,
+  "activeSegments": 8,
+  "ownershipInterval": "[s0,s1)",
+  "laneCentersM": [
+    -3.8,
+    -7.4,
+    -11,
+    3.8,
+    7.4,
+    11
+  ],
+  "laneDirection": [
+    1,
+    1,
+    1,
+    -1,
+    -1,
+    -1
+  ],
+  "assetAxes": {
+    "right": "+X",
+    "up": "+Y",
+    "front": "+Z"
+  },
+  "pivot": "ground",
+  "collisionDefault": false,
+  "slots": [
+    {
+      "id": "road.surface",
+      "kind": "swept-ribbon",
+      "status": "core-reserved",
+      "tRanges": [
+        [
+          -14,
+          14
+        ]
+      ],
+      "liftM": 0,
+      "placement": "Host samples both boundaries every5 s-units in A42; provider supplies material/texture only. Median overlays center. Do not ship a flat200m road tile."
+    },
+    {
+      "id": "road.shoulder",
+      "kind": "swept-ribbon",
+      "status": "core-reserved",
+      "tRanges": [
+        [
+          -16,
+          -14
+        ],
+        [
+          14,
+          16
+        ]
+      ],
+      "liftM": 0.003
+    },
+    {
+      "id": "road.median",
+      "kind": "swept-ribbon",
+      "status": "core-reserved",
+      "tRanges": [
+        [
+          -1.6,
+          1.6
+        ]
+      ],
+      "liftM": 0.012
+    },
+    {
+      "id": "marking.solid",
+      "kind": "swept-ribbon",
+      "status": "replace-after-review",
+      "offsetsM": [
+        -13.4,
+        -2.1,
+        2.1,
+        13.4
+      ],
+      "widthM": 0.12,
+      "liftM": 0.018,
+      "alignment": "surface",
+      "collision": false
+    },
+    {
+      "id": "marking.dashed",
+      "kind": "repeat",
+      "status": "replace-after-review",
+      "offsetsM": [
+        -9.2,
+        -5.6,
+        5.6,
+        9.2
+      ],
+      "a42PeriodS": 12,
+      "a42PhaseWithinChunkS": 2,
+      "lengthM": 4,
+      "widthM": 0.12,
+      "heightM": 0.015,
+      "centerLiftM": 0.025,
+      "alignment": "surface",
+      "collision": false,
+      "note": "A42 resets phase each chunk; future host should use global phase for continuity. Example periodicAnchors uses global phase and does not modify current road."
+    },
+    {
+      "id": "barrier.outer",
+      "kind": "repeat-or-swept",
+      "status": "collision-aligned-replacement",
+      "offsetsM": [
+        -14.2,
+        14.2
+      ],
+      "a42PeriodS": 5,
+      "a42PhaseWithinChunkS": 2.5,
+      "a42BoundsM": {
+        "width": 1.1,
+        "height": 0.8,
+        "length": 5.03
+      },
+      "centerLiftM": 0.4,
+      "alignment": "upright",
+      "collisionOwner": "Highway.collide/barrierContact; provider never changes collision parameters"
+    },
+    {
+      "id": "barrier.median",
+      "kind": "repeat-or-swept",
+      "status": "collision-aligned-replacement",
+      "offsetsM": [
+        -1.3,
+        1.3
+      ],
+      "a42PeriodS": 5,
+      "a42PhaseWithinChunkS": 2.5,
+      "a42BoundsM": {
+        "width": 1.1,
+        "height": 0.8,
+        "length": 5.03
+      },
+      "centerLiftM": 0.4,
+      "alignment": "upright"
+    },
+    {
+      "id": "reflector.post",
+      "kind": "repeat",
+      "status": "existing-replacement",
+      "offsetsM": [
+        -15.9,
+        15.9
+      ],
+      "a42PeriodS": 40,
+      "a42BoundsM": {
+        "width": 0.1,
+        "height": 1.5,
+        "length": 0.15
+      },
+      "pivot": "ground",
+      "alignment": "upright",
+      "collision": false
+    },
+    {
+      "id": "sign.roadside",
+      "kind": "repeat-event",
+      "status": "proposed",
+      "sideRangesM": [
+        [
+          -22,
+          -17
+        ],
+        [
+          17,
+          22
+        ]
+      ],
+      "spacingSRange": [
+        120,
+        240
+      ],
+      "alignment": "upright",
+      "frontAxis": "+Z",
+      "faceRule": "facing=-travelDirection so readable face points toward approaching vehicles",
+      "collision": false,
+      "clearanceRule": "Entire ground-level footprint remains outside |t|>=16; no misleading signs for unsupported branches"
+    },
+    {
+      "id": "lamp.roadside",
+      "kind": "repeat",
+      "status": "proposed",
+      "offsetsM": [
+        -18,
+        18
+      ],
+      "spacingSRange": [
+        40,
+        60
+      ],
+      "heightRangeM": [
+        7,
+        10
+      ],
+      "alignment": "upright",
+      "collision": false,
+      "lightingRule": "emissive only; no per-lamp real light or shadow pass"
+    },
+    {
+      "id": "bridge.overpass",
+      "kind": "unique-event",
+      "status": "proposed-deferred-host-review",
+      "minimumDeckUndersideHeightM": 5.5,
+      "minimumSupportAbsOffsetM": 18,
+      "alignment": "upright",
+      "pivot": "ground",
+      "collision": false,
+      "note": "5.5m is a project design target, not a validated regulation. Not a drivable deck. Host owns span bounds, visibility/segment ownership and collision review before use."
+    },
+    {
+      "id": "vegetation.near",
+      "kind": "seeded-area-instances",
+      "status": "existing-replacement",
+      "absOffsetRangeM": [
+        24,
+        60
+      ],
+      "alignment": "upright",
+      "collision": false,
+      "densityOwner": "host seed/planner, not asset factory"
+    },
+    {
+      "id": "vegetation.far",
+      "kind": "seeded-area-instances",
+      "status": "existing-replacement",
+      "absOffsetRangeM": [
+        60,
+        134
+      ],
+      "alignment": "upright",
+      "collision": false,
+      "lod": "low-poly/impostor after host support",
+      "a42CombinedTreesPerChunk": 26
+    }
+  ],
+  "providerManifestExample": {
+    "id": "vendor.reflector-post.v1",
+    "slot": "reflector.post",
+    "units": "m",
+    "pivot": "ground",
+    "frontAxis": "+Z",
+    "dimensionsM": {
+      "width": 0.18,
+      "height": 1.5,
+      "length": 0.18
+    },
+    "boundsM": {
+      "min": [
+        -0.09,
+        0,
+        -0.09
+      ],
+      "max": [
+        0.09,
+        1.5,
+        0.09
+      ]
+    },
+    "lods": [
+      {
+        "level": 0,
+        "distanceMaxM": 150,
+        "triangles": 200,
+        "drawsPerBatch": 1
+      },
+      {
+        "level": 1,
+        "distanceMaxM": 400,
+        "triangles": 60,
+        "drawsPerBatch": 1
+      },
+      {
+        "level": 2,
+        "distanceMaxM": 650,
+        "triangles": 12,
+        "drawsPerBatch": 1
+      }
+    ],
+    "textures": [],
+    "materialsMax": 1,
+    "castShadow": false,
+    "collision": false,
+    "license": {
+      "type": "original",
+      "author": "Visual Developer",
+      "source": "project-owned"
+    },
+    "delivery": "createAsset(THREE) returns descriptor and parts. Runtime example implements LOD0 only; distances/levels above are proposed metadata pending host LOD support."
+  }
+}

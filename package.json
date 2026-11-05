@@ -1,0 +1,32 @@
+{
+  "name": "max-driving-lab",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check:seat": "node tests/seat-position.mjs && node tests/app-bootstrap.mjs && node tests/app-bootstrap.mjs --seat-reload && node tests/app-bootstrap.mjs --storage-denied && node tests/camera-clearance.mjs reports/A52 && node tests/camera-rig.mjs reports/A52",
+    "check:fast": "node tests/fast-steering.mjs /tmp/driving-lab-fast-test && node tests/steering-trace.mjs",
+    "check:predictor": "node tests/predictor.mjs",
+    "check:shadow": "node tests/sign-audit.mjs && node tests/shadow-estimators.mjs && node tests/shadow-telemetry.mjs && node tests/slip-detector.mjs && node tests/slip-lifecycle.mjs",
+    "check": "node tests/physics.mjs && node tests/scene.mjs && node tests/controls.mjs && node tests/grip.mjs && node tests/handling.mjs && node tests/cockpit.mjs && node tests/sensors.mjs && node tests/recovery.mjs && node tests/touch-pad.mjs && node tests/ui-menu.mjs && node tests/circuit.mjs && node tests/gr86.mjs && node tests/telemetry.mjs && node tests/structure.mjs && node tests/pose.mjs && node tests/lap.mjs && node tests/drivetrain.mjs && node tests/car-model.mjs && node tests/rollover.mjs && node tests/highway.mjs && node tests/highway-drive.mjs && node tests/release013.mjs && node tests/traffic-experience.mjs && node tests/app-bootstrap.mjs && node tests/steering-response.mjs && node tests/steering-dynamics.mjs && node tests/countersteer-range.mjs && node tests/driving-diagnostics.mjs && node tests/driving-experience.mjs",
+    "check:traffic-ai2": "node tests/traffic-ai2.mjs && node tests/traffic-player-identity.mjs && node --expose-gc tests/traffic-performance.mjs",
+    "check:continuity": "node tests/traffic-trace.mjs && node tests/traffic-continuity.mjs --assert",
+    "check:camera": "node tests/camera-rig.mjs reports && node tests/camera-identity.mjs reports && node tests/camera-clearance.mjs reports && node tests/camera-performance.mjs reports",
+    "check:launch": "node tests/launch-validation.mjs",
+    "check:head": "node tests/head-inertia.mjs && node tests/head-projection.mjs && node tests/head-lifecycle.mjs",
+    "check:calibration": "node tests/camera-feel-audit.mjs && node tests/camera-calibration.mjs && node tests/camera-calibration-summary.mjs && node tests/camera-calibration-safety.mjs && node tests/camera-calibration-projection.mjs && node tests/camera-calibration-performance.mjs",
+    "check:highway2": "node tests/road-geometry.mjs && node tests/road-contacts.mjs && node tests/road-visual-frame.mjs && node tests/road-identity.mjs && node tests/traffic-ai2.mjs && node tests/traffic-continuity.mjs --assert --out=reports/A51/continuity && node tests/camera-rig.mjs reports/A51 && node --expose-gc tests/road-performance.mjs",
+    "check:syntax": "node tests/syntax.mjs",
+    "check:static": "node tests/static-audit.mjs",
+    "check:infrastructure": "node tests/infrastructure-contract.mjs",
+    "check:integration": "npm test --prefix integration/highway-visual-v1",
+    "check:current": "node tests/run-current.mjs",
+    "check:legacy": "node tests/legacy/identity-audits.mjs",
+    "check:browser": "node tests/browser-smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

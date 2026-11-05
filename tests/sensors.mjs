@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {requestTiltAccess,orientationGravity} from '../dist/sensors.js';
+const env={isSecureContext:true,document:{}};env.self=env.top=env;
+let calls=[];env.DeviceMotionEvent={requestPermission(){calls.push('motion');return Promise.resolve('granted');}};env.DeviceOrientationEvent={requestPermission(){calls.push('orientation');return Promise.resolve('granted');}};
+const pending=requestTiltAccess(env);assert.deepEqual(calls,['orientation','motion'],'Permission requests occur synchronously before leaving the native gesture');assert.equal((await pending).ok,true);
+env.DeviceOrientationEvent.requestPermission=()=>Promise.resolve('denied');assert.equal((await requestTiltAccess(env)).ok,true,'Granted motion can serve as fallback');env.DeviceMotionEvent.requestPermission=()=>Promise.resolve('denied');assert.equal((await requestTiltAccess(env)).reason,'denied');
+env.DeviceMotionEvent.requestPermission=()=>{throw Object.assign(new Error(),{name:'NotAllowedError'});};assert.equal((await requestTiltAccess(env)).reason,'gesture');
+env.top={};env.document.permissionsPolicy={allowsFeature:()=>false};assert.equal((await requestTiltAccess(env)).reason,'policy');env.top=env;assert.equal((await requestTiltAccess(env)).reason,'gesture','Top-level request is not preempted by uncertain policy support');
+const gravity=orientationGravity(90,0);assert.ok(Math.abs(gravity.y-9.81)<.001&&Math.abs(gravity.x)<.001);assert.equal(orientationGravity(null,0),null);for(const [b,g] of [[30,10],[75,-50],[-80,85]])assert.ok(Math.abs(Math.hypot(...Object.values(orientationGravity(b,g)))-9.81)<.001);
+const app=fs.readFileSync('dist/app.js','utf8');assert.ok(app.includes("'right','tilt-btn','copy-log'].includes(button.id)"),'Permission button must be exempt from synthetic touch clicks');
+console.log('Sensors: synchronous native-gesture requests, partial grant, denial, errors, embedding policy and orientation gravity verified.');
