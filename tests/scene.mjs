@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import {buildWorld,buildCar} from '../dist/world.js';
+import {points,courseLength,nearest,elevation,terrain} from '../dist/course.js';
+import {Vehicle,DT} from '../dist/physics.js';
+import fs from 'node:fs';
+const world=buildWorld(),car=buildCar();let meshes=0,triangles=0;
+for(const group of [world.scene,car.root])group.traverse(obj=>{
+ if(!obj.isMesh)return;meshes++;const g=obj.geometry,p=g.attributes.position;
+ assert.ok([...p.array].every(Number.isFinite));if(g.index){assert.ok(g.index.array.reduce((max,n)=>Math.max(max,n),0)<p.count);triangles+=g.index.count/3;}else triangles+=p.count/3;
+});
+assert.ok(courseLength>600&&courseLength<3000);
+for(const p of points)assert.ok(nearest(p.x,p.z).distance<.0001);
+assert.ok(car.deformables.some(p=>p.mesh.geometry.attributes.normal.getY(0)>.5),'Body includes upward-facing surfaces');
+assert.equal(terrain(90,0).surface,'asphalt');assert.equal(terrain(138,-33).surface,'asphalt');
+const v=new Vehicle(terrain);v.reset(90,-40);v.y=.7;for(const w of v.wheels)w.groundPrev=elevation(90+w.x,-40+w.z);
+for(let i=0;i<6/DT;i++)v.step(DT,{gas:.5,steer:.08});assert.ok(Number.isFinite(v.y));
+const html=fs.readFileSync('dist/index.html','utf8'),js=fs.readFileSync('dist/app.js','utf8');
+const ids=[...html.matchAll(/id="([^"]+)"/g)].map(m=>m[1]);assert.equal(new Set(ids).size,ids.length,'Unique DOM IDs');
+for(const m of js.matchAll(/\$\('([^']+)'\)/g))assert.ok(ids.includes(m[1]),`Missing DOM target ${m[1]}`);
+console.log(JSON.stringify({meshes,triangles:Math.round(triangles),courseLength:Math.round(courseLength),points:points.length,ids:ids.length}));

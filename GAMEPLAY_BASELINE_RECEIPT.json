@@ -1,0 +1,13 @@
+{
+  "baselineVersion": "0.14A.3.1",
+  "sourceCommit": "8bc0030d27a6ba8f63263de098c6582d96f02d15",
+  "archiveSHA256": "9991f0f8f1a3fafff03e18100e16348c53208806845345636ac05d81076d5e5f",
+  "zipCRC": true,
+  "sourceFilesCompared": 146,
+  "buildModulesCompared": 21,
+  "controlURL": "https://max-driving-lab-recovery-a31.maxtrcgi.chatgpt.site",
+  "tag": "gameplay-baseline/v0.14A.3.1",
+  "immutablePolicy": "Never move or overwrite tag or original archive",
+  "extremeOversteerFixed": false,
+  "ordinaryDrivingiPhoneConfirmation": "User report in current task; no new device test by developer"
+}

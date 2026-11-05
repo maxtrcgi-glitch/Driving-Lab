@@ -1,0 +1,45 @@
+{
+  "version": "0.14A.4.2",
+  "url": "https://max-driving-lab.maxtrcgi.chatgpt.site",
+  "sourceRuntimeCommit": "5d7bc6f99bfebaf75832117e3804d2ccdba4881c",
+  "sourceRuntimeTag": "release/v0.14A.4.2",
+  "sourceDeliveryTag": "delivery/v0.14A.4.2",
+  "nativeSiteCommit": "e4f66b160963b51d5c422899ae910610c1e68faa",
+  "nativeVersion": 25,
+  "nativeVersionId": "appgprj_6ac3ab6964a8819180ced6a4738c6759~appgver_1b9433174cb081918677fe7e83ef190f",
+  "deploymentId": "appgdep_6acbcafa16f08191b9176bc1791e1206",
+  "deploymentStatus": "succeeded",
+  "buildId": "v014a42-5e80bbad66f5",
+  "httpsFilesChecked": 33,
+  "allHTTPHashesMatch": true,
+  "package": {
+    "archiveInputBytes": 943808,
+    "archiveInputSha256": "727ab33d27f5a2f6a18ac156d23295f5b6e1dcc0d14473f09751e02f6af9f563",
+    "decodedBytes": 4515840,
+    "decodedSha256": "e6c879885f2bd2c4a0edc54b249e837428f1fb9abeaa61da2f0efd296b7ce351",
+    "fileCount": 62,
+    "allPayloadsMatchNativeSource": true
+  },
+  "nativeArchiveStorage": {
+    "archive_format": "tar",
+    "sediment_file_id": "file_00000000df2c8210a2944299b854cbab",
+    "content_hash": "sha256:2689e4cf2870ddece0c01f86647e3781a8ec207f3eb3151deb4fcf30e63227fb",
+    "size_bytes": 4515840,
+    "file_count": 62
+  },
+  "archiveHashNote": "Native service re-packs the tar container; its recorded hash differs from the local input gzip and decoded tar. All local archive payloads and served runtime bytes were checked independently; container equality is not asserted.",
+  "rollback": {
+    "sourceTag": "gameplay-baseline/v0.14A.4.1",
+    "sourceCommit": "045763b78112d7850df61594ed39b18bc9dc523b",
+    "zip": "Gameplay_Baseline_v014A41.zip",
+    "zipSha256": "486c8eb52bee704f93a1eda9c5b99a7a28c942e7c8feb945fd6f4019638e7d21",
+    "nativeCommit": "8350ad1616a1e6b37317b54999a2c2c1466d785a",
+    "nativeVersion": 24,
+    "nativeVersionId": "appgprj_6ac3ab6964a8819180ced6a4738c6759~appgver_3de65291e64c81919b4a563a25cde75b"
+  },
+  "deviceQA": false,
+  "browserQA": false,
+  "protection": "19 modules byte-identical A.4.1; exact Reference camera and Chase replay; launch fix preserved",
+  "archiveVerification": "Payload manifest/CRC/Git restore results in outer ARCHIVE_VERIFICATION.json, generated after delivery tag.",
+  "userReport": "Director reports A.4.1 launch fix accepted on iPhone; not an A.4.2 mobile acceptance."
+}

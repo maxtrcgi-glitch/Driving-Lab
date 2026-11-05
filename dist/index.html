@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="theme-color" content="#111719"><meta name="description" content="Driving Lab: an experimental vehicle simulator with a dedicated handling circuit.">
+ <link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+ <title>DRIVING LAB v0.14A.5.2 — Cockpit Seat Adjustment</title><link rel="stylesheet" href="./style.css">
+</head>
+<body>
+ <main id="app">
+  <section id="stage" aria-label="Driving simulator">
+   <canvas id="view" aria-label="3D view of the car and handling circuit"></canvas>
+   <div class="hud-top">
+    <div class="session"><span class="eyebrow">DRIVING LAB v0.14A.5.2 — Cockpit Seat Adjustment</span><span class="eyebrow" id="location">HANDLING CIRCUIT</span><span id="lap-time">00:00.0</span><small id="lap-info">Lap 1</small></div>
+    <button id="pause-btn" class="pause-button" aria-label="Pause and menu" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button>
+   </div>
+   <div id="camera-orbit" class="camera-orbit" aria-label="Drag to orbit chase camera" hidden><span>Camera · drag</span></div>
+   <div class="telemetry">
+    <div class="speed"><strong id="speed">0</strong><span>km/h</span></div>
+    <div class="gear"><small>Gear</small><strong id="gear">N</strong></div>
+    <div class="rpm-wrap"><div class="rpm-label"><span id="rpm">900</span><span>rpm</span></div><div class="rpm-track"><div id="rpm-bar"></div></div><div class="assist-status"><span id="abs-status">ABS</span><span id="tcs-status">TCS</span><span id="surface">ASPHALT</span></div></div>
+   </div>
+   <div class="load-panel" id="load-panel" aria-label="Wheel loads"><span class="eyebrow">WHEEL LOADS, kN</span><div class="load-grid"><span><i id="load-fl"></i><b id="value-fl">0</b></span><span><i id="load-fr"></i><b id="value-fr">0</b></span><span><i id="load-rl"></i><b id="value-rl">0</b></span><span><i id="load-rr"></i><b id="value-rr">0</b></span></div></div>
+   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+   <div class="drive-controls">
+    <div class="steering">
+     <div class="control-tools"><button id="calibrate-btn" hidden>Center steering</button></div>
+     <div class="steer-buttons" hidden><button id="left" aria-label="Steer left">Left</button><button id="right" aria-label="Steer right">Right</button></div>
+     <div id="steer-pad" class="steer-pad" aria-label="Steering: touch anywhere and drag left or right"><span>Steering</span><div class="pad-rail"><i id="pad-knob"></i></div></div>
+     <div class="tilt-indicator" aria-hidden="true">Tilt steering</div>
+     <div class="steer-meter"><i id="steer-marker"></i></div>
+    </div>
+    <div class="pedals"><button id="handbrake" class="handbrake" aria-label="Hold handbrake" aria-pressed="false">Handbrake</button><button id="reverse-btn" class="direction" aria-label="Switch between forward and reverse" aria-pressed="false">D</button><button id="brake" class="pedal brake" aria-label="Brake: move higher for more pressure"><span>Brake</span></button><button id="gas" class="pedal gas" aria-label="Throttle: move higher for more pressure"><span>Throttle</span></button></div>
+   </div>
+   <div id="welcome" class="welcome">
+    <div class="welcome-inner"><span class="eyebrow">DRIVING LAB v0.14A.5.2 — Cockpit Seat Adjustment</span><h1>Find your rhythm.</h1><div class="welcome-buttons"><button id="start-highway" class="primary">Endless highway</button><button id="start-track">Drive circuit</button><button id="start-pad">Test pad</button></div><p>Steer on the left. Drag your thumb; release to center.<br>Pedals on the right. Move higher for more pressure.</p><p class="welcome-hint">Rolling start in traffic · 2.08 km circuit · test pad<br>Tilt steering and car setup are in the pause menu.</p><button id="welcome-settings">Controls & setup</button><small class="prototype-note">Independent head & drift gaze presets · A/B without reload</small></div>
+   </div>
+   <div id="fatal" class="fatal" hidden role="alert"></div>
+  </section>
+  <dialog id="pause-menu" class="pause-menu" aria-labelledby="pause-title">
+   <div class="dialog-head"><h2 id="pause-title">Pause</h2><span class="eyebrow">DRIVING LAB v0.14A.5.2 — Cockpit Seat Adjustment</span></div>
+   <button id="resume-btn" class="primary wide">Resume driving</button>
+   <div class="menu-actions"><button id="settings-btn">Controls & setup</button><button id="camera-btn">Cockpit</button><button id="reset-btn">Return to start</button><button id="repair-btn">Repair car</button><button id="fullscreen-btn">Fullscreen</button></div>
+   <details class="setting-group"><summary>Telemetry</summary><div class="setup-section">
+    <p class="settings-note">Recording automatically. Last 60 seconds of driving; pauses are excluded. Copy before closing or reloading the game.</p>
+    <label>Copy duration<select id="log-duration"><option value="15">Last 15 seconds</option><option value="30" selected>Last 30 seconds</option><option value="60">Last 60 seconds</option></select></label>
+    <div class="menu-actions"><button id="copy-log">Copy telemetry</button><button id="mark-log">Mark issue</button><button id="download-log">Export file</button><button id="download-steering">Steering trace · 20s</button></div>
+    <p id="log-status" class="settings-note" role="status">No driving recorded yet.</p>
+    <p id="perf-status" class="settings-note">Drive to record performance.</p>
+    <div id="log-fallback" hidden><label for="log-text">Select and copy this text</label><textarea id="log-text" readonly rows="5" spellcheck="false"></textarea></div>
+   </div></details>
+   <p class="settings-note">Keyboard: WASD / arrows · Space: handbrake · P: pause</p>
+  </dialog>
+  <dialog id="settings">
+   <div class="dialog-head"><div><span class="eyebrow">DRIVING LAB</span><h2>Settings</h2></div><button id="close-settings" aria-label="Close">✕</button></div>
+   <details class="setting-group" open><summary>Controls</summary><div class="setup-section">
+    <label>Thumb travel <output id="steering-travel-out">100%</output><input id="steering-travel" type="range" min="0.7" max="1.5" step="0.05" value="1"></label><label>Center precision <output id="steering-precision-out">1.45</output><input id="steering-precision" type="range" min="1" max="2.2" step="0.05" value="1.45"></label><p class="settings-note">More travel and precision make small corrections easier. Fine corrections adapt to speed. Full thumb travel reaches mechanical steering lock.</p><button id="tilt-btn">Enable tilt steering</button><p id="steer-status" role="status">Touch steering · release to center</p><a id="sensor-open" href="https://max-driving-lab.maxtrcgi.chatgpt.site" target="_blank" rel="noopener" hidden>Open standalone game</a>
+    <p class="settings-note">Countersteering Assist: Off · shadow diagnostics only. ABS and TCS remain separate car settings.</p>
+    <label>Full steering at tilt <output id="tilt-range-out">40°</output><input id="tilt-range" type="range" min="15" max="60" step="1" value="40"></label><label class="switch"><input id="invert-tilt" type="checkbox"> Invert tilt steering</label>
+    <p class="settings-note">Hold your phone at a comfortable angle. After enabling tilt, use Center steering in the lower left corner.</p>
+   </div></details>
+   <details class="setting-group camera-settings-group"><summary>Camera settings</summary><div class="setup-section">
+    <label>View<select id="camera-select"><option value="1" selected>Cockpit · first person</option><option value="0">Chase · follow & manual orbit</option><option value="2">Hood</option></select></label>
+    <p class="settings-note">First person</p>
+    <label>Camera mode<select id="first-person-mode"><option value="static">Static · A.3.3 reference</option><option value="driver" selected>DriverView Hybrid</option></select></label>
+    <div class="seat-controls"><h3>Driver Seat Position</h3>
+    <label>Seat Height <output id="seat-height-out">0 cm</output><input id="seat-height" type="range" min="-15" max="2" step="1" value="0"></label>
+    <label>Seat Forward / Back <output id="seat-forward-out">0 cm</output><input id="seat-forward" type="range" min="-20" max="2" step="1" value="0"></label>
+    <button id="reset-seat">Reset Position</button>
+    <button id="seat-preview">Live seat preview</button>
+    <p class="settings-note">Negative = lower / back. Positive = higher / forward. Limits reserve space for head motion. Changes preview immediately; other camera settings stay unchanged.</p>
+    </div>
+    <label>Cockpit vertical FOV <output id="fov-out">60°</output><input id="fov" type="range" min="55" max="90" value="60"></label>
+    <label class="switch"><input id="head-inertia" type="checkbox" checked> Head inertia</label>
+    <label>Head inertia preset<select id="head-preset"><option value="reference">A.4.1 Reference</option><option value="natural" selected>Natural</option><option value="strong">Strong</option></select></label>
+    <label>Inertia intensity <output id="inertia-intensity-out">25%</output><input id="inertia-intensity" type="range" min="0" max="100" value="25"></label>
+    <label class="switch"><input id="horizon-stabilization" type="checkbox" checked> Horizon stabilization</label>
+    <label class="switch"><input id="automatic-look" type="checkbox" checked> Automatic look ahead</label>
+    <label class="switch"><input id="drift-gaze" type="checkbox"> Drift-aware gaze · experimental</label>
+    <label>Drift gaze preset<select id="gaze-preset"><option value="reference">A.4.1 Reference</option><option value="natural" selected>Natural</option><option value="strong">Strong</option></select></label>
+    <label>Drift gaze intensity <output id="gaze-intensity-out">100%</output><input id="gaze-intensity" type="range" min="0" max="100" value="100"></label>
+    <label>Maximum drift yaw <output id="gaze-max-out">25°</output><input id="gaze-max" type="range" min="10" max="25" value="25"></label>
+    <label>Dynamic vertical FOV<select id="dynamic-fov"><option value="0" selected>Off</option><option value="3">Mild · +3°</option><option value="6">Strong · +6°</option></select></label>
+    <p class="settings-note">Static disables head/look effects and dynamic FOV. DriverView starts subtle; drift gaze and dynamic FOV are optional. No automatic steering.</p>
+    <p class="settings-note">Third person</p>
+    <label>Chase distance <output id="chase-distance-out">5.6 m</output><input id="chase-distance" type="range" min="4.5" max="10" step="0.1" value="5.6"></label>
+    <label>Chase height <output id="chase-height-out">2.15 m</output><input id="chase-height" type="range" min="1.3" max="4" step="0.05" value="2.15"></label>
+    <label class="switch"><input id="camera-recenter" type="checkbox" checked> Automatic recentering</label>
+    <label>Recentering speed <output id="recenter-speed-out">1×</output><input id="recenter-speed" type="range" min="0.4" max="2.5" step="0.1" value="1"></label>
+    <p class="settings-note">Chase: drag the Camera pad above the pedals. Steering stays on the left. Release to return after a short delay.</p>
+    <button id="reset-camera">Reset camera settings</button>
+   </div></details>
+   <details class="setting-group"><summary>Display & sound</summary><div class="setup-section">
+    <label>Graphics<select id="graphics-quality"><option value="performance">Performance</option><option value="balanced" selected>Balanced</option><option value="high">High detail</option></select></label><label class="switch"><input id="sound" type="checkbox" checked> Engine sound</label><label class="switch"><input id="telemetry" type="checkbox"> Wheel loads</label>
+   </div></details>
+   <details class="setting-group"><summary>Circuit & conditions</summary><div class="setup-section">
+    <label>Location<select id="spawn"><option value="highway">Endless highway · traffic</option><option value="track">Handling Circuit · 2.08 km</option><option value="pad">Test pad · braking & slalom</option><option value="bumps">Bump lane</option></select></label><button id="move-btn">Go to location</button><label>Highway traffic<select id="traffic-density"><option value="0">Empty road</option><option value="18">Light</option><option value="28" selected>Normal</option><option value="42">Busy · 42 cars</option><option value="72">Dense · 72 cars</option><option value="120">Very dense · 120 cars</option></select></label><button id="new-route">New highway route</button><label class="switch"><input id="wet" type="checkbox"> Wet road</label>
+   </div></details>
+   <details class="setting-group"><summary>Car</summary><div class="setup-section">
+    <label>Drivetrain<select id="drive"><option value="rwd">RWD · rear-wheel drive</option></select></label>
+    <label>Test mass incl. driver <output id="mass-out">1350 kg</output><input id="mass" type="range" min="950" max="1800" step="5" value="1350"></label><label>Power scale <output id="power-out">100%</output><input id="power" type="range" min="0.5" max="1.8" step="0.05" value="1"></label><label>Tire grip scale <output id="grip-out">100%</output><input id="grip" type="range" min="0.6" max="1.35" step="0.05" value="1"></label><label>Spring stiffness <output id="spring-out">35 kN/m</output><input id="spring" type="range" min="22000" max="65000" step="1000" value="35000"></label><label>Damping <output id="damper-out">3.2 kN·s/m</output><input id="damper" type="range" min="1200" max="6200" step="200" value="3200"></label>
+    <label class="switch"><input id="lsd" type="checkbox" checked> Limited-slip differential</label><label class="switch"><input id="abs" type="checkbox" checked> ABS</label><label class="switch"><input id="tcs" type="checkbox"> Traction control</label><label class="switch"><input id="slow" type="checkbox"> Slow motion ×¼</label><p class="settings-note">GR86 is rear-wheel drive. Gear changes are assisted automatically.</p>
+   </div></details>
+   <button id="default-btn" class="wide">Restore reference setup</button>
+   <p class="settings-note">Internet connection required. Landscape orientation gives the best view.</p>
+  </dialog>
+ </main>
+ <script type="module" src="./app.js"></script>
+</body>
+</html>

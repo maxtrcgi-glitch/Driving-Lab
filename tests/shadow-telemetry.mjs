@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import {Vehicle,DT} from '../dist/physics.js';
+import {DrivingExperience} from '../dist/driving-experience.js';
+import {TelemetryLog,columns} from '../dist/telemetry.js';
+const v=new Vehicle(),e=new DrivingExperience(),log=new TelemetryLog('0.14A.2-C0.1');v.reset(0,0,0,20);
+for(let i=0;i<240;i++){v.step(DT,{});e.observe(v,DT);}
+assert.equal(e.state.valid,true);assert.equal(e.reference.valid,true);
+e.configureAssist(true,100);
+log.capture(1,v,{steer:0},{experience:e,steering:e.processor,tilt:{range:30,invert:false},frameMs:16.67,renderMs:0,steps:4,backlogMs:0,discardedMs:0});
+const row=Object.fromEntries(columns.map((k,i)=>[k,log.rows[0][i]]));
+assert.equal(columns.length,186);assert.equal(columns.indexOf('shadow_only'),120);assert.equal(columns.indexOf('slip_phase_code'),148);assert.equal(columns.indexOf('predictor_enabled'),166);assert.equal(row.predictor_enabled,0);assert.equal(row.predictor_valid,0);
+assert.equal(row.shadow_only,1);assert.equal(row.assist_requested_on,1);assert.equal(row.assist_requested_strength_pct,100);assert.equal(row.assist_effective_strength_pct,0);assert.equal(row.assist_correction,0);
+assert.equal(row.state_valid,1);assert.equal(row.state_reason_bits,0);assert.equal(row.reference_valid,1);assert.ok(Number.isFinite(row.com_beta_dot_deg_s));
+assert.equal(row.skid_detected,null);assert.equal(row.skid_phase,null);
+assert.equal(row.slip_phase_code,1);assert.ok(row.slip_quality>=.55);assert.equal(row.secondary_transition_warning,0);
+e.resetShadow();log.capture(1.2,v,{steer:0},{experience:e,steering:e.processor,tilt:{range:30,invert:false},steps:4});
+const reset=Object.fromEntries(columns.map((k,i)=>[k,log.rows.at(-1)[i]]));
+assert.equal(reset.state_valid,0);assert.equal(reset.com_beta_dot_deg_s,null);assert.equal(reset.alignment_rack_deg,null);assert.equal(reset.FR_alpha_geom_deg,null);
+assert.equal(reset.slip_phase_code,0);assert.equal(reset.slip_quality,0);assert.equal(reset.front_tyre_yaw_moment_approx_Nm,null);
+assert.ok(log.rows.every(r=>r.length===columns.length));assert.match(log.export(30),/NOT calibrated confidence/);
+console.log('C0.3 CSV:186 append-compatible fields; optional predictions separate from zero actuation passed.');

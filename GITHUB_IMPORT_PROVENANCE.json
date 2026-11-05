@@ -1,0 +1,7 @@
+{
+  "baseline": "v0.14A.5.2",
+  "original_archive": "Driving_Lab_v014A52_Seat_Adjustment_All_In_One(1).zip",
+  "original_sha256": "06b7d0f07897f4e0c17375c4002093dd4e69288d002c197c03aec5c4272ad3f8",
+  "source_archive_testzip": "OK",
+  "note": "Visual V1.3 not integrated; duplicate dist/modules and generated reports excluded"
+}

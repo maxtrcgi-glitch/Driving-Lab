@@ -1,0 +1,31 @@
+# DRIVING LAB — A.5.2 HANDOFF
+
+Main: https://max-driving-lab.maxtrcgi.chatgpt.site
+Version: v0.14A.5.2 — Cockpit Seat Adjustment. Publication status/commits/build: RELEASE_RECEIPT.json. Published Site version27;35 HTTPS requests all match. Runtime b77997dbae2c7eeb40fdc1d58ecbab2baeb2cce1, native0421e44f6722c9364e092f6ae5651c3af35af562, buildv014a52-b02575ffa2ff. Delivery tag/commit in archive START_HERE. Deployment includes an unused earlier candidate fingerprint folder; only current28 modules are loaded.
+Control/rollback: accepted A.5.1, source e843b6ba49bad8f1888c266ef0f9614f79a9f464, immutable gameplay-baseline/v0.14A.5.1, Site version26. No separately hosted control URL is claimed.
+
+## Result
+
+Camera Settings → Driver Seat Position: Seat Height, Seat Forward / Back, Reset Position. UI values are signed centimetres,1cm step; stored values SI metres. Applied immediately, no car/game restart. Live seat preview uses a compact right-docked modal and clear backdrop, automatically shows cockpit; driving remains paused, as with the existing Settings menu. Close/Resume returns to driving. Regular Chase/DriverView algorithms and ordinary mode transition behaviour are unchanged; deliberate Live preview finishes the visual mode transition immediately so it works while paused.
+
+Current GR86 limits: height −15…+2cm, forward −20…+2cm. Original ±15/±20 recommendations were not safe: upper eye/head reserve exceeds the roof/header and forward reserve crosses the sloped windscreen. Conservative rectangle retains4.3cm forward/3.4cm backward,1.2cm vertical and2cm lateral existing head reserves.72 extreme points,1872 near-origin rays, no solid cabin obstruction within25mm; minimum roof margin38mm and conservative vertical glass margin41.36mm. Limits do not prove full-frustum safety in a damaged cabin or comfort on iPhone. Raising/advancing beyond +2cm would need a separately validated, potentially coupled envelope or a revised base-eye/model, not larger limits blindly.
+
+## Architecture
+
+Vehicle-owned immutable eye.clone → user local Y/Z seat offsets → unchanged head dynamic XYZ offsets → existing body-frame quaternion → unchanged head/horizon/gaze orientation → sole CameraRig.apply transform/FOV. No duplicate offsets and no vehicle writes. Chase/Hood ignore offsets. CameraObservation continues sampling the calibrated vehicle-owned base anchor; dragging sliders must not create false acceleration impulses or recalibrate A42 Head Inertia. Head/gaze spring states, targets, response and profiles are unchanged. CameraRig constructor accepts optional vehicle-specific seat bounds for future cars, alongside their existing base-eye argument; no vehicle-selection feature added. Loader/saver and UI currently use current-car default bounds; a future car selector must pass/use its matching bounds consistently rather than broadening current GR86 storage silently.
+
+Storage key retained: driving-lab-camera-v014a4. Additive seatHeight/seatForward fields with default0; valid previous FOV/presets/intensity/mode/Chase settings preserved. Finite numeric values clamped; strings/null/NaN/Infinity ignored; invalid JSON defaults. No new key or unnecessary schema migration. Safe access also catches the localStorage getter throwing. Save errors do not stop gameplay; persistence then cannot be guaranteed and defaults return next session. Safari/PWA persistence depends on available same-origin storage; uninstall/clear-site-data/OS eviction are outside guarantees. Real PWA reopen test is pending.
+
+## Files / tests
+
+Changed runtime only camera-settings.js, camera-rig.js, app.js (UI/storage/version), index.html and style.css (compact controls). No physics, control, road, AI, transmission, material/model or calibrated camera-profile edits.29 other dist files are byte-identical A51, including road-geometry/highway/highway-world, physics, controls, vehicle-spec, camera-observation/profiles/road, diagnostics and assets. Visual V1.3 NOT integrated.
+
+Tests: tests/seat-position.mjs, extended app-bootstrap with fresh reload and denied-storage variants, npm run check (29 suites), camera-rig30/60/120FPS, camera-clearance, camera-calibration-safety68 cases, real Highway contact regression6×15s. New test compares A51 CameraRig source directly: zero-seat camera position/quaternion exact;2880 real physics full-state steps identical with seat changes; all head/gaze springs exact; expected local→world displacement error≤1.32e−14m. Nonzero orientation differs only floating-point lookAt cancellation, tolerance1e−12. Chase transform exact, resets/resume/rebase preserve seat settings. UI test verifies cm→metres, paused preview, Reset Position preserves all other camera values, respawn/mode switches, independent steering/orbit pointers and compact panel wiring. Fresh app VM restores saved seat/FOV/presets; throwing storage getter starts normally and live sliders work. Node DOM/WebGL stub is not Safari visual/device testing.
+
+CPU: three alternating20,000-step Node runs/class; all raw numbers reports/A52/seat-position.json. Warm legacy roughly0.0024–0.0025ms/step vs current0.0025–0.0026ms/step in this run. No new per-frame vectors or render resources; extra scalar offset additions only. These are Node CPU figures, NOT iPhone FPS, GPU completion or a statistically strong device benchmark. No substantial CPU cost observed; real frame pacing remains manual acceptance.
+
+## iPhone / next task
+
+Verify A.5.2 title → Pause/Settings/Camera settings → Live seat preview. Move both sliders, verify road/steering wheel perspective changes immediately, Reset Position, close/resume; try Strong head100%, braking/acceleration and drift gaze. Reopen PWA without clearing data; saved seat and old camera settings must return. Respawn, First Person↔Chase, pause/resume, landscape rotation. Full guide IPHONE_A52_TEST.md. Check low/high endpoints for clipping. Report device/iOS, settings, video if issues.
+
+Stop for player feedback. If accepted, Director defines next independent task; Visual V1.3 review/integration requires its own scope and validated contract/budget. GPT-6.1 Sol or Sol for normal UI/integration fixes; Luna docs; Astra unnecessary for this seat stage. Extreme oversteer remains known/unfixed. Source/tests/docs, both Git bundles, ready-build, A51 immutable ZIP and deployment evidence are in one All-In-One archive.

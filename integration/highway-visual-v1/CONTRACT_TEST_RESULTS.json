@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "frameCases": 576,
+  "segmentsCreated": 502,
+  "segmentsRetired": 494,
+  "retainedLimit": 8,
+  "baseline": {
+    "sceneMeshBatches": 118,
+    "instantiatedTriangles": 78152,
+    "uniqueGeometryBufferBytes": 234296,
+    "textures": 1,
+    "scope": "CPU scene census; culling, shadow passes, renderer frame calls and iPhone FPS not measured"
+  },
+  "exampleCreateCpuMs": {
+    "p50": 0.024997999999996523,
+    "p95": 0.10764199999999846,
+    "scope": "Node one-part posts, no GPU or representative game stream benchmark"
+  }
+}

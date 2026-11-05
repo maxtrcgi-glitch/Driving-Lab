@@ -1,0 +1,2 @@
+import {Vehicle,DT} from '../dist/physics.js';import {DrivingExperience} from '../dist/driving-experience.js';
+export function makeSeed(kmh,side,age,h=DT){const v=new Vehicle(),e=new DrivingExperience();v.reset(0,0,0,kmh/3.6);for(let i=0;i<Math.round(.4/h);i++){v.step(h,{});e.observe(v,h);}for(let i=0;i<Math.round(age/h);i++){const t=i*h,f=(t<.8?.78:-.9)*side;v.step(h,{steer:e.value(Math.sign(f)*Math.abs(f)**1.45,v.speed,h,'touch'),gas:1,handbrake:t>=.5&&t<.8?.22:0});e.observe(v,h);}return {v,e};}
