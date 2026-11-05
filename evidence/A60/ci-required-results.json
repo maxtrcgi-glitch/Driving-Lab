@@ -1,0 +1,125 @@
+{
+  "browserIncluded": false,
+  "required": true,
+  "results": [
+    {
+      "command": "npm run check:syntax",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 4.2,
+      "logPath": "reports/current/check-syntax.log"
+    },
+    {
+      "command": "npm run check:static",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 0.19,
+      "logPath": "reports/current/check-static.log"
+    },
+    {
+      "command": "npm run check:infrastructure",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 0.19,
+      "logPath": "reports/current/check-infrastructure.log"
+    },
+    {
+      "command": "npm run check",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 77.42,
+      "logPath": "reports/current/check.log"
+    },
+    {
+      "command": "npm run check:fast",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 34.04,
+      "logPath": "reports/current/check-fast.log"
+    },
+    {
+      "command": "npm run check:predictor",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 2.06,
+      "logPath": "reports/current/check-predictor.log"
+    },
+    {
+      "command": "npm run check:shadow",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 4.91,
+      "logPath": "reports/current/check-shadow.log"
+    },
+    {
+      "command": "npm run check:seat",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 26.06,
+      "logPath": "reports/current/check-seat.log"
+    },
+    {
+      "command": "npm run check:traffic-ai2",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 41.4,
+      "logPath": "reports/current/check-traffic-ai2.log"
+    },
+    {
+      "command": "npm run check:continuity",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 46.99,
+      "logPath": "reports/current/check-continuity.log"
+    },
+    {
+      "command": "npm run check:camera",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 23.6,
+      "logPath": "reports/current/check-camera.log"
+    },
+    {
+      "command": "npm run check:launch",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 72.08,
+      "logPath": "reports/current/check-launch.log"
+    },
+    {
+      "command": "npm run check:head",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 13.57,
+      "logPath": "reports/current/check-head.log"
+    },
+    {
+      "command": "npm run check:calibration",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 97.42,
+      "logPath": "reports/current/check-calibration.log"
+    },
+    {
+      "command": "npm run check:highway2",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 102.15,
+      "logPath": "reports/current/check-highway2.log"
+    },
+    {
+      "command": "npm run check:integration",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 0.45,
+      "logPath": "reports/current/check-integration.log"
+    },
+    {
+      "command": "npm run check:traffic-ai3",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 0.59,
+      "logPath": "reports/current/check-traffic-ai3.log"
+    }
+  ]
+}

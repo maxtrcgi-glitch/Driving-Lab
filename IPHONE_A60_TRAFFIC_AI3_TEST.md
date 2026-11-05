@@ -1,6 +1,6 @@
 # A60 iPhone Traffic Test Guide
 Status: manual validation pending. Main HTTPS URL is still A52 and must not be mistaken for this candidate.
-Use only an explicitly provided separate A60 preview, or serve the checked-out core/traffic-ai3 dist on your own test host. No candidate HTTPS URL is claimed in this handoff.
+Separate experimental preview: https://driving-lab-a60-traffic-preview.maxtrcgi.chatgpt.site (sign in with the owner account if requested). It does not replace the stable site. Confirm the version before testing.
 1. Confirm header v0.14A.6.0 — Traffic AI 3.0; choose Endless highway.
 2. At density28, follow a visibly slower car for a minute; watch smooth braking, a pass into a free lane, and return to normal flow. Repeat density72 and120.
 3. Approach a car planning a lane change at150,200,250km/h. Check it does not jump directly in front; verify no synchronized braking of unrelated lanes.

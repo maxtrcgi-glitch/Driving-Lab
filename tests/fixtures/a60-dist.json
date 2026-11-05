@@ -3,7 +3,7 @@
   "source_commit": "candidate core/traffic-ai3",
   "files": {
     "THREE-LICENSE.txt": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
-    "app.js": "359df08c819a08e6d2ed400873d12470ea61321a1acc4de3cc3f98c5375c2dbc",
+    "app.js": "f05803df63407ec4a1d7b30aec71b153067f17ab019523f22ddee3af47a0de9c",
     "camera-observation.js": "09f60d66532993864b649fa49343356099283b579af6269d06874caaa4fce1f9",
     "camera-profiles.js": "87253a2e0a7c352e7dc2112deda8fcb3948bf5c209fc0c0e8f9813751c6f3d5e",
     "camera-rig.js": "d363720a16fae13f757f6a0677e35ab59eff0ced8e01eb28a4d73707de6b3698",
