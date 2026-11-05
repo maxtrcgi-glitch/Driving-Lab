@@ -1,0 +1,190 @@
+{
+  "stage": "R2 checkpoint 1 / pre-checkpoint 2",
+  "asset_status": "REJECTED for near traffic visual PoC; copyright license verified",
+  "files": [
+    {
+      "path": "StreetCar.zip",
+      "bytes": 4393524,
+      "sha256": "ac656413e94739691c6f14dd98e5dc262b2e2cac67f6a3219d4e6cab4b203a64",
+      "author": "Alexander123",
+      "source_url": "https://opengameart.org/content/street-racing-car",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "commercial_use": true,
+      "modification": true,
+      "redistribution": true,
+      "attribution": "optional; retained by project"
+    },
+    {
+      "path": "streetcar/StreetCar.unitypackage",
+      "bytes": 4392101,
+      "sha256": "683e24a3e8b6bad429c4cc79b5e1e4a8407bb31f2a46fdfc18145bee1e1770d3",
+      "author": "Alexander123",
+      "source_url": "https://opengameart.org/content/street-racing-car",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "commercial_use": true,
+      "modification": true,
+      "redistribution": true,
+      "attribution": "optional; retained by project"
+    },
+    {
+      "path": "unity/Assets/StreetCar/Materials/Standard/Body.mat",
+      "bytes": 3137,
+      "sha256": "b3e40be0e69f59ef478179677078c542b7036e7fb85c442b3aaaaa034eb85dfa",
+      "author": "Alexander123",
+      "source_url": "https://opengameart.org/content/street-racing-car",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "commercial_use": true,
+      "modification": true,
+      "redistribution": true,
+      "attribution": "optional; retained by project"
+    },
+    {
+      "path": "unity/Assets/StreetCar/Materials/Standard/Glass.mat",
+      "bytes": 3006,
+      "sha256": "3060036373ddaaf4b90fed575f3172d753f5db62dc50eeba90c717ada790127f",
+      "author": "Alexander123",
+      "source_url": "https://opengameart.org/content/street-racing-car",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "commercial_use": true,
+      "modification": true,
+      "redistribution": true,
+      "attribution": "optional; retained by project"
+    },
+    {
+      "path": "unity/Assets/StreetCar/Materials/Standard/Tyres.mat",
+      "bytes": 3061,
+      "sha256": "5c0ca4cdf780ab1dd64bc8d93f900fa0e4c68bdd74ddfd8aefe34bbe962a148b",
+      "author": "Alexander123",
+      "source_url": "https://opengameart.org/content/street-racing-car",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "commercial_use": true,
+      "modification": true,
+      "redistribution": true,
+      "attribution": "optional; retained by project"
+    },
+    {
+      "path": "unity/Assets/StreetCar/Materials/Textures/DeltaTexture 1.png",
+      "bytes": 3219213,
+      "sha256": "ec6ea8e75af420b6d569bbf9df9f24c16efe35d6ac0a0c71a98f51ecfdfd1dc6",
+      "author": "Alexander123",
+      "source_url": "https://opengameart.org/content/street-racing-car",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "commercial_use": true,
+      "modification": true,
+      "redistribution": true,
+      "attribution": "optional; retained by project"
+    },
+    {
+      "path": "unity/Assets/StreetCar/Materials/Textures/DeltaTyres 1.png",
+      "bytes": 994871,
+      "sha256": "6ae5a59c0a482b184e223a89676db7fa78e5e7da4f404e129b42cb2393c6074e",
+      "author": "Alexander123",
+      "source_url": "https://opengameart.org/content/street-racing-car",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "commercial_use": true,
+      "modification": true,
+      "redistribution": true,
+      "attribution": "optional; retained by project"
+    },
+    {
+      "path": "unity/Assets/StreetCar/Materials/URP/Body.mat",
+      "bytes": 2562,
+      "sha256": "b23757e575e2fa899a9cb46867200901431587a5578a8e8096b6cdcec6a717fc",
+      "author": "Alexander123",
+      "source_url": "https://opengameart.org/content/street-racing-car",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "commercial_use": true,
+      "modification": true,
+      "redistribution": true,
+      "attribution": "optional; retained by project"
+    },
+    {
+      "path": "unity/Assets/StreetCar/Materials/URP/Glass.mat",
+      "bytes": 2450,
+      "sha256": "9c5ae1350655dcb597f2b4fac4284fcb3db17d9c3c870705532cfe80543001a9",
+      "author": "Alexander123",
+      "source_url": "https://opengameart.org/content/street-racing-car",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "commercial_use": true,
+      "modification": true,
+      "redistribution": true,
+      "attribution": "optional; retained by project"
+    },
+    {
+      "path": "unity/Assets/StreetCar/Materials/URP/Tyres.mat",
+      "bytes": 2551,
+      "sha256": "9741f69ffcfb8d546d6070a0979cfc72892267d3ac461f0e539cf7207d14d34d",
+      "author": "Alexander123",
+      "source_url": "https://opengameart.org/content/street-racing-car",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "commercial_use": true,
+      "modification": true,
+      "redistribution": true,
+      "attribution": "optional; retained by project"
+    },
+    {
+      "path": "unity/Assets/StreetCar/Mesh/StreetCar.fbx",
+      "bytes": 79084,
+      "sha256": "46c853f5aa646a5d9376c8d323cedb7646b9ba95aaa806215f035c45c7a4b1cc",
+      "author": "Alexander123",
+      "source_url": "https://opengameart.org/content/street-racing-car",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "commercial_use": true,
+      "modification": true,
+      "redistribution": true,
+      "attribution": "optional; retained by project"
+    },
+    {
+      "path": "unity/Assets/StreetCar/StreetCar Standard.prefab",
+      "bytes": 4120,
+      "sha256": "386d3afe17442f2d9833fd89812234910c40857030b1e7d39a61fa34e57c6700",
+      "author": "Alexander123",
+      "source_url": "https://opengameart.org/content/street-racing-car",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "commercial_use": true,
+      "modification": true,
+      "redistribution": true,
+      "attribution": "optional; retained by project"
+    },
+    {
+      "path": "unity/Assets/StreetCar/StreetCar.prefab",
+      "bytes": 12669,
+      "sha256": "0fe2dc99f11b722425810f1bcfdddecca7cf17ef912147aafdc403f73b7b485b",
+      "author": "Alexander123",
+      "source_url": "https://opengameart.org/content/street-racing-car",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "commercial_use": true,
+      "modification": true,
+      "redistribution": true,
+      "attribution": "optional; retained by project"
+    }
+  ],
+  "not_acquired": [
+    {
+      "name": "MMC Generic Sedan",
+      "reason": "Sketchfab requires sign-in",
+      "license_observed": "CC BY 4.0"
+    },
+    {
+      "name": "MMC Generic Sport Coupe",
+      "reason": "Fab EULA acceptance pending user decision",
+      "archive_name": "generic-sport-coupe-car.zip",
+      "listed_size": "75.98 MB",
+      "license_observed": "Fab Standard License",
+      "sha256": null
+    }
+  ]
+}
