@@ -1,0 +1,69 @@
+name: A52 Stable Freeze
+on:
+  push:
+    branches: [release/a52-stable-freeze]
+permissions:
+  contents: write
+jobs:
+  freeze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TARGET: 2cd72beceeddb2ada569bc9e7e69582f0c925cc8
+      TAG: gameplay-baseline/v0.14A.5.2
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: controller
+      - name: Verify accepted head, CI and freeze tag without moving existing tags
+        working-directory: controller
+        run: |
+          test "$(gh api repos/$GITHUB_REPOSITORY/branches/main --jq .commit.sha)" = "$TARGET"
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/42027051987/jobs > /tmp/a52-jobs.json
+          python3 -c 'import json; j=json.load(open("/tmp/a52-jobs.json"))["jobs"]; assert all(any(x["name"]==n and x["conclusion"]=="success" for x in j) for n in ["Required current regression tests","Required real Chromium WebGL smoke","Required merge gate"])'
+          git fetch origin "$TARGET"
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG"; then
+            git fetch origin "refs/tags/$TAG:refs/tags/$TAG"
+            test "$(git rev-parse "$TAG^{commit}")" = "$TARGET"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG" "$TARGET" -m "Driving Lab v0.14A.5.2 stable integrated gameplay baseline; accepted main $TARGET; current/browser/merge gate passed; historical diagnostics remain red."
+            git push origin "refs/tags/$TAG"
+          fi
+      - uses: actions/checkout@v6
+        with:
+          ref: gameplay-baseline/v0.14A.5.2
+          path: recovered
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Verify fresh tagged checkout and run mandatory recovery tests
+        working-directory: recovered
+        run: |
+          test "$(git rev-parse HEAD)" = "$TARGET"
+          npm ci
+          npm run check:current
+          npx playwright install --with-deps --only-shell chromium
+          npm run check:browser
+      - name: Create real stable Release and independent backup
+        working-directory: recovered
+        run: |
+          python3 ../controller/freeze-tools/package.py
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --title "Driving Lab v0.14A.5.2 — Stable Baseline" --notes-file ../release-output/A52_STABLE_RELEASE_REPORT.md --latest
+          export RELEASE_URL="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json url --jq .url)"
+          python3 ../controller/freeze-tools/package.py
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file ../release-output/A52_STABLE_RELEASE_REPORT.md
+          gh release upload "$TAG" ../release-output/* --repo "$GITHUB_REPOSITORY"
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json url,assets > ../release-output/release-assets.json
+          gh release upload "$TAG" ../release-output/release-assets.json --repo "$GITHUB_REPOSITORY"
+      - uses: actions/upload-artifact@v5
+        if: ${{ always() }}
+        with:
+          name: a52-stable-freeze-evidence
+          path: |
+            recovered/reports/
+            release-output/
