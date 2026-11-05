@@ -4,6 +4,7 @@ on:
     branches: [release/a52-stable-freeze]
 permissions:
   contents: write
+  actions: read
 jobs:
   freeze:
     runs-on: ubuntu-24.04
