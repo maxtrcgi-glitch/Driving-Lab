@@ -5,16 +5,26 @@ on:
     paths: [.github/workflows/a60-diagnose.yml]
 permissions:
   contents: read
-  actions: read
 jobs:
-  failed-log:
+  startup-contract:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - name: Read existing failed regression artifact
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: gh run download 42199334563 --name current-regression-reports --dir /tmp/a60-ci-diagnose
-      - name: Print exact general regression failure
-        run: cat /tmp/a60-ci-diagnose/current/check.log
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Record exact rolling-start values
+        run: |
+          node --input-type=module <<'NODE'
+          import {Highway,MAX_TRAFFIC} from './dist/highway.js';
+          for(const seed of [1,86,917]){
+            const h=new Highway(seed);h.density=MAX_TRAFFIC;const p=h.reset();
+            const front=h.cars.filter(c=>c.lane===1&&c.s>0).sort((a,b)=>a.s-b.s)[0];
+            console.log(JSON.stringify({seed,playerSpeed:p.speed,playerKmh:p.speed*3.6,front:front&&{id:front.id,speed:front.speed,desired:front.desired,profile:front.profile}}));
+          }
+          NODE
+      - name: Run unchanged traffic-experience contract directly
+        run: node tests/traffic-experience.mjs
