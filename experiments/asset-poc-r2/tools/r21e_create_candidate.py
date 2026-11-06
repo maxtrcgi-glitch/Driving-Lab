@@ -20,7 +20,7 @@ row=np.r_[inds[:,0],inds[:,1]];col=np.r_[inds[:,1],inds[:,2]];adj=coo_matrix((np
 _,first=np.unique(labels,return_index=True);centres=positions[first];centres=np.asarray(centres,dtype=np.float32); selected=[];dist=np.full(num,np.inf);rng=np.random.default_rng(21);idx=int(rng.integers(num))
 for _ in range(400):
  selected.append(idx);dist=np.minimum(dist,np.sum((centres-centres[idx])**2,axis=1));idx=int(np.argmax(dist))
-mask=np.isin(labels[inds[:,0]],selected);tris=inds[mask];uniq,inv=np.unique(tris,return_inverse=True);newinds=inv.astype('<u4')
+mask=np.isin(labels[inds[:,0]],selected);tris=inds[mask];uniq,inv=np.unique(tris,return_inverse=True);newinds=inv.reshape(-1).astype('<u4')
 path=args.lod0;glb=open(path,'rb').read();jslen=struct.unpack_from('<I',glb,12)[0];g=json.loads(glb[20:20+jslen]);binary=bytearray(glb[28+jslen:]);
 def add(data,target=None):
  while len(binary)%4:binary.append(0)

@@ -31,3 +31,5 @@ jobs:
           if-no-files-found: warn
 
 # Candidate comparison checkpoint.
+
+# Validate complete leaf index array.
