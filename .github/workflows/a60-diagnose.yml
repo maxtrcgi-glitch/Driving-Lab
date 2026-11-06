@@ -1,0 +1,20 @@
+name: A60 failed-log diagnostic
+on:
+  push:
+    branches: [core/traffic-ai3]
+    paths: [.github/workflows/a60-diagnose.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  failed-log:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Read existing failed regression artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh run download 42199334563 --name current-regression-reports --dir /tmp/a60-ci-diagnose
+      - name: Print exact general regression failure
+        run: cat /tmp/a60-ci-diagnose/current/check.log
