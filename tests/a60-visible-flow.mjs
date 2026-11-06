@@ -22,8 +22,14 @@ for(const density of [28,72,120])for(const speedKmh of [100,150,200])for(const s
  const near=events.filter(e=>e.dir>0&&e.relativeS>0&&e.relativeS<250),late=near.filter(e=>e.t>30),mean=speeds.reduce((a,b)=>a+b,0)/speeds.length;
  rows.push({density,speedKmh,seed,seconds:300,starts:events.length,startsAhead250:near.length,startsAhead250After30s:late.length,overtakeStartsAhead250:near.filter(e=>e.to<e.from).length,completions,completionsAhead250:visibleCompletions,completionsAhead150:closeCompletions,completionsAhead150After30s:lateCloseCompletions,inconsistentEntries,npcPasses:passes.length,npcPassesAhead250:passes.filter(e=>e.relativeS>0&&e.relativeS<250).length,actualSpeedMeanKmh:mean,actualSpeedStdKmh:Math.sqrt(speeds.reduce((a,b)=>a+(b-mean)**2,0)/speeds.length),minBodyGapM:minGap,spawnFailures:h.spawnFailures,npcContacts:h.npcContacts,barrierContacts:h.barrierContacts,events:near,passEvents:passes});
 }
+const result={qualityGateEnabled:!measureOnly,scope:'Road-s front250m observation proxy, not rendered visibility or iPhone proof; starts and completions separate; no player collision solver',rows};
+result.qualityGatePassed=measureOnly?null:false;
+fs.mkdirSync('reports/A60',{recursive:true});fs.writeFileSync(process.argv.slice(2).find(a=>!a.startsWith('--'))||'reports/A60/visible-flow.json',JSON.stringify(result,null,2)+'\n');
 if(!measureOnly){
  for(const row of rows){assert.equal(row.inconsistentEntries,0);if(row.density>=72){assert.ok(row.completionsAhead150After30s>=1,'No nearby completed maneuver after warmup: '+JSON.stringify(row));assert.ok(row.passEvents.some(e=>e.t>30&&e.relativeS>0&&e.relativeS<250),'No completed NPC pass ahead after warmup');}}
  for(const density of [28,72,120]){const group=rows.filter(r=>r.density===density);assert.ok(group.reduce((n,r)=>n+r.actualSpeedStdKmh,0)/group.length>=12,'Actual speed diversity must not collapse to the old narrow flow');}
 }
-const result={qualityGateEnabled:!measureOnly,scope:'Road-s front250m observation proxy, not rendered visibility or iPhone proof; starts and completions separate; no player collision solver',rows};fs.mkdirSync('reports/A60',{recursive:true});fs.writeFileSync(process.argv.slice(2).find(a=>!a.startsWith('--'))||'reports/A60/visible-flow.json',JSON.stringify(result,null,2)+'\n');for(const r of rows)console.log(JSON.stringify({...r,events:undefined}));
+
+result.qualityGatePassed=measureOnly?null:true;
+fs.mkdirSync('reports/A60',{recursive:true});fs.writeFileSync(process.argv.slice(2).find(a=>!a.startsWith('--'))||'reports/A60/visible-flow.json',JSON.stringify(result,null,2)+'\n');
+for(const r of rows)console.log(JSON.stringify({...r,events:undefined}));

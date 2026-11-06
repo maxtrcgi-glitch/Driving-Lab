@@ -5,11 +5,12 @@
   "density": 120,
   "seed": 917,
   "distanceM": 99017.63635876396,
-  "recycles": 3243,
-  "minBodyGapM": 11.437783003860385,
+  "recycles": 3267,
+  "minBodyGapM": 8.522316874808165,
   "maxEmptyAhead1000S": 0,
   "objectsReused": true,
   "finite": true,
   "respawnSeedMatch": true,
-  "scope": "Headless traffic/road model; player collisions, rendering, actual FPS and iPhone not measured"
+  "scope": "Headless traffic/road model; player collisions, rendering, actual FPS and iPhone not measured",
+  "source_commit": "Follow-up Revision2 commit containing this file"
 }

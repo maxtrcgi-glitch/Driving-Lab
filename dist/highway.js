@@ -27,9 +27,10 @@ export class Highway{
   const id=existing?.id??this.serial++,generation=existing?existing.generation+1:0,key=id+this.trafficSeed*99+generation*1009;
   const baseLane=id%6===5?3+Math.floor(id/6)%3:id%3;
   let lane=existing?.lane??baseLane;const dir=lane<3?1:-1,r=hash(key),truck=existing?.truck??(r>.78+hash(this.trafficSeed+17)*.10);
-  const profile=existing?.profile??(hash(key+101)<.23?'cautious':hash(key+101)>.77?'brisk':'regular');
+  const profile=(hash(key+101)<.23?'cautious':hash(key+101)>.77?'brisk':'regular');
   const headway=profile==='cautious'?1.75:profile==='brisk'?1.18:1.45;
-  const desired=existing?.desired??(truck?20+hash(key+3)*7:(profile==='cautious'?23:profile==='brisk'?33:27)+hash(key+3)*(profile==='cautious'?7:10)),cruiseLane=existing?.cruiseLane??Math.floor(lane/3)*3+(truck||profile==='cautious'?2:profile==='brisk'?0:1);
+  const desired=(truck?20+hash(key+3)*7:(profile==='cautious'?20:profile==='brisk'?34:24)+hash(key+3)*(profile==='cautious'?7:10)),cruiseLane=Math.floor(lane/3)*3+(truck||profile==='cautious'?2:profile==='brisk'?(hash(key+127)<.8?0:1):(hash(key+127)<.8?1:2));
+  lane=cruiseLane; // Enter the stream in the driver/type cruising lane; safety may select a fallback.
   let row=0;for(const c of this.cars)if(c!==existing&&c.lane===lane)row++;
   const spacing=60+hash(this.trafficSeed+lane*31)*6,phase=[18,0,-18,8,-12,25][lane];
   const ownLane=Math.abs(LANES[lane]-(this.playerOffset??LANES[1]))<2.8;
@@ -48,11 +49,13 @@ export class Highway{
   const relative=existing?dir*desired-(this.playerForwardSpeed??28):0,entryLane=lane;
   const entrySide=relative>0?-1:1;
   let s=playerS+(initial?(anchor?slot*spacing+phase+(hash(key+7)-.5)*6:spread):entrySide*(TRAFFIC_ENTRY+hash(key+this.clock)*12)),found=false,spawnSpeed=desired;
-  for(let choice=0;choice<(existing?3:1)&&!found;choice++){
-   if(choice){lane=Math.floor(entryLane/3)*3+(entryLane%3+choice)%3;s=playerS+entrySide*TRAFFIC_ENTRY;}
-   for(let tries=0;tries<160;tries++){
+  const firstS=s,searchDirection=initial?1:entrySide;
+  for(let choice=0;choice<3&&!found;choice++){
+   if(choice){lane=Math.floor(entryLane/3)*3+(entryLane%3+choice)%3;s=initial?firstS:playerS+entrySide*TRAFFIC_ENTRY;}
+   for(let tries=0;tries<240;tries++){
+    let nextS=s+searchDirection*4;
     let clear=Math.abs(LANES[lane]-(this.playerOffset??LANES[1]))>2.8||Math.abs(s-playerS)>55;
-    if(clear)for(const c of this.cars)if(c!==existing&&Math.abs(c.s-s)<=46&&(c.lane===lane||c.targetLane===lane||Math.abs(c.offset-LANES[lane])<=2.6)){clear=false;break;}
+    if(clear)for(const c of this.cars)if(c!==existing&&Math.abs(c.s-s)<=46&&(c.lane===lane||c.targetLane===lane||Math.abs(c.offset-LANES[lane])<=2.6)){clear=false;nextS=searchDirection>0?Math.max(nextS,c.s+46.01):Math.min(nextS,c.s-46.01);}
     if(clear){
      let gap=Infinity,leadSpeed=desired,rearGap=Infinity,rearSpeed=0;
      for(const c of this.cars)if(c!==existing&&c.dir===dir&&this.occupies(c,lane)){const d=(c.s-s)*dir,gapTo=Math.abs(d)-((truck?6.8:4.55)+c.length)/2;if(d>=0&&gapTo<gap){gap=gapTo;leadSpeed=c.speed;}else if(d<0&&gapTo<rearGap){rearGap=gapTo;rearSpeed=c.speed;}}
@@ -62,8 +65,8 @@ export class Highway{
      spawnSpeed=Math.min(frontUpper,Math.max(desired,rearLower));
      if(rearLower<=frontUpper){found=true;break;}
     }
-    if(initial){s+=12;if(s>playerS+1240)s=playerS-1240;}
-    else{s+=entrySide*12;if(Math.abs(s-playerS)>TRAFFIC_RETIRE-8)s=playerS+entrySide*TRAFFIC_ENTRY;}
+    if(initial){s=nextS;if(s>playerS+1240)s=playerS-1240;}
+    else{s=nextS;if(Math.abs(s-playerS)>TRAFFIC_RETIRE-8)s=playerS+entrySide*TRAFFIC_ENTRY;}
    }
   }
   if(!found){this.spawnFailures++;return null;}
