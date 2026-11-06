@@ -16,6 +16,7 @@ for (const suite of requiredSuites) {
   finally { fs.closeSync(fd); }
   const row = {command: `npm run ${suite}`, status: result.status === 0 && !result.error ? 'PASS' : 'FAIL', exitCode: result.status, error: result.error?.message, seconds: Math.round((performance.now() - start) / 10) / 100, logPath};
   results.push(row); console.log(JSON.stringify(row));
+  if(row.status === 'FAIL') console.error(fs.readFileSync(logPath, 'utf8').slice(-24000));
   fs.writeFileSync('reports/current/results.json', JSON.stringify({browserIncluded: false, required: true, results}, null, 2));
 }
 process.exitCode = results.every(result => result.status === 'PASS') ? 0 : 1;

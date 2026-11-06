@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 jobs:
-  startup-contract:
+  compatibility-contract:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -16,15 +16,8 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
-      - name: Record exact rolling-start values
-        run: |
-          node --input-type=module <<'NODE'
-          import {Highway,MAX_TRAFFIC} from './dist/highway.js';
-          for(const seed of [1,86,917]){
-            const h=new Highway(seed);h.density=MAX_TRAFFIC;const p=h.reset();
-            const front=h.cars.filter(c=>c.lane===1&&c.s>0).sort((a,b)=>a.s-b.s)[0];
-            console.log(JSON.stringify({seed,playerSpeed:p.speed,playerKmh:p.speed*3.6,front:front&&{id:front.id,speed:front.speed,desired:front.desired,profile:front.profile}}));
-          }
-          NODE
-      - name: Run unchanged traffic-experience contract directly
+      - name: Current rolling-start and unchanged physics contracts
+        run: node tests/release013.mjs
+      - name: Current recycling and allocation contracts
+        if: always()
         run: node tests/traffic-experience.mjs
