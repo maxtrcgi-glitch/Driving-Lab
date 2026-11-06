@@ -3,7 +3,7 @@ import {Highway,LANES} from '../dist/highway.js';
 const h=new Highway(86);h.reset(86,917);
 const ego=h.cars.find(c=>c.dir>0&&!c.truck),lead=h.cars.find(c=>c.dir>0&&c!==ego);
 h.cars=[ego,lead];
-function place(c,s,lane,speed,desired){const p=h.point(s,LANES[lane]);Object.assign(c,{...p,s,lane,targetLane:lane,offset:LANES[lane],speed,desired,dir:1,changing:0,cooldown:0,acceleration:0,crashed:false,vx:Math.sin(p.yaw)*speed,vz:Math.cos(p.yaw)*speed});}
+function place(c,s,lane,speed,desired){const p=h.point(s,LANES[lane]);Object.assign(c,{...p,intent:null,s,lane,targetLane:lane,offset:LANES[lane],speed,desired,dir:1,changing:0,cooldown:0,acceleration:0,crashed:false,vx:Math.sin(p.yaw)*speed,vz:Math.cos(p.yaw)*speed});}
 place(ego,0,1,30,40);place(lead,55,1,18,18);ego.cruiseLane=1;lead.cooldown=1000;
 let completedLaneChangeAt=null,passedAt=null,maxLateralStep=0;
 for(let i=0;i<30*240;i++){

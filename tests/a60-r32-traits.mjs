@@ -17,7 +17,7 @@ assert.notEqual(choices[0],choices[1]);console.log({passed:true,seed:917,densiti
 // Hold every physical/driver parameter constant except the tested preference.
 h.density=28;
 function choice({patience=.5,cooperation=.5,leadSpeed,leadGap}){
- const c={...fast,s:0,lane:1,targetLane:1,offset:LANES[1],speed:20,desired:34,headway:1.5,maxAccel:1.5,comfortableBrake:3,changing:0,cooldown:0,acceleration:0,cruiseLane:1,traits:{...fast.traits,patience,cooperation,laneDiscipline:.5}};
+ const c={...fast,intent:null,s:0,lane:1,targetLane:1,offset:LANES[1],speed:20,desired:34,headway:1.5,maxAccel:1.5,comfortableBrake:3,changing:0,cooldown:0,acceleration:0,cruiseLane:1,traits:{...fast.traits,patience,cooperation,laneDiscipline:.5}};
  const lead={...c,id:500,s:leadGap,speed:leadSpeed},rear={...c,id:501,s:-40,speed:20,lane:0,targetLane:0,offset:LANES[0]},right={...c,id:502,s:5,speed:leadSpeed,lane:2,targetLane:2,offset:LANES[2]};
  h.cars=[c,lead,rear,right];h._useLaneIndex=false;h.decide(c,null);return c.targetLane;
 }
