@@ -33,3 +33,5 @@ jobs:
 # Candidate comparison checkpoint.
 
 # Validate complete leaf index array.
+
+# Full candidate binary integrity checkpoint.
