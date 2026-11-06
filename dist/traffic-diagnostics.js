@@ -1,0 +1,7 @@
+// Opt-in, bounded instrumentation. This module never influences decisions.
+export class TrafficDiagnostics {
+ constructor(limit=128){this.limit=limit;this.events=[];this.counts={};this.states=new Map();}
+ state(car){let s=this.states.get(car.id);if(!s||s.generation!==car.generation){if(!s&&this.states.size>=256)this.states.delete(this.states.keys().next().value);s={generation:car.generation,lastDecisionReason:'not_observed',lastRejectionReason:'none',leaderGap:Infinity,leaderSpeed:null};this.states.set(car.id,s);}return s;}
+ event(car,type,reason=''){const s=this.state(car);if(type==='PASS_REJECTED')s.lastRejectionReason=reason;else s.lastDecisionReason=reason||type;this.counts[type]=(this.counts[type]||0)+1;if(this.events.length===this.limit)this.events.shift();this.events.push({id:car.id,generation:car.generation,type,reason});}
+ snapshot(car){const s=this.state(car);return {id:car.id,generation:car.generation,driverProfile:car.driverProfile,desiredSpeed:car.desired,actualSpeed:car.speed,currentLane:car.lane,targetLane:car.targetLane,leaderGap:s.leaderGap,leaderSpeed:s.leaderSpeed,laneChangeState:car.aborting?'aborting':car.changing?'changing':'idle',lastDecisionReason:s.lastDecisionReason,lastRejectionReason:s.lastRejectionReason};}
+}

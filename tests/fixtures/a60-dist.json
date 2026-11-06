@@ -3,7 +3,7 @@
   "source_commit": "core/traffic-ai3, Revision 2",
   "files": {
     "THREE-LICENSE.txt": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
-    "app.js": "f05803df63407ec4a1d7b30aec71b153067f17ab019523f22ddee3af47a0de9c",
+    "app.js": "8c9fd3bc351f0b7a2dd37b5e17dee9eb58523319a626dcc6bb6d9ab967f749f6",
     "camera-observation.js": "09f60d66532993864b649fa49343356099283b579af6269d06874caaa4fce1f9",
     "camera-profiles.js": "87253a2e0a7c352e7dc2112deda8fcb3948bf5c209fc0c0e8f9813751c6f3d5e",
     "camera-rig.js": "d363720a16fae13f757f6a0677e35ab59eff0ced8e01eb28a4d73707de6b3698",
@@ -15,10 +15,10 @@
     "driving-experience.js": "2f49adbcb82832df407a094a1257dad934feb979c734878527d554b0e3f59ffb",
     "gr86-model.js": "08d61f94d766b69ff4b167c41043151d3492656258ead9f25b700b918f816a22",
     "highway-world.js": "c05f3227dd5143090211cd8eb2ebf85128ecae2ddfc81854cd1dbb99efadf3cb",
-    "highway.js": "142c68e5cce6d00c4a73216291ae6d23051a33ea3ef6a87b4edfa50a6df3f838",
+    "highway.js": "d1fa6391b6d73294c3334de3779184c4825cb2c15d9f8d5937ef7c5bafd27de7",
     "icon-192.png": "32a007508fe8dd04f888621d87fefe345ea632104f46cd62849c6fc5912fc29b",
     "icon-512.png": "96139bf488f560345d3f5b17c8adef5efbb03608cb0d59cb38bd58fc1bd780d1",
-    "index.html": "6e745d79604533358206a0f471a8881c4629bc7f1c5ac8092d43a017405232ab",
+    "index.html": "53c3db8f346f65594bf3a9a44ad47cb2ac38f370f929cd470a2265f35d4d6acb",
     "manifest.webmanifest": "2783851276f5ce6b7813687b5b7c942086ca1108cd907e1e8d233f8e5d03ce43",
     "physics.js": "ff645940b464935c58c4b5239c9254ad1879c5f802cf472c78fe3945a15384ad",
     "road-geometry.js": "d20dd8ea1217bc311524cadd48a0fe538546f53b41e399c33071d60eda8b39f7",
@@ -35,6 +35,8 @@
     "traffic-trace.js": "6364cb3135378b1a8aaad87cc53901051a5df1eb2d97ec944044925a06653551",
     "vehicle-spec.js": "bfb7a130a0a369f1d9315694238102891a71122bf6a4be12ca2ae6e621d85876",
     "vehicle-state.js": "113855dfb51626949991cf33180dfcc4c9ec50f2e7046d7d7c7a8fc49e1033b3",
-    "world.js": "095d5f8cc539afc45332ed863bf96ec09e9911ed1ca0b2a23ab014694244dd8e"
+    "world.js": "095d5f8cc539afc45332ed863bf96ec09e9911ed1ca0b2a23ab014694244dd8e",
+    "traffic-diagnostics.js": "3e11fd276b301c781f33b8dfa4338cad30067e9e8d9d47b4e359f02c6911364e",
+    "traffic-diagnostics.css": "75e56d611125ac32d4146e809f2f1621f041524cf0af394f3fb7551ca424d998"
   }
 }
