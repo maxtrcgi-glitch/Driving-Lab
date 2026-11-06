@@ -4,14 +4,14 @@
  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
  <meta name="theme-color" content="#111719"><meta name="description" content="Driving Lab: an experimental vehicle simulator with a dedicated handling circuit.">
  <link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
- <title>DRIVING LAB v0.14A.6.0 — Traffic AI 3.0</title><link rel="stylesheet" href="./style.css">
+ <title>DRIVING LAB v0.14A.6.0 — Traffic AI 3.0 · Revision 2</title><link rel="stylesheet" href="./style.css">
 </head>
 <body>
  <main id="app">
   <section id="stage" aria-label="Driving simulator">
    <canvas id="view" aria-label="3D view of the car and handling circuit"></canvas>
    <div class="hud-top">
-    <div class="session"><span class="eyebrow">DRIVING LAB v0.14A.6.0 — Traffic AI 3.0</span><span class="eyebrow" id="location">HANDLING CIRCUIT</span><span id="lap-time">00:00.0</span><small id="lap-info">Lap 1</small></div>
+    <div class="session"><span class="eyebrow">DRIVING LAB v0.14A.6.0 — Traffic AI 3.0 · Revision 2</span><span class="eyebrow" id="location">HANDLING CIRCUIT</span><span id="lap-time">00:00.0</span><small id="lap-info">Lap 1</small></div>
     <button id="pause-btn" class="pause-button" aria-label="Pause and menu" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button>
    </div>
    <div id="camera-orbit" class="camera-orbit" aria-label="Drag to orbit chase camera" hidden><span>Camera · drag</span></div>
@@ -33,12 +33,12 @@
     <div class="pedals"><button id="handbrake" class="handbrake" aria-label="Hold handbrake" aria-pressed="false">Handbrake</button><button id="reverse-btn" class="direction" aria-label="Switch between forward and reverse" aria-pressed="false">D</button><button id="brake" class="pedal brake" aria-label="Brake: move higher for more pressure"><span>Brake</span></button><button id="gas" class="pedal gas" aria-label="Throttle: move higher for more pressure"><span>Throttle</span></button></div>
    </div>
    <div id="welcome" class="welcome">
-    <div class="welcome-inner"><span class="eyebrow">DRIVING LAB v0.14A.6.0 — Traffic AI 3.0</span><h1>Find your rhythm.</h1><div class="welcome-buttons"><button id="start-highway" class="primary">Endless highway</button><button id="start-track">Drive circuit</button><button id="start-pad">Test pad</button></div><p>Steer on the left. Drag your thumb; release to center.<br>Pedals on the right. Move higher for more pressure.</p><p class="welcome-hint">Rolling start in traffic · 2.08 km circuit · test pad<br>Tilt steering and car setup are in the pause menu.</p><button id="welcome-settings">Controls & setup</button><small class="prototype-note">Independent head & drift gaze presets · A/B without reload</small></div>
+    <div class="welcome-inner"><span class="eyebrow">DRIVING LAB v0.14A.6.0 — Traffic AI 3.0 · Revision 2</span><h1>Find your rhythm.</h1><div class="welcome-buttons"><button id="start-highway" class="primary">Endless highway</button><button id="start-track">Drive circuit</button><button id="start-pad">Test pad</button></div><p>Steer on the left. Drag your thumb; release to center.<br>Pedals on the right. Move higher for more pressure.</p><p class="welcome-hint">Rolling start in traffic · 2.08 km circuit · test pad<br>Tilt steering and car setup are in the pause menu.</p><button id="welcome-settings">Controls & setup</button><small class="prototype-note">Independent head & drift gaze presets · A/B without reload</small></div>
    </div>
    <div id="fatal" class="fatal" hidden role="alert"></div>
   </section>
   <dialog id="pause-menu" class="pause-menu" aria-labelledby="pause-title">
-   <div class="dialog-head"><h2 id="pause-title">Pause</h2><span class="eyebrow">DRIVING LAB v0.14A.6.0 — Traffic AI 3.0</span></div>
+   <div class="dialog-head"><h2 id="pause-title">Pause</h2><span class="eyebrow">DRIVING LAB v0.14A.6.0 — Traffic AI 3.0 · Revision 2</span></div>
    <button id="resume-btn" class="primary wide">Resume driving</button>
    <div class="menu-actions"><button id="settings-btn">Controls & setup</button><button id="camera-btn">Cockpit</button><button id="reset-btn">Return to start</button><button id="repair-btn">Repair car</button><button id="fullscreen-btn">Fullscreen</button></div>
    <details class="setting-group"><summary>Telemetry</summary><div class="setup-section">

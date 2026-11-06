@@ -1,3 +1,5 @@
+> Superseded after failed iPhone traffic acceptance. See [Revision2 report](Driving_Lab_A60_Traffic_AI3_R2_Report.md) and current PR checks. Earlier results below refer to the first candidate.
+
 # Driving Lab A.6.0 — Traffic AI 3.0
 Status: ready for independent review. Required regression/browser/merge gate PASS for the runtime candidate; iPhone acceptance pending. Separate experimental preview only.
 Base: stable A52 tag gameplay-baseline/v0.14A.5.2 / 2cd72beceeddb2ada569bc9e7e69582f0c925cc8.

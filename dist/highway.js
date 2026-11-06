@@ -27,6 +27,9 @@ export class Highway{
   const id=existing?.id??this.serial++,generation=existing?existing.generation+1:0,key=id+this.trafficSeed*99+generation*1009;
   const baseLane=id%6===5?3+Math.floor(id/6)%3:id%3;
   let lane=existing?.lane??baseLane;const dir=lane<3?1:-1,r=hash(key),truck=existing?.truck??(r>.78+hash(this.trafficSeed+17)*.10);
+  const profile=existing?.profile??(hash(key+101)<.23?'cautious':hash(key+101)>.77?'brisk':'regular');
+  const headway=profile==='cautious'?1.75:profile==='brisk'?1.18:1.45;
+  const desired=existing?.desired??(truck?20+hash(key+3)*7:(profile==='cautious'?23:profile==='brisk'?33:27)+hash(key+3)*(profile==='cautious'?7:10)),cruiseLane=existing?.cruiseLane??Math.floor(lane/3)*3+(truck||profile==='cautious'?2:profile==='brisk'?0:1);
   let row=0;for(const c of this.cars)if(c!==existing&&c.lane===lane)row++;
   const spacing=60+hash(this.trafficSeed+lane*31)*6,phase=[18,0,-18,8,-12,25][lane];
   const ownLane=Math.abs(LANES[lane]-(this.playerOffset??LANES[1]))<2.8;
@@ -42,24 +45,30 @@ export class Highway{
   const spread=-1240+(boundedRank+.5)*2480/count;
   // Select the arrival side from relative road velocity. NPC speed is never
   // increased to chase the player. Outgoing actors re-enter beyond visibility.
-  const relative=existing?existing.dir*existing.speed-(this.playerForwardSpeed??28):0;
+  const relative=existing?dir*desired-(this.playerForwardSpeed??28):0,entryLane=lane;
   const entrySide=relative>0?-1:1;
-  let s=playerS+(initial?(anchor?slot*spacing+phase+(hash(key+7)-.5)*6:spread):entrySide*(TRAFFIC_ENTRY+hash(key+this.clock)*12)),found=false;
+  let s=playerS+(initial?(anchor?slot*spacing+phase+(hash(key+7)-.5)*6:spread):entrySide*(TRAFFIC_ENTRY+hash(key+this.clock)*12)),found=false,spawnSpeed=desired;
   for(let choice=0;choice<(existing?3:1)&&!found;choice++){
-   if(choice){lane=Math.floor(baseLane/3)*3+(baseLane%3+choice)%3;s=playerS+entrySide*TRAFFIC_ENTRY;}
+   if(choice){lane=Math.floor(entryLane/3)*3+(entryLane%3+choice)%3;s=playerS+entrySide*TRAFFIC_ENTRY;}
    for(let tries=0;tries<160;tries++){
     let clear=Math.abs(LANES[lane]-(this.playerOffset??LANES[1]))>2.8||Math.abs(s-playerS)>55;
     if(clear)for(const c of this.cars)if(c!==existing&&Math.abs(c.s-s)<=46&&(c.lane===lane||c.targetLane===lane||Math.abs(c.offset-LANES[lane])<=2.6)){clear=false;break;}
-    if(clear){found=true;break;}
+    if(clear){
+     let gap=Infinity,leadSpeed=desired,rearGap=Infinity,rearSpeed=0;
+     for(const c of this.cars)if(c!==existing&&c.dir===dir&&this.occupies(c,lane)){const d=(c.s-s)*dir,gapTo=Math.abs(d)-((truck?6.8:4.55)+c.length)/2;if(d>=0&&gapTo<gap){gap=gapTo;leadSpeed=c.speed;}else if(d<0&&gapTo<rearGap){rearGap=gapTo;rearSpeed=c.speed;}}
+     let frontUpper=Math.sqrt(Math.max(0,leadSpeed*leadSpeed+2*3*Math.max(0,gap-6)));
+     let rearLower=Math.sqrt(Math.max(0,rearSpeed*rearSpeed-2*3*Math.max(0,rearGap-6-rearSpeed*.7)));
+     if(!initial){const flowSpeed=(this.playerForwardSpeed??28)*dir;if(dir*entrySide>0)frontUpper=Math.min(frontUpper,flowSpeed);else rearLower=Math.max(rearLower,flowSpeed+.01);}
+     spawnSpeed=Math.min(frontUpper,Math.max(desired,rearLower));
+     if(rearLower<=frontUpper){found=true;break;}
+    }
     if(initial){s+=12;if(s>playerS+1240)s=playerS-1240;}
     else{s+=entrySide*12;if(Math.abs(s-playerS)>TRAFFIC_RETIRE-8)s=playerS+entrySide*TRAFFIC_ENTRY;}
    }
   }
   if(!found){this.spawnFailures++;return null;}
-  const profile=existing?.profile??(hash(key+101)<.23?'cautious':hash(key+101)>.77?'brisk':'regular');
-  const headway=profile==='cautious'?1.75:profile==='brisk'?1.18:1.45;
-  const speed=existing?.desired??clamp((truck?21:25)+hash(key+3)*7+(lane%3===0?2:0)+(profile==='brisk'?3:profile==='cautious'?-2:0),18,truck?29:39),p=this.point(s,LANES[lane]);
-  const car={id,generation,lane,targetLane:lane,offset:LANES[lane],dir,s,speed,desired:speed,profile,headway,driverProfile:profile==='brisk'?'Assertive':profile==='cautious'?'Calm':'Normal',comfortableBrake:profile==='cautious'?2.5:3,jerkLimit:profile==='brisk'?3:2.2,lastDecisionAt:-1,maxAccel:profile==='brisk'?1.9:profile==='cautious'?1.2:1.5,truck,length:truck?6.8:4.55,width:truck?2.3:1.82,mass:truck?4200:1500,inertia:truck?19000:2600,x:p.x,z:p.z,y:p.y,pitch:p.pitch*dir,yaw:p.yaw+(dir<0?Math.PI:0),vx:Math.sin(p.yaw)*speed*dir,vz:Math.cos(p.yaw)*speed*dir,yawRate:0,acceleration:0,braking:false,changing:0,changeDuration:3.8+hash(key+19)*.6,startOffset:LANES[lane],cooldown:3+hash(key+29)*7,crashed:false,hitAt:-Infinity,passed:false,wasAhead:s>playerS+5,lastAhead:s-playerS};
+  const speed=spawnSpeed,p=this.point(s,LANES[lane]);
+  const car={id,generation,lane,targetLane:lane,offset:LANES[lane],dir,s,speed,desired,cruiseLane,profile,headway,driverProfile:profile==='brisk'?'Assertive':profile==='cautious'?'Calm':'Normal',comfortableBrake:profile==='cautious'?2.5:3,jerkLimit:profile==='brisk'?3:2.2,lastDecisionAt:-1,maxAccel:profile==='brisk'?1.9:profile==='cautious'?1.2:1.5,truck,length:truck?6.8:4.55,width:truck?2.3:1.82,mass:truck?4200:1500,inertia:truck?19000:2600,x:p.x,z:p.z,y:p.y,pitch:p.pitch*dir,yaw:p.yaw+(dir<0?Math.PI:0),vx:Math.sin(p.yaw)*speed*dir,vz:Math.cos(p.yaw)*speed*dir,yawRate:0,acceleration:0,braking:false,changing:0,changeDuration:3.8+hash(key+19)*.6,startOffset:LANES[lane],cooldown:3+hash(key+29)*7,crashed:false,hitAt:-Infinity,passed:false,wasAhead:s>playerS+5,lastAhead:s-playerS};
   this.spawned++;if(existing){this.retired++;Object.assign(existing,car);}else this.cars.push(car);return car;
  }
  buildLaneIndex(){for(const list of this._laneLists)list.length=0;for(const c of this.cars)for(let lane=0;lane<6;lane++)if(this.occupies(c,lane))this._laneLists[lane].push(c);for(const list of this._laneLists)list.sort((a,b)=>a.s-b.s||a.id-b.id);this._useLaneIndex=!this.cars.some(c=>c.crashed);}
@@ -88,9 +97,10 @@ export class Highway{
  accelerationFor(car,gap,leadSpeed){const brake=car.comfortableBrake??3,target=this.targetSpeed(car),wanted=5+car.speed*car.headway+Math.max(0,car.speed*(car.speed-leadSpeed)/(2*Math.sqrt(car.maxAccel*brake)));
   return clamp(car.maxAccel*(1-(car.speed/target)**4-(wanted/Math.max(gap,.5))**2),-8,car.maxAccel);
  }
+ lanePace(car,info){const target=this.targetSpeed(car);return Math.min(target,info.leadSpeed+Math.max(0,info.gap-5-car.speed*car.headway)/6);}
  laneSafe(car,info){
   const frontClosing=Math.max(0,car.speed-info.leadSpeed),rearClosing=Math.max(0,info.rearSpeed-car.speed),duration=car.changeDuration??4;
-  return info.gap>Math.max(12,car.speed*.7,frontClosing*duration+8)&&info.rearGap>Math.max(12,info.rearSpeed*.8,rearClosing*duration+10)&&this.accelerationFor(car,info.gap,info.leadSpeed)>-2.5&&(info.rearGap===Infinity||info.rearGap>6+info.rearSpeed*1.1+Math.max(0,info.rearSpeed*(info.rearSpeed-car.speed)/(2*Math.sqrt(1.5*3))));
+  return info.gap>Math.max(12,car.speed*.7,frontClosing*duration+8)&&info.rearGap>Math.max(12,info.rearSpeed*.8,rearClosing*duration+10)&&this.accelerationFor(car,info.gap,info.leadSpeed)>-2.5&&(info.rearGap===Infinity||(info.rear?this.accelerationFor(info.rear,info.rearGap,car.speed)>-2.5:info.rearGap>6+info.rearSpeed*1.1+Math.max(0,info.rearSpeed*(info.rearSpeed-car.speed)/(2*Math.sqrt(1.5*3)))));
  }
  safeLane(car,lane,player){if(lane<0||lane>5||Math.floor(lane/3)!==Math.floor(car.lane/3))return false;return this.laneSafe(car,this.laneInfo(car,lane,player,this._candidate));}
  decide(car,player){
@@ -100,21 +110,27 @@ export class Highway{
    if(threatened&&this.safeLane(car,car.lane,player)){car.startOffset=car.offset;car.startLateralV=car.lateralV||0;car.startLateralA=car.lateralA||0;car.targetLane=car.lane;car.changeDuration=3.8;car.changing=car.changeDuration;car.aborting=true;car.cooldown=Math.max(car.cooldown,12);this.abortedChanges++;}
   }
   this.decisions++;const current=this.laneInfo(car,car.targetLane,player,this._current);let acc=this.accelerationFor(car,current.gap,current.leadSpeed);
-  if(!car.changing&&car.cooldown<=0){let best=-1,bestScore=.3;const blocked=current.gap<100&&current.leadSpeed<car.desired-1.5;
+  if(!car.changing&&car.cooldown<=0){let best=-1,bestScore=.3;
+   const pace=this.lanePace(car,current),target=this.targetSpeed(car),closing=Math.max(0,car.speed-current.leadSpeed);
+   const blocked=current.gap<Math.max(120,car.speed*car.headway+closing*8)&&current.leadSpeed<target-1.5;
+   const cruise=car.cruiseLane??Math.floor(car.lane/3)*3+1;
    for(let delta=-1;delta<=1;delta+=2){const lane=car.lane+delta;if(lane<0||lane>5||Math.floor(lane/3)!==Math.floor(car.lane/3))continue;
-    // Keep outer lanes when clear. No gratuitous passing-lane oscillation.
-    if(!blocked&&delta<0)continue;const next=this.laneInfo(car,lane,player,this._candidate);
+    const next=this.laneInfo(car,lane,player,this._candidate);
     if(!this.laneSafe(car,next)){this.rejectedChanges++;continue;}
-    const nextAcc=this.accelerationFor(car,next.gap,next.leadSpeed),score=nextAcc-acc+(blocked?(delta<0?.4:0):(delta>0?.38:0));
-    if(score>bestScore&&(blocked?next.gap>current.gap+12:nextAcc>-.15)){best=lane;bestScore=score;}
+    const nextAcc=this.accelerationFor(car,next.gap,next.leadSpeed),nextPace=this.lanePace(car,next),preference=Math.abs(car.lane-cruise)-Math.abs(lane-cruise);
+    // Speed gain motivates a pass; stable driver/type lane preference motivates return.
+    // Do not demand a longer gap when the adjacent leader is moving faster.
+    const score=nextAcc-acc+.16*(nextPace-pace)+preference*.36+(blocked&&delta<0?.15:0);
+    if(score>bestScore&&(blocked?nextPace>pace+1||nextAcc>acc+.3:preference>0&&nextPace>pace-1&&nextAcc>-.15)){best=lane;bestScore=score;}
    }
    if(best>=0){car.targetLane=best;this.reserveLane(car,best);car.startOffset=car.offset;car.startLateralV=car.startLateralA=0;car.aborting=false;car.changing=car.changeDuration;car.cooldown=12+hash(car.id+this.trafficSeed+this.clock)*7;this.laneChanges++;const next=this.laneInfo(car,best,player,this._candidate);acc=Math.min(acc,this.accelerationFor(car,next.gap,next.leadSpeed));}
   }
   // Reserve both lanes throughout the manoeuvre; brake for either lead.
   let sourceEmergency=false;
-  if(car.changing&&car.lane!==car.targetLane){const source=this.laneInfo(car,car.lane,player,this._candidate),sourceAcc=this.accelerationFor(car,source.gap,source.leadSpeed),closing=Math.max(0,car.speed-source.leadSpeed);sourceEmergency=sourceAcc<-3&&((closing>.1&&source.gap/closing<1.5)||source.gap<4+car.speed*.65);acc=Math.min(acc,sourceAcc);}
+  if(car.changing&&car.lane!==car.targetLane){const source=this.laneInfo(car,car.lane,player,this._candidate),sourceAcc=this.accelerationFor(car,source.gap,source.leadSpeed),closing=Math.max(0,car.speed-source.leadSpeed);sourceEmergency=sourceAcc<-3&&((closing>.1&&source.gap/closing<1.5)||source.gap<4+car.speed*.65||Math.max(0,(car.speed*car.speed-source.leadSpeed*Math.abs(source.leadSpeed))/(2*Math.max(.5,source.gap-5)))>(car.comfortableBrake??3)*.85);acc=Math.min(acc,sourceAcc);}
   const closing=Math.max(0,car.speed-current.leadSpeed),ttc=closing>.1?current.gap/closing:Infinity;
-  const emergency=sourceEmergency||acc<-3&&(ttc<1.5||current.gap<4+car.speed*.65);
+  const requiredBrake=Math.max(0,(car.speed*car.speed-current.leadSpeed*Math.abs(current.leadSpeed))/(2*Math.max(.5,current.gap-5)));
+  const emergency=sourceEmergency||acc<-3&&(ttc<1.5||current.gap<4+car.speed*.65||requiredBrake>(car.comfortableBrake??3)*.85);
   const decisionDt=car.lastDecisionAt>=0?clamp(this.clock-car.lastDecisionAt,0,.1):1/30;
   if(!emergency)acc=clamp(acc,car.acceleration-(car.jerkLimit??2.2)*decisionDt,car.acceleration+(car.jerkLimit??2.2)*decisionDt);
   car.lastDecisionAt=this.clock;car.emergencyBraking=emergency;car.acceleration=acc;car.braking=acc<-.7;

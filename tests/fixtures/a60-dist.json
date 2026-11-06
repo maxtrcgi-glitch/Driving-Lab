@@ -1,6 +1,6 @@
 {
   "version": "0.14A.6.0",
-  "source_commit": "candidate core/traffic-ai3",
+  "source_commit": "core/traffic-ai3, Revision 2",
   "files": {
     "THREE-LICENSE.txt": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
     "app.js": "f05803df63407ec4a1d7b30aec71b153067f17ab019523f22ddee3af47a0de9c",
@@ -15,10 +15,10 @@
     "driving-experience.js": "2f49adbcb82832df407a094a1257dad934feb979c734878527d554b0e3f59ffb",
     "gr86-model.js": "08d61f94d766b69ff4b167c41043151d3492656258ead9f25b700b918f816a22",
     "highway-world.js": "c05f3227dd5143090211cd8eb2ebf85128ecae2ddfc81854cd1dbb99efadf3cb",
-    "highway.js": "671795495349a688ae18f661bc50413a0a23696946d996b611c456ce725b6201",
+    "highway.js": "b8b2c3be7d618fee676bacc3113f35119377fed500f111d87c47e141215c8436",
     "icon-192.png": "32a007508fe8dd04f888621d87fefe345ea632104f46cd62849c6fc5912fc29b",
     "icon-512.png": "96139bf488f560345d3f5b17c8adef5efbb03608cb0d59cb38bd58fc1bd780d1",
-    "index.html": "7cf419ed0ff6f64973540e7f6674decd4a6314813bcecbde6d71ad459cb5dcae",
+    "index.html": "6e745d79604533358206a0f471a8881c4629bc7f1c5ac8092d43a017405232ab",
     "manifest.webmanifest": "2783851276f5ce6b7813687b5b7c942086ca1108cd907e1e8d233f8e5d03ce43",
     "physics.js": "ff645940b464935c58c4b5239c9254ad1879c5f802cf472c78fe3945a15384ad",
     "road-geometry.js": "d20dd8ea1217bc311524cadd48a0fe538546f53b41e399c33071d60eda8b39f7",

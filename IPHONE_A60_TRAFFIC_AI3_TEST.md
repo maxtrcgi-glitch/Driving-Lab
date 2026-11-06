@@ -1,3 +1,5 @@
+> Current candidate: **Revision2**. Confirm that marker in the header before comparing. The first A60 preview failed manual behavior acceptance. Current report: Driving_Lab_A60_Traffic_AI3_R2_Report.md.
+
 # A60 iPhone Traffic Test Guide
 Status: manual validation pending. Main HTTPS URL is still A52 and must not be mistaken for this candidate.
 Separate experimental preview: https://driving-lab-a60-traffic-preview.maxtrcgi.chatgpt.site (sign in with the owner account if requested). It does not replace the stable site. Confirm the version before testing.
