@@ -1,0 +1,30 @@
+name: R2.1e Tree Source Comparison
+on:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths: ['.github/workflows/r21e-tree-source.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps --only-shell chromium
+      - run: python3 experiments/asset-poc-r2/tests/r21e-source.py
+      - run: node experiments/asset-poc-r2/tests/r21e-webgl.mjs
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: r21e-tree-source-comparison
+          path: reports/tree-r21e/
+          if-no-files-found: warn
