@@ -21,3 +21,5 @@ jobs:
       - name: Current recycling and allocation contracts
         if: always()
         run: node tests/traffic-experience.mjs
+
+# Verify corrected visibility expression syntax.

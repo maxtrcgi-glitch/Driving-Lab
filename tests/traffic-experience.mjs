@@ -20,7 +20,7 @@ for(const density of [28,42,72,120]){
   assert.equal(h.cars.length,density);assert.ok(h.cars.every(c=>Number.isFinite(c.x+c.z+c.speed+c.yaw)));
   for(const c of h.cars){const before=old.get(c.id);if(c.generation!==before.generation){
    assert.equal(c.generation,before.generation+1);assert.ok(before.s<s-260||before.s>s+1200,'Only out-of-window cars recycled');
-   for(const q of [before,c])assert.ok(Math.exp(-(.0017*Math.hypot(q.x-p.x,q.z-p.z))**2)<=.01,'Both ends of recycling must be outside visibility');
+   for(const q of [before,c])assert.ok(Math.exp(-((.0017*Math.hypot(q.x-p.x,q.z-p.z))**2))<=.01,'Both ends of recycling must be outside visibility');
    if(Math.abs(c.s-before.s)<=5&&Math.hypot(c.x-before.x,c.z-before.z)>=3&&recycledNearSameS.length<3)recycledNearSameS.push({id:c.id,fromGeneration:before.generation,toGeneration:c.generation,longitudinalDelta:c.s-before.s,worldDelta:Math.hypot(c.x-before.x,c.z-before.z)});
    recycled++;
   }else{assert.equal(c.desired,before.desired);assert.equal(c.profile,before.profile);assert.ok(Math.hypot(c.x-before.x,c.z-before.z)<3,'Continuous NPC motion: '+JSON.stringify({id:c.id,generation:c.generation,before,after:{s:c.s,x:c.x,z:c.z}}));}}
