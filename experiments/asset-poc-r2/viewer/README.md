@@ -1,0 +1,5 @@
+# Tree WebGL viewer
+
+From `experiments/asset-poc-r2/`, serve the directory over HTTP, e.g. `python3 -m http.server 8000`, then open `http://localhost:8000/viewer/`. The three GLBs are loaded from `../assets/vegetation/`; do not open index.html via file://. All JS modules are local, Three.js r180 under its included MIT license. No game code is modified.
+
+Use the LOD dropdown for forced comparison or Auto for per-tree distance selection (12/25 m boundaries, ±2 m hysteresis). Use 1/10/30 for a deliberately uninstanced load test; each model clone shares geometry/materials/textures within that LOD. Orbit with drag, zoom by wheel or touch. Stats include the ground's 2 triangles and 1 draw call. FPS/frame time uses a moving requestAnimationFrame average, capped by display refresh; browser tab throttling and camera/frustum change results. This is diagnostic, not a target-device benchmark. Each LOD is loaded separately, so embedded textures are duplicated across LODs; per-LOD decoded RGBA mipmapped texture estimate is about 6 MiB, up to 18 MiB for all three before other GPU allocations.
