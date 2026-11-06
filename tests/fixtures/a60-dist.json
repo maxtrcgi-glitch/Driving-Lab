@@ -3,7 +3,7 @@
   "source_commit": "core/traffic-ai3, Revision 2",
   "files": {
     "THREE-LICENSE.txt": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
-    "app.js": "2fdd641451fa4fa1ac03ddc0cd8bf312ddf2873895d279cff9f88fc52ef5f99c",
+    "app.js": "8f620df73a8a2762c524f9dcc32b24eca9595855e3e69ac23d3c0abbae914eb8",
     "camera-observation.js": "09f60d66532993864b649fa49343356099283b579af6269d06874caaa4fce1f9",
     "camera-profiles.js": "87253a2e0a7c352e7dc2112deda8fcb3948bf5c209fc0c0e8f9813751c6f3d5e",
     "camera-rig.js": "d363720a16fae13f757f6a0677e35ab59eff0ced8e01eb28a4d73707de6b3698",
@@ -15,7 +15,7 @@
     "driving-experience.js": "2f49adbcb82832df407a094a1257dad934feb979c734878527d554b0e3f59ffb",
     "gr86-model.js": "08d61f94d766b69ff4b167c41043151d3492656258ead9f25b700b918f816a22",
     "highway-world.js": "c05f3227dd5143090211cd8eb2ebf85128ecae2ddfc81854cd1dbb99efadf3cb",
-    "highway.js": "f07540859cf575e508075d5e0edb1d239aceef95080a68dcaf4b5f185ca00aaa",
+    "highway.js": "b4e6ff6c8948246c863599ea408cc60838cc593260d59e1d4c589430dfa90fa0",
     "icon-192.png": "32a007508fe8dd04f888621d87fefe345ea632104f46cd62849c6fc5912fc29b",
     "icon-512.png": "96139bf488f560345d3f5b17c8adef5efbb03608cb0d59cb38bd58fc1bd780d1",
     "index.html": "53c3db8f346f65594bf3a9a44ad47cb2ac38f370f929cd470a2265f35d4d6acb",

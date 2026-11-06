@@ -35,7 +35,7 @@ export class Highway{
   const assertiveness=clamp(center+(hash(key+211)-.5)*.28,0,1),discipline=clamp(.55+(hash(key+223)-.5)*.4,0,1);
   const traits={speedTendency:assertiveness,patience:1-assertiveness,overtakeMotivation:assertiveness,cooperation:clamp(.72-.48*assertiveness+(hash(key+227)-.5)*.12,0,1),laneDiscipline:discipline};
   const headway=1.05+traits.patience*.9;
-  const desired=(truck?20+hash(key+3)*7:(profile==='cautious'?20:profile==='brisk'?34:24)+hash(key+3)*(profile==='cautious'?7:10))*(.97+.06*traits.speedTendency),cruiseLane=Math.floor(lane/3)*3+(truck||profile==='cautious'?2:profile==='brisk'?(hash(key+127)<.8?0:1):(hash(key+127)<.8?1:2));
+  const desired=Math.min(44,(truck?20+hash(key+3)*7:(profile==='cautious'?20:profile==='brisk'?34:24)+hash(key+3)*(profile==='cautious'?7:10))*(.97+.06*traits.speedTendency)),cruiseLane=Math.floor(lane/3)*3+(truck||profile==='cautious'?2:profile==='brisk'?(hash(key+127)<.8?0:1):(hash(key+127)<.8?1:2));
   lane=cruiseLane; // Enter the stream in the driver/type cruising lane; safety may select a fallback.
   let row=0;for(const c of this.cars)if(c!==existing&&c.lane===lane)row++;
   const spacing=60+hash(this.trafficSeed+lane*31)*6,phase=[18,0,-18,8,-12,25][lane];
