@@ -1,0 +1,32 @@
+name: R2.1c Tree WebGL Validation
+on:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths:
+      - '.github/workflows/r21c-tree-webgl.yml'
+      - 'experiments/asset-poc-r2/tests/tree-webgl.mjs'
+      - 'experiments/asset-poc-r2/viewer/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tree-webgl:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps --only-shell chromium
+      - run: node experiments/asset-poc-r2/tests/tree-webgl.mjs
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: r21c-tree-webgl
+          path: reports/tree-webgl/
+          if-no-files-found: warn
