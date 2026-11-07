@@ -23,7 +23,7 @@ jobs:
           src=experiments/asset-poc-r2
           mkdir -p demo/assets/asphalt-track demo/r31/assets demo/viewer
           cp -r "$src/r34" "$src/r23c" demo/
-          cp -r "$src/viewer/vendor" demo/viewer/
+          cp -r "$src/viewer/vendor" "$src/viewer/utils" demo/viewer/
           cp "$src"/assets/asphalt-track/*_1k.jpg demo/assets/asphalt-track/
           cp "$src/assets/asphalt-track/manifest.json" demo/assets/asphalt-track/
           cp "$src/r31/assets/guardrail.glb" demo/r31/assets/
