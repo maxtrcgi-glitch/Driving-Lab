@@ -25,6 +25,7 @@ assert.equal(d.counts.START_AHEAD_250,5);
 assert.equal(d.counts.FRUSTUM_SEEN,2);
 assert.equal(d.counts.FRUSTUM_SUSTAINED,1);
 assert.equal(d.counts.FRUSTUM_RETURN_SUSTAINED,1);
+assert.equal(d.counts.FRUSTUM_NEAR_SUSTAINED,1);
 center.generation++;
 d.sampleView(.7,camera);
 assert.equal(d.maneuvers.has(center.id),false);
@@ -41,3 +42,10 @@ const behind=add(9,0,0,40);
 camera.rotation.y=Math.PI;camera.updateMatrixWorld();d.sampleView(2.4,camera);
 assert.equal(d.maneuvers.get(behind.id).seen,true);
 console.log('Frustum vs road-space, horizontal/vertical FOV, camera orientation, dwell and recycling verified.');
+
+const far=new TrafficDiagnostics();
+const straight=new PerspectiveCamera(60,2,.1,400);straight.updateMatrixWorld();
+far.startManeuver({id:10,generation:0,x:0,y:0,z:-350,s:350,changing:1},0,'slower_leader');
+for(let i=0;i<=6;i++)far.sampleView(i/10,straight);
+assert.equal(far.counts.FRUSTUM_SUSTAINED,1);
+assert.equal(far.counts.FRUSTUM_NEAR_SUSTAINED??0,0);

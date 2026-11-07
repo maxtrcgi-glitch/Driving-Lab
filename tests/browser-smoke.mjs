@@ -56,6 +56,7 @@ try {
   assert.equal((await page.goto(baseURL, {waitUntil: 'domcontentloaded'})).status(), 200);
   await page.waitForFunction(() => window.drivingLab?.version === '0.14A.6.0');
   assert.match(await page.title(), /v0\.14A\.6\.0.*Traffic AI R3\.4 Experimental/);
+  assert.equal(await page.evaluate(()=>window.drivingLab.trafficRevision),'R3.4 Experimental');
   assert.equal(await page.locator('#fatal').isVisible(), false);
   stage('webgl');
   result.webgl = await page.evaluate(() => {
@@ -86,6 +87,8 @@ try {
   await page.waitForFunction(previous => document.querySelector('#traffic-debug-overlay').textContent !== previous, first, {timeout:20000});
   const observed=await page.evaluate(() => ({text:document.querySelector('#traffic-debug-overlay').textContent, diagnostics:!!window.drivingLab.highway.diagnostics, overlay:(()=>{const r=document.querySelector('#traffic-debug-overlay').getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom};})(),controls:[...document.querySelectorAll('.steer-pad,.pedal')].filter(e=>e.getClientRects().length).map(e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom};})}));
   assert.ok(observed.diagnostics && observed.text.includes('Motivation '));
+  assert.match(observed.text,/Frustum seen \d+ · ≥0.5s \d+/);
+  assert.match(observed.text,/Traffic \d+\/\d+ · eval \d+ · candidate rejects \d+/);
   assert.ok(observed.controls.length>0);
   for(const c of observed.controls)assert.ok(observed.overlay.right<=c.left||observed.overlay.left>=c.right||observed.overlay.bottom<=c.top||observed.overlay.top>=c.bottom,'Overlay must not cover steering or pedals');
   await page.locator('#pause-btn').click();await page.locator('#settings-btn').click();
