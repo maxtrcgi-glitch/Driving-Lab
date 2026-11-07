@@ -73,3 +73,39 @@ A required per-vertex `roadLocalMetres` attribute represents lateral and longitu
 - A permitted CI route or browser-enabled environment is needed to run the prepared test, inspect all frames, compare seam continuity and the shader error logs, measure controlled A/B frame timings, and tune/reject the material accordingly. On completion, test on target iPhone. Separately validate negative/large-origin chunk joins, normal orientation and physically plausible lighting. Do not proceed to R2.2b-3 until these gates are resolved and the Director authorizes it.
 
 The material checkpoint commit was `b07a5a9c87bb810d06913ae975c29d021683f951`; the commit containing this addendum and showcase is available from Git history.
+
+
+---
+
+## R2.2b-2 Validation Recovery — final quality gate
+
+**Final status: REJECTED for the current Variant B as a visual integration candidate.** The real WebGL shader runs and changes pixels, but the observed reduction in repetition is modest, regular banding remains prominent under grazing light, and the close image appears softer than A. The surface remains too dark under the frontal rig to assess fine detail well. This is a rejection of this candidate and visual gate, not a claim that the source asphalt or future material approaches cannot work. No shader rewrite or unrelated asset work was performed.
+
+### Evidence and execution
+
+- [Validation run 42339324201](https://github.com/maxtrcgi-glitch/Driving-Lab/actions/runs/42339324201) succeeded at tested code SHA `fca0f054a83dba8e6f5f5740e774d8bb3e28f2a1`; [artifact 13560976450](https://github.com/maxtrcgi-glitch/Driving-Lab/actions/runs/42339324201/artifacts/13560976450) contains matching 1280×800 A/B images, seam images at all four joins, eight motion-position frames, `stats.json`, `errors.json` and `test.log`. Downloaded ZIP SHA-256 `7ee7a2feb0a16027174d4a37960fc8066b689053a14d21e24a0902e3e2415c59` matched GitHub's artifact digest. Chromium uses WebGL 2 / ANGLE SwiftShader, not an iPhone GPU.
+- The earlier [run 42338948349](https://github.com/maxtrcgi-glitch/Driving-Lab/actions/runs/42338948349) also rendered successfully but automated `setState` did not refresh the on-screen buttons: screenshots labelled Material A even in B. The images themselves used the requested variant. Fixed that demonstrated UI defect and hid the overlay in automated captures; the final run above is the authoritative evidence.
+- Actual renderer `LINK_STATUS` was true for two WebGL programs and program logs were empty; no captured page, console, request or HTTP errors, and reported GL errors were zero. All three 1024² texture maps loaded. Map color-space properties were sRGB for albedo and non-color for normal and roughness; mipmap generation and anisotropy 8 were configured. Link status and rendering validate these paths in this environment, not physically correct normal handedness, calibrated reflectance or all device drivers.
+- Both variants use the same geometry, source textures, lighting, exposure, cameras and renderer. Switching A/B changes road pixels: for example mean absolute difference in the bottom 1280×450 of matched close screenshots is RGB (1.159, 0.918, 0.845) on an 8-bit scale; this includes background and is a sanity check, not a quality metric. Tested script writes actual variant states and hides UI during capture.
+
+### Matched visual inspection
+
+- **Close:** B retains visible fine grain but is somewhat softened versus A; superposition reduces texture contrast and fine surface distinctness. Both remain dark.
+- **Driver near and far:** both surfaces appear very dark and nearly uniform in frontal daylight; B is not convincingly more realistic in these conditions.
+- **Grazing:** B softens some repeating detail compared with A, but conspicuous regular transverse bands remain across the roadway; neither gives a convincing natural variation. There is no persuasive substantial reduction of the broad pattern. Grazing highlight can look too smooth; the physical reflectance is not calibrated and the rig is minimal.
+- **Overview:** both appear nearly black and featureless. A/B differences there are too small to justify a positive visual quality decision.
+- **Boundaries:** inspected `A/B-seam-50/100/150/200.png`; no distinct gap or abrupt material discontinuity was observed at the targeted joins in these dark/grazing views. Periodic bands make subtle transitions harder to assess. This is not proof of no seam under every light, direction, resolution, or independent streaming chunk.
+
+### Continuity and temporal limits
+
+Automated scene geometry checks compared shared vertex positions, UVs and `roadLocalMetres` at 50, 100, 150 and 200 m (tolerance 1e-6 for attributes) and passed. The five pieces share one material and globally continuous road coordinates, so this checks the showcase configuration; it does not exercise separately rebased chunks, different normal tangent frames or lane curves. Color, roughness and normals use matching UV inputs/translations in the code, but per-map visual isolation and independent normal orientation tests were not performed. No reproducible join defect was found, so no shader/geometry seam fix was made.
+
+The existing unit test checks negative and very large chainage modulo. An additional local arithmetic check passed 15 combinations of negative/positive/very large BigInt origins and 1 m, 50 m, 50.123 m lengths for the 2 m, 43 m and 71 m phase continuity; this was not GPU rendering and does not validate precision/rebasing in a streaming world. The macro modulation repeats longitudinally after 3,053 m; endless non-repetition remains unresolved.
+
+Inspected `motion-0.png` through `motion-7.png`: they step 0.92 m per image from 47 m to 53.44 m across the 50 m join. No obvious abrupt appearance jump was seen in these stills; repetitive bands persist. Eight separately captured positions are not continuous real-time footage, so swimming, shimmer, aliasing, stutter and speed-dependent stability remain unverified. No 100–200 km/h performance or motion-quality claim follows.
+
+### Cost and scope
+
+The instrumented views reported 2–5 draws / 4–10 triangles depending on frustum, 3 texture objects for both variants and zero GL errors. Three 1K RGBA8 textures with full mip chains are approximately 16 MiB before overhead or driver-dependent format choices, not measured GPU allocation. Source inspection suggests 3 fragment texture lookups for A and up to 6 for B (two per map); actual optimized GPU execution and frame-time delta are UNKNOWN. Frame timing values in the initial artifact were uncontrolled animation-frame intervals and are not a benchmark; the final artifact intentionally omits them. SwiftShader timings cannot establish iPhone Safari performance.
+
+Only the narrowly authorized workflow `.github/workflows/r22b2-road-webgl.yml`, showcase UI instrumentation, test and this report changed during recovery. No stable game, production workflows, physics, traffic, tree or road shader changes were made. The report commit SHA is available from Git history; self-inserting a commit's own SHA changes the commit.
