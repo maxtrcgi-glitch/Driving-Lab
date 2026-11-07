@@ -1,0 +1,5 @@
+import assert from 'node:assert/strict';
+import {tilePhaseFromMillimetres,createRoadBaseline} from '../road/road-surface.mjs';
+assert.equal(tilePhaseFromMillimetres(2500n),.25);assert.equal(tilePhaseFromMillimetres(-500n),.75);assert.equal(tilePhaseFromMillimetres(1000000000000000500n),.25);assert.throws(()=>tilePhaseFromMillimetres(1));assert.throws(()=>tilePhaseFromMillimetres(1n,0n));
+const vec=()=>({set(x,y){this.x=x;this.y=y}}), tex=()=>({repeat:vec(),offset:vec()});
+const T={RepeatWrapping:1,LinearFilter:2,LinearMipmapLinearFilter:3,SRGBColorSpace:'s',NoColorSpace:'',MeshStandardMaterial:class{constructor(x){Object.assign(this,x)}}};let c=tex(),n=tex(),r=tex();let mat=createRoadBaseline(T,{color:c,normal:n,roughness:r,widthMetres:16,lengthMetres:250,phaseV:.25,anisotropy:8});assert.equal(c.repeat.x,8);assert.equal(c.repeat.y,125);assert.equal(n.offset.y,.25);assert.equal(c.colorSpace,'s');assert.equal(n.colorSpace,'');assert.equal(mat.metalness,0);assert.equal(mat.normalMap,n);assert.throws(()=>createRoadBaseline(T,{color:c,normal:c,roughness:r,widthMetres:1,lengthMetres:1}));console.log('R2.2b-1 foundation tests pass');
