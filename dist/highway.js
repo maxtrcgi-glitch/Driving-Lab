@@ -25,7 +25,7 @@ export class Highway{
  project(x,z){const globalZ=z+this.origin;let s=globalZ;for(let i=0;i<3;i++){const dx=this.center(s)-x,g=this.gradient(s);s-=(s-globalZ+dx*g)/(1+g*g+dx*this.curvature(s));}const g=this.gradient(s),offset=((x-this.center(s))-(globalZ-s)*g)/Math.hypot(1,g);return {s,offset};}
  terrain(x,z){const {s,offset}=this.project(x,z),a=Math.abs(offset);return {height:this.height(s),grip:a>=1.6&&a<=14?1:a<16?.72:.55,surface:a>=1.6&&a<=14?'asphalt':a<16?'gravel':'grass'};}
  reset(seed=this.seed,trafficSeed=seed){if(this.diagnostics)this.diagnostics=new TrafficDiagnostics();this.seed=seed;this.trafficSeed=trafficSeed>>>0;this.origin=0;this.cars.length=0;this.clock=0;this.aiClock=1/30;this.spawnFailures=0;this.spawned=0;this.retired=0;this.passes=0;this.contacts=0;this.topSpeed=0;this.distance=0;this.serial=0;this.playerForwardSpeed=0;this.decisions=0;this.laneChanges=0;this.rejectedChanges=0;this.barrierContacts=0;this.npcContacts=0;this.pairChecks=0;this.abortedChanges=0;this._useLaneIndex=false;this.setDensity(this.density,0);let lead=null,rear=null;for(const c of this.cars)if(c.lane===1){if(c.s>0&&(!lead||c.s<lead.s))lead=c;if(c.s<0&&(!rear||c.s>rear.s))rear=c;}const speed=lead?.speed??28;if(rear)rear.speed=Math.min(rear.speed,speed);return {...this.point(0,LANES[1]),speed};}
- setDensity(count,playerS,playerOffset=LANES[1]){this.playerOffset=playerOffset;this.density=clamp(Math.round(count),0,MAX_TRAFFIC);while(this.cars.length>this.density){this.cars.pop();this.retired++;}let attempts=0;while(this.cars.length<this.density&&attempts++<500)this.spawn(playerS,true);}
+ setDensity(count,playerS,playerOffset=LANES[1]){this.playerOffset=playerOffset;this.density=clamp(Math.round(count),0,MAX_TRAFFIC);while(this.cars.length>this.density){const removed=this.cars.pop();this.diagnostics?.endManeuver(removed);this.retired++;}let attempts=0;while(this.cars.length<this.density&&attempts++<500)this.spawn(playerS,true);}
  spawn(playerS,initial=false,existing=null){
   const id=existing?.id??this.serial++,generation=existing?existing.generation+1:0,key=id+this.trafficSeed*99+generation*1009;
   const baseLane=id%6===5?3+Math.floor(id/6)%3:id%3;
@@ -79,7 +79,7 @@ export class Highway{
   if(!found){this.spawnFailures++;return null;}
   const speed=spawnSpeed,p=this.point(s,LANES[lane]);
   const car={id,generation,intent:createIntent(),lane,targetLane:lane,offset:LANES[lane],dir,s,speed,desired,cruiseLane,profile,headway,driverProfile:profile==='brisk'?'Assertive':profile==='cautious'?'Calm':'Normal',traits,comfortableBrake:2.2+.9*traits.speedTendency,jerkLimit:profile==='brisk'?3:2.2,lastDecisionAt:-1,maxAccel:1.1+traits.speedTendency,truck,length:truck?6.8:4.55,width:truck?2.3:1.82,mass:truck?4200:1500,inertia:truck?19000:2600,x:p.x,z:p.z,y:p.y,pitch:p.pitch*dir,yaw:p.yaw+(dir<0?Math.PI:0),vx:Math.sin(p.yaw)*speed*dir,vz:Math.cos(p.yaw)*speed*dir,yawRate:0,acceleration:0,braking:false,changing:0,changeDuration:3.8+hash(key+19)*.6,startOffset:LANES[lane],cooldown:3+hash(key+29)*7,crashed:false,hitAt:-Infinity,passed:false,wasAhead:s>playerS+5,lastAhead:s-playerS};
-  this.spawned++;if(existing){this.retired++;Object.assign(existing,car);}else this.cars.push(car);return car;
+  this.spawned++;if(existing){this.diagnostics?.endManeuver(existing);this.retired++;Object.assign(existing,car);}else this.cars.push(car);return car;
  }
  buildLaneIndex(){this._intentActors.clear();for(const actor of this.cars)this._intentActors.set(actor.id,actor);for(const list of this._laneLists)list.length=0;for(const c of this.cars)for(let lane=0;lane<6;lane++)if(this.occupies(c,lane))this._laneLists[lane].push(c);for(const list of this._laneLists)list.sort((a,b)=>a.s-b.s||a.id-b.id);this._useLaneIndex=!this.cars.some(c=>c.crashed);}
  reserveLane(c,lane){if(!this._useLaneIndex)return;const list=this._laneLists[lane];if(!list.includes(c)){list.push(c);list.sort((a,b)=>a.s-b.s||a.id-b.id);}}
@@ -117,7 +117,7 @@ export class Highway{
   if(car.changing&&car.targetLane!==car.lane&&!car.aborting&&1-car.changing/car.changeDuration<.35&&car.speed>8){
    const target=this.laneInfo(car,car.targetLane,player,this._candidate),frontClosing=Math.max(0,car.speed-target.leadSpeed),rearClosing=Math.max(0,target.rearSpeed-car.speed);
    const threatened=target.gap<8||target.rearGap<8||(frontClosing>0&&target.gap/frontClosing<2)||(rearClosing>0&&target.rearGap/rearClosing<2);
-   if(threatened&&this.safeLane(car,car.lane,player)){car.startOffset=car.offset;car.startLateralV=car.lateralV||0;car.startLateralA=car.lateralA||0;car.targetLane=car.lane;car.changeDuration=3.8;car.changing=car.changeDuration;car.aborting=true;car.cooldown=Math.max(car.cooldown,12);this.abortedChanges++;if(this.diagnostics)this.diagnostics.event(car,'LANE_CHANGE_ABORTED','target_threatened');}
+   if(threatened&&this.safeLane(car,car.lane,player)){car.startOffset=car.offset;car.startLateralV=car.lateralV||0;car.startLateralA=car.lateralA||0;car.targetLane=car.lane;car.changeDuration=3.8;car.changing=car.changeDuration;car.aborting=true;car.cooldown=Math.max(car.cooldown,12);this.abortedChanges++;if(this.diagnostics){this.diagnostics.endManeuver(car);this.diagnostics.event(car,'LANE_CHANGE_ABORTED','target_threatened');}}
   }
   if(!this._useLaneIndex){this._intentActors.clear();for(const actor of this.cars)this._intentActors.set(actor.id,actor);}
   this.decisions++;const current=this.laneInfo(car,car.targetLane,player,this._current);let acc=this.accelerationFor(car,current.gap,current.leadSpeed);
@@ -139,7 +139,7 @@ export class Highway{
     const score=nextAcc-acc+.16*(nextPace-pace)+preference*(.18+.36*(car.traits?.laneDiscipline??.5))+(blocked&&delta<0?.15:0)-gapWait;
     if(score>bestScore&&(blocked?nextPace>pace+1||nextAcc>acc+.3:preference>0&&nextPace>pace-1&&nextAcc>-.15)){best=lane;bestScore=score;}else if(diag)diag.event(car,'PASS_REJECTED','incentive_or_preference_not_met');
    }
-   if(best>=0&&!(intention.state==='EXECUTE_PASS'&&!intention.passCompleted)){intention.targetLane=best;if(intention.targetId!==null&&!intention.passCompleted)intention.state='EXECUTE_PASS';if(diag){diag.state(car).motivation=blocked?'slower_leader':'cruising_lane';diag.event(car,'PASS_ACCEPTED','candidate_selected');diag.event(car,'LANE_CHANGE_STARTED','candidate_selected');}car.targetLane=best;this.reserveLane(car,best);car.startOffset=car.offset;car.startLateralV=car.startLateralA=0;car.aborting=false;car.changing=car.changeDuration;car.cooldown=12+hash(car.id+this.trafficSeed+this.clock)*7;this.laneChanges++;const next=this.laneInfo(car,best,player,this._candidate);acc=Math.min(acc,this.accelerationFor(car,next.gap,next.leadSpeed));}
+   if(best>=0&&!(intention.state==='EXECUTE_PASS'&&!intention.passCompleted)){intention.targetLane=best;if(intention.targetId!==null&&!intention.passCompleted)intention.state='EXECUTE_PASS';if(diag){diag.state(car).motivation=blocked?'slower_leader':'cruising_lane';diag.event(car,'PASS_ACCEPTED','candidate_selected');diag.startManeuver(car,player?.s,diag.state(car).motivation);}car.targetLane=best;this.reserveLane(car,best);car.startOffset=car.offset;car.startLateralV=car.startLateralA=0;car.aborting=false;car.changing=car.changeDuration;car.cooldown=12+hash(car.id+this.trafficSeed+this.clock)*7;this.laneChanges++;const next=this.laneInfo(car,best,player,this._candidate);acc=Math.min(acc,this.accelerationFor(car,next.gap,next.leadSpeed));}
   }
   // Reserve both lanes throughout the manoeuvre; brake for either lead.
   let sourceEmergency=false;
@@ -164,7 +164,7 @@ export class Highway{
     const q3=10*D-6*V-1.5*A,q4=-15*D+8*V+1.5*A,q5=6*D-3*V-.5*A;
     c.offset=c.startOffset+V*t+.5*A*t*t+q3*t**3+q4*t**4+q5*t**5;
     c.lateralV=(V+A*t+3*q3*t*t+4*q4*t**3+5*q5*t**4)/T;c.lateralA=(A+6*q3*t+12*q4*t*t+20*q5*t**3)/(T*T);
-    if(c.changing===0){if(this.diagnostics)this.diagnostics.event(c,'LANE_CHANGE_COMPLETED',c.aborting?'abort_completed':'completed');c.lane=c.targetLane;c.lateralV=c.lateralA=0;c.aborting=false;}
+    if(c.changing===0){if(this.diagnostics){this.diagnostics.endManeuver(c);this.diagnostics.event(c,'LANE_CHANGE_COMPLETED',c.aborting?'abort_completed':'completed');}c.lane=c.targetLane;c.lateralV=c.lateralA=0;c.aborting=false;}
    }
    const p=this.point(c.s,c.offset),oldX=c.x,oldZ=c.z;c.x=p.x;c.z=p.z;c.y=p.y;c.pitch=p.pitch*c.dir;c.vx=(c.x-oldX)/dt;c.vz=(c.z-oldZ)/dt;c.yaw=Math.hypot(c.vx,c.vz)>.01?Math.atan2(c.vx,c.vz):p.yaw+(c.dir<0?Math.PI:0);c.yawRate=0;this.barrierContact(c,true);
    const ahead=(c.s-player.s);if(ahead>5)c.wasAhead=true;if(c.dir>0&&c.wasAhead&&ahead<-5&&!c.passed&&this.clock-c.hitAt>5){c.passed=true;this.passes++;}c.lastAhead=ahead;

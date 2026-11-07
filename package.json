@@ -22,7 +22,7 @@
     "check:current": "node tests/run-current.mjs",
     "check:legacy": "node tests/legacy/identity-audits.mjs",
     "check:browser": "node tests/browser-smoke.mjs",
-    "check:traffic-ai3": "node tests/a60-longitudinal.mjs && node tests/a60-lane-changes.mjs && node tests/a60-protected.mjs && node tests/a60-endurance.mjs && node tests/a60-overtaking.mjs && node tests/a60-visible-flow.mjs && node tests/a60-r31-diagnostics.mjs && node tests/a60-r32-traits.mjs && node tests/a60-r33-intent.mjs",
+    "check:traffic-ai3": "node tests/a60-longitudinal.mjs && node tests/a60-lane-changes.mjs && node tests/a60-protected.mjs && node tests/a60-endurance.mjs && node tests/a60-overtaking.mjs && node tests/a60-visible-flow.mjs && node tests/a60-r31-diagnostics.mjs && node tests/a60-r32-traits.mjs && node tests/a60-r33-intent.mjs && node tests/a60-r34-frustum.mjs",
     "bench:traffic-ai3": "node --expose-gc tests/a60-traffic-bench.mjs reports/A60/current-node.json"
   },
   "devDependencies": {
