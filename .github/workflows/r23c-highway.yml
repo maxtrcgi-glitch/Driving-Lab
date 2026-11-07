@@ -1,0 +1,29 @@
+name: R2.3c highway comparison
+on:
+  workflow_dispatch:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths: ['.github/workflows/r23c-highway.yml', 'experiments/asset-poc-r2/r23c/**']
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps --only-shell chromium
+      - run: node experiments/asset-poc-r2/r23c/test.mjs
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: r23c-highway-comparison
+          path: reports/r23c/
+          if-no-files-found: warn
