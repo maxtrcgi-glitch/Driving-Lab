@@ -8,7 +8,7 @@ window.loadingDiagnostics=diag;
 function update(stage){diag.stage=stage;info.textContent=`${stage} · ${diag.loaded}/${diag.total} · ${((Date.now()-diag.started)/1000).toFixed(1)}s${diag.failed.length?' · '+diag.failed.length+' failure(s)':''}`;}
 function failure(name,err){const e={resource:name,category:err?.category||'load',message:String(err?.message||err)};diag.failed.push(e);update(`Failed: ${name} (${e.category})`);}
 function timeout(p,name,ms=30000){let timer;return Promise.race([p,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Object.assign(new Error('Timed out after '+ms+' ms'),{category:'timeout'})),ms)})]).finally(()=>clearTimeout(timer));}
-async function load(name,fn){update('Loading '+name);try{const value=await timeout(Promise.resolve().then(fn),name);diag.loaded++;update('Loaded '+name);return value}catch(err){failure(name,err);throw err}}
+async function load(name,fn){update('Loading '+name);try{const value=await timeout(Promise.resolve().then(fn),name);diag.loaded++;if(!diag.finished)update('Loaded '+name);return value}catch(err){failure(name,err);throw err}}
 window.addEventListener('error',e=>failure('JavaScript',e.error||e.message));
 window.addEventListener('unhandledrejection',e=>{failure('Promise',e.reason);e.preventDefault()});
 const tick=setInterval(()=>{if(!diag.finished)update(diag.stage)},1000);

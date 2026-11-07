@@ -18,7 +18,7 @@ try {
   await page.waitForFunction(()=>window.loadingDiagnostics?.finished,null,{timeout:65000});
   const d=await page.evaluate(()=>window.loadingDiagnostics), text=await page.locator('#info').textContent();
   if(['success','clipboard'].includes(scenario)){assert.equal(d.complete,true,JSON.stringify(d));assert.equal(d.loaded,11);assert.equal(await page.evaluate(()=>window.sceneStats().glError),0)}
-  else {assert.equal(d.complete,false);assert.ok(d.failed.length,JSON.stringify(d));assert.match(text,/fail/i);if(scenario==='timeout')assert.equal(d.failed[0].category,'timeout');if(scenario==='glb'||scenario==='rejection'||scenario==='timeout')assert.ok(await page.locator('canvas').count());}
+  else {assert.equal(d.complete,false);assert.ok(d.failed.length,JSON.stringify(d));assert.match(text,/fail/i);assert.ok(text.includes(d.failed[0].resource), text);if(scenario==='timeout')assert.equal(d.failed[0].category,'timeout');if(scenario==='glb'||scenario==='rejection'||scenario==='timeout')assert.ok(await page.locator('canvas').count());}
   if(scenario==='clipboard'){await page.locator('#copy').click();assert.equal(await page.locator('#diagnostics').isVisible(),true);assert.match(await page.locator('#diagnostics').inputValue(),/renderer/)}
   console.log(scenario,JSON.stringify({text,loaded:d.loaded,failed:d.failed,webgl:d.webgl}));
   await page.close();
