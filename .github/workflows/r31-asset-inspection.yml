@@ -5,7 +5,7 @@ on:
     branches: [visual/asset-poc-r2]
     paths: ['.github/workflows/r31-asset-inspection.yml','experiments/asset-poc-r2/r31/**']
 permissions:
-  contents: read
+  contents: write
 jobs:
   inspect:
     runs-on: ubuntu-24.04
@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          persist-credentials: false
+          persist-credentials: true
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
@@ -37,3 +37,17 @@ jobs:
           name: r31-original-assets-inspection
           path: reports/r31/
           if-no-files-found: warn
+      - name: Preserve verified original files and evidence
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/visual/asset-poc-r2'
+        run: |
+          echo '178f41be4922db5d4e70f6e08b054d2c303ad9c4663f3e4a18bb8fd94c33594e  experiments/asset-poc-r2/r31/assets/highway-segment.glb' | sha256sum -c -
+          echo '188c8b1510d9e19d5add90be91cd83cf2ee234dc62269263b6a504dd9f865ac6  experiments/asset-poc-r2/r31/assets/guardrail.glb' | sha256sum -c -
+          mkdir -p experiments/asset-poc-r2/r31/evidence
+          cp reports/r31/*.json reports/r31/*.png reports/r31/*LICENSE.txt experiments/asset-poc-r2/r31/evidence/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f experiments/asset-poc-r2/r31/assets/*.glb experiments/asset-poc-r2/r31/evidence/
+          if ! git diff --cached --quiet; then
+            git commit -m 'R3.1 preserve original assets and WebGL evidence [skip ci]'
+            git push origin HEAD:visual/asset-poc-r2
+          fi
