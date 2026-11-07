@@ -1,0 +1,37 @@
+name: R2.2b-2 Road WebGL Validation
+on:
+  workflow_dispatch:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths:
+      - '.github/workflows/r22b2-road-webgl.yml'
+      - 'experiments/asset-poc-r2/road/**'
+      - 'experiments/asset-poc-r2/tests/r22b2-*.mjs'
+permissions:
+  contents: read
+jobs:
+  road-webgl:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps --only-shell chromium
+      - run: node experiments/asset-poc-r2/tests/r22b2-foundation.mjs
+      - name: Run WebGL comparison
+        run: |
+          mkdir -p reports/road-r22b2
+          set -o pipefail
+          node experiments/asset-poc-r2/tests/r22b2-webgl.mjs 2>&1 | tee reports/road-r22b2/test.log
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: r22b2-road-webgl
+          path: reports/road-r22b2/
+          if-no-files-found: warn
