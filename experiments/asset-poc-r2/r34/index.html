@@ -1,0 +1,118 @@
+<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta charset="utf-8"><title>Driving Lab | Highway R3.4</title><style>*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#9db4c1;font:14px system-ui;color:#fff}canvas{display:block}#ui{position:absolute;top:env(safe-area-inset-top,10px);left:10px;right:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}button{border:1px solid #ffffff66;background:#15242bdd;color:white;border-radius:6px;padding:9px 12px}#info{background:#15242bcc;padding:8px;border-radius:6px;font-size:12px}</style><script type="importmap">{"imports":{"three":"../viewer/vendor/three.module.js"}}</script></head><body><div id="ui"><button data-view="driver">Driver</button><button data-view="roadside">Roadside</button><button data-view="overview">Overview</button><button data-view="rail">Guardrail</button><button data-view="shoulder">Shoulder</button><button id="sun">Low sun</button><button id="drive">Drive</button><span id="info">Loading…</span></div><script type="module">
+import * as T from 'three';
+import { GLTFLoader } from '../viewer/vendor/GLTFLoader.js';
+const renderer=new T.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.2;renderer.debug.checkShaderErrors=true;document.body.appendChild(renderer.domElement);
+const scene=new T.Scene();scene.background=new T.Color(0xb6c9d3);scene.fog=new T.Fog(0xb6c9d3,190,550);const camera=new T.PerspectiveCamera(52,innerWidth/innerHeight,.1,700);scene.add(new T.HemisphereLight(0xe4efff,0x8d8977,2));const sun=new T.DirectionalLight(0xfff0d5,3);sun.position.set(-60,95,40);scene.add(sun);
+const textureLoader = new T.TextureLoader();
+async function surface(directory, name) {
+  const [map, normalMap, roughnessMap] = await Promise.all(
+    ['diff', 'nor_gl', 'rough'].map(channel =>
+      textureLoader.loadAsync(`${directory}/${name}_${channel}_1k.jpg`)
+    )
+  );
+  map.colorSpace = T.SRGBColorSpace;
+  for (const texture of [map, normalMap, roughnessMap]) {
+    texture.wrapS = texture.wrapT = T.RepeatWrapping;
+    texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  }
+  return new T.MeshStandardMaterial({map, normalMap, roughnessMap, roughness: 1, metalness: 0});
+}
+
+const gltf = new GLTFLoader();
+const [asphalt, resurfaced, gravel, guardrail, barrier] = await Promise.all([
+  surface('./assets', 'asphalt_02'),
+  surface('../assets/asphalt-track', 'asphalt_track'),
+  surface('./assets', 'gravel_road'),
+  gltf.loadAsync('../r31/assets/guardrail.glb'),
+  gltf.loadAsync('./assets/jersey-barrier.glb')
+]);
+
+const roadWidth = 13.5;
+const roadCenter = 1.5;
+const length = 300;
+const edgeHeight = -roadWidth * .01;
+const crownHeight = x => -.02 * Math.abs(x - roadCenter);
+
+function stripSurface(width, from, to, center, subdivisions, height, material, tileSize) {
+  const geometry = new T.PlaneGeometry(width, to - from, subdivisions, 1);
+  const { position, uv } = geometry.attributes;
+  const midpoint = (from + to) / 2;
+  for (let i = 0; i < position.count; i++) {
+    const x = center + position.getX(i);
+    const distance = midpoint - position.getY(i);
+    position.setZ(i, height(x));
+    uv.setXY(i, x / tileSize, -distance / tileSize);
+  }
+  geometry.computeVertexNormals();
+  const mesh = new T.Mesh(geometry, material);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.set(center, 0, -midpoint);
+  scene.add(mesh);
+}
+
+// Preserve the R2.3c crown and shoulder profile. One pavement change uses
+// adjoining geometry so there are no nearly coplanar repair overlays.
+for (const [from, to, material, tile] of [
+  [0, 76, asphalt, 3], [76, 97, resurfaced, 2], [97, length, asphalt, 3]
+]) {
+  stripSurface(roadWidth, from, to, roadCenter, 54, crownHeight, material, tile);
+}
+for (const [center, edge] of [[-6.25, -5.25], [9.25, 8.25]]) {
+  stripSurface(2, 0, length, center, 1,
+    x => edgeHeight - .04 * Math.abs(x - edge), gravel, 2);
+}
+const ground = new T.Mesh(
+  new T.PlaneGeometry(210, 600),
+  new T.MeshStandardMaterial({color:0x858b6e, roughness:1})
+);
+ground.rotation.x = -Math.PI / 2;
+ground.position.set(0, edgeHeight - .08, -150);
+scene.add(ground);
+
+// Retain the neutral paint while batching stripes as a single draw.
+const lines = [];
+for (const x of [-5.15, 5.15]) lines.push([x, -150, 300, .2]);
+for (const x of [-1.75, 1.75]) {
+  for (let z = 0; z < length; z += 18) lines.push([x, -z - 3, 6, .15]);
+}
+const markings = new T.InstancedMesh(
+  new T.PlaneGeometry(1, 1),
+  new T.MeshStandardMaterial({color:0xbab8af, roughness:.9}),
+  lines.length
+);
+const pose = new T.Object3D();
+for (const [i, [x, z, depth, width]] of lines.entries()) {
+  pose.position.set(x, crownHeight(x) + .008, z);
+  pose.rotation.set(-Math.PI / 2, 0, x < roadCenter ? .02 : -.02, 'ZXY');
+  pose.scale.set(width, depth, 1);
+  pose.updateMatrix();
+  markings.setMatrixAt(i, pose.matrix);
+}
+scene.add(markings);
+
+function repeatModel(source, x, first, spacing, count, rotation) {
+  source.updateMatrixWorld(true);
+  const world = new T.Object3D();
+  const matrix = new T.Matrix4();
+  source.traverse(part => {
+    if (!part.isMesh) return;
+    const instances = new T.InstancedMesh(part.geometry, part.material, count);
+    for (let i = 0; i < count; i++) {
+      world.position.set(x, ground.position.y, -(first + i * spacing));
+      world.rotation.y = rotation;
+      world.updateMatrix();
+      matrix.multiplyMatrices(world.matrix, part.matrixWorld);
+      instances.setMatrixAt(i, matrix);
+    }
+    instances.computeBoundingSphere();
+    scene.add(instances);
+  });
+}
+
+// Both original models are X-long. The right rail presents its beam to traffic.
+repeatModel(guardrail.scene, 10.85, 6, 12, 25, -Math.PI / 2);
+repeatModel(barrier.scene, -7.85, 2.072, 4.144, 72, Math.PI / 2);
+
+let mode='driver',moving=false,low=false,distance=20,last=performance.now(),frame=0,speed=100;function setView(){if(mode==='driver'){camera.position.set(0,1.2,-distance);camera.lookAt(0,.15,-distance-55)}else if(mode==='roadside'){camera.position.set(9.4,1,-distance);camera.lookAt(-1,.2,-distance-35)}else if(mode==='rail'){camera.position.set(8.75,.70,-distance+1.7);camera.lookAt(10.8,.28,-distance-2)}else if(mode==='shoulder'){camera.position.set(8.5,.5,-distance+1);camera.lookAt(9.1,-.17,-distance-5)}else{camera.position.set(35,24,-distance-15);camera.lookAt(0,0,-distance-60)}}
+window.setScene=({view=mode,sunLow=low,move=moving,at=distance,kmh=speed}={})=>{mode=view;low=sunLow;moving=move;distance=at;speed=kmh;sun.position.set(...(low?[-75,9,-30]:[-60,95,40]));setView();renderer.render(scene,camera);return window.sceneStats()};window.sceneStats=()=>({view:mode,distance,calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,textures:renderer.info.memory.textures,glError:renderer.getContext().getError(),version:renderer.getContext().getParameter(renderer.getContext().VERSION)});document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>window.setScene({view:b.dataset.view}));document.querySelector('#sun').onclick=()=>window.setScene({sunLow:!low});document.querySelector('#drive').onclick=()=>{moving=!moving;document.querySelector('#drive').textContent=moving?'Pause':'Drive'};addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});window.setScene();window.ready=true;renderer.setAnimationLoop(now=>{let dt=Math.min(now-last,80);last=now;if(moving)distance=(distance+dt/1000*speed/3.6)%230;setView();renderer.render(scene,camera);if(++frame%20===0)document.querySelector('#info').textContent=`${renderer.info.render.calls} draws · ${renderer.info.render.triangles} tris`;});
+</script></body></html>

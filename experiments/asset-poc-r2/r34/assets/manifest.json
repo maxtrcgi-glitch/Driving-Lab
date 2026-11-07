@@ -1,0 +1,51 @@
+{
+  "asphalt_02_diff_1k.jpg": {
+    "source": "https://polyhaven.com/a/asphalt_02",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/asphalt_02/asphalt_02_diff_1k.jpg",
+    "license": "CC0-1.0",
+    "bytes": 731707,
+    "sha256": "1aa5ce99f58a625c71d48cfc3e68b65ca85ccb00f39e045c0a928608a0ea25ed"
+  },
+  "asphalt_02_nor_gl_1k.jpg": {
+    "source": "https://polyhaven.com/a/asphalt_02",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/asphalt_02/asphalt_02_nor_gl_1k.jpg",
+    "license": "CC0-1.0",
+    "bytes": 1240122,
+    "sha256": "42a1c381b53204e83a982db2864479a30bc127bbdeebb1006f8ee51bff099df3"
+  },
+  "asphalt_02_rough_1k.jpg": {
+    "source": "https://polyhaven.com/a/asphalt_02",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/asphalt_02/asphalt_02_rough_1k.jpg",
+    "license": "CC0-1.0",
+    "bytes": 544032,
+    "sha256": "70ba3edc65525eb4dc366cf010ca7ae0bd34e0251ff0225c2dad627a873d0712"
+  },
+  "gravel_road_diff_1k.jpg": {
+    "source": "https://polyhaven.com/a/gravel_road",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/gravel_road/gravel_road_diff_1k.jpg",
+    "license": "CC0-1.0",
+    "bytes": 684038,
+    "sha256": "bccbb077a825bdd0eb6f607939578a6ee549822824278fb3a828f6eed3d05d45"
+  },
+  "gravel_road_nor_gl_1k.jpg": {
+    "source": "https://polyhaven.com/a/gravel_road",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/gravel_road/gravel_road_nor_gl_1k.jpg",
+    "license": "CC0-1.0",
+    "bytes": 983723,
+    "sha256": "0920996cab9f2d62a2eb73a3589804527aa0273c4ca61b9f526ce4cba37edebc"
+  },
+  "gravel_road_rough_1k.jpg": {
+    "source": "https://polyhaven.com/a/gravel_road",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/gravel_road/gravel_road_rough_1k.jpg",
+    "license": "CC0-1.0",
+    "bytes": 361584,
+    "sha256": "de602a8ce72aea4ef931b25c9b15fb5e38636bfb32c7df91d0656f7aace193b0"
+  },
+  "jersey-barrier.glb": {
+    "source": "https://www.innerscene.com/tools/library/3d-parts/jersey-barrier-5dc3eefe",
+    "url": "https://www.innerscene.com/api/library/jersey-barrier-5dc3eefe/download",
+    "license": "CC0-1.0",
+    "bytes": 3186720,
+    "sha256": "572d6c2b44e0ad4deb3000d9fb214785b7f625bc5da46680994371140e64f2ba"
+  }
+}
