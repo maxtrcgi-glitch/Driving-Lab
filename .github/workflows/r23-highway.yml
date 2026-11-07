@@ -1,0 +1,29 @@
+name: R2.3 highway visual proof
+on:
+  workflow_dispatch:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths: ['.github/workflows/r23-highway.yml', 'experiments/asset-poc-r2/r23/**']
+permissions:
+  contents: read
+jobs:
+  webgl:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps --only-shell chromium
+      - run: node experiments/asset-poc-r2/r23/test.mjs
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: r23-highway-webgl
+          path: reports/r23/
+          if-no-files-found: warn
