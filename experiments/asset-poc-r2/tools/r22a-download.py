@@ -14,7 +14,7 @@ manifest={'asset':'asphalt_track','source':'https://polyhaven.com/a/asphalt_trac
 for size in ['1k','2k']:
  for kind in ['diff','nor_gl','rough']:
   name=f'asphalt_track_{kind}_{size}.jpg';matches=[u for u in urls if urllib.parse.unquote(urllib.parse.urlparse(u).path).endswith('/'+name)]
-  if len(matches)!=1:raise RuntimeError(f'Expected one URL for {name}, got {len(matches)}')
+  if not matches:raise RuntimeError(f'No URL for {name}')
   with urllib.request.urlopen(urllib.request.Request(matches[0],headers={'User-Agent':'DrivingLab/1.0'}),timeout=180) as r:content=r.read()
   if content[:2]!=b'\xff\xd8':raise RuntimeError('not JPEG: '+name)
   (root/name).write_bytes(content);manifest['files'].append({'name':name,'source_url':matches[0],'bytes':len(content),'sha256':hashlib.sha256(content).hexdigest()})

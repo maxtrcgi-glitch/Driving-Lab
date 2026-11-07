@@ -35,3 +35,5 @@ jobs:
             git commit -m 'R2.2a: add CC0 asphalt source textures'
             git push origin HEAD:visual/asset-poc-r2
           fi
+
+# Source API can return duplicate URLs.
