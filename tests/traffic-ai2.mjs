@@ -24,7 +24,7 @@ for(const density of [28,72,120])for(const seed of [37,101,391,719,2027,4099,812
  for(let i=0;i<90*30;i++){
   const t=i/30,v=t<12?28:t<18?Math.max(0,28-(t-12)*5):t<28?0:t<50?Math.min(70,(t-28)*3.5):t<64?70:30;
   s+=v/30/Math.hypot(1,h.gradient(s));h.step(1/30,player(h,s,v));assert.equal(h.cars.length,density);maxCars=Math.max(maxCars,h.cars.length);
-  for(const c of h.cars){assert.ok(Number.isFinite(c.x+c.z+c.speed+c.yaw));assert.equal(c.crashed,false,'Normal AI must not hit NPC/barriers');if(c.changing){changeFrames++;const last=lastChanges.get(c.id);if(!last||last.generation!==c.generation||last.target!==c.targetLane){if(last&&last.generation===c.generation)assert.ok(h.clock-last.time>=11.9,"No rapid ping-pong lane changes");lastChanges.set(c.id,{generation:c.generation,target:c.targetLane,time:h.clock});}}}
+  for(const c of h.cars){assert.ok(Number.isFinite(c.x+c.z+c.speed+c.yaw));assert.equal(c.crashed,false,'Normal AI must not hit NPC/barriers');if(c.changing&&!c.aborting){changeFrames++;const last=lastChanges.get(c.id);if(!last||last.generation!==c.generation||last.target!==c.targetLane){if(last&&last.generation===c.generation)assert.ok(h.clock-last.time>=11.9,"No rapid ping-pong lane changes");lastChanges.set(c.id,{generation:c.generation,target:c.targetLane,time:h.clock});}}}
   if(i%10===0){let stopped=0;const speeds=[];for(let a=0;a<h.cars.length;a++){const c=h.cars[a];speeds.push(c.speed);if(c.speed<3)stopped++;for(let b=a+1;b<h.cars.length;b++){const d=h.cars[b];if(Math.abs(c.offset-d.offset)<(c.width+d.width)/2+.03){const gap=Math.abs(c.s-d.s)-(c.length+d.length)/2;minGap=Math.min(minGap,gap);assert.ok(gap>0,`Lane-selection overlap seed=${seed} density=${density} IDs=${c.id}/${d.id}`);}}}
    speeds.sort((a,b)=>a-b);minMedianSpeed=Math.min(minMedianSpeed,speeds[Math.floor(speeds.length/2)]);if(stopped>density*.4)jamSamples++;samples++;stops+=stopped;
   }
@@ -47,3 +47,4 @@ const crash=fixture();crash.h.cars=[crash.ego,crash.lead];at(crash.h,crash.ego,0
 for(const dt of [1/30,1/60,1/120,1/240]){const h=new Highway(86);h.density=72;h.reset(86,918);for(let i=0;i<10/dt;i++)h.step(dt,player(h,i*dt*28));assert.ok(h.decisions/72>=299&&h.decisions/72<=301);assert.equal(h.cars.length,72);}
 const result={version:'0.14A.3.3',heldoutCombinations:24,secondsEach:90,fixedSeedsMatch:true,distinctStartupSeeds:32,minBodyGapM:minGap,maxSideStepM:maxSideStep,maxSideAccelerationMps2:maxSideAcceleration,laneChanges:changes,globalJamSamples:jamSamples,samples,minMedianSpeedMps:minMedianSpeed,wallTrials,maxCars,normalNPCContacts:0,normalBarrierContacts:0,frameRatesHz:[30,60,120,240],flows,nodeOnly:true,iPhoneQA:false};
 fs.writeFileSync(out+'/traffic-validation.json',JSON.stringify(result,null,2));console.log(result);
+

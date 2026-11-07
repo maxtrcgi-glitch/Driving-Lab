@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "simulatedSeconds": 1800,
+  "trafficHz": 30,
+  "density": 120,
+  "seed": 917,
+  "distanceM": 99017.63635876396,
+  "recycles": 3276,
+  "minBodyGapM": 14.037209511635591,
+  "maxEmptyAhead1000S": 0,
+  "objectsReused": true,
+  "finite": true,
+  "respawnSeedMatch": true,
+  "scope": "Headless traffic/road model; player collisions, rendering, actual FPS and iPhone not measured"
+}

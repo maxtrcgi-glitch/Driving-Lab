@@ -1,0 +1,16 @@
+[
+  {
+    "mutation": "zero-braking",
+    "test": "tests/a60-longitudinal.mjs",
+    "exit": 1,
+    "detected": true,
+    "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(h.accelerationFor(c,25,c.speed)<h.accelerationFor(c,100,c.speed))\n\n    at file:///tmp/a60-negative-8olorq70/tests/a60-longitudinal.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\n    at async node:internal/modules/esm/loader:647:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.22.1\n"
+  },
+  {
+    "mutation": "instant-lane",
+    "test": "tests/a60-lane-changes.mjs",
+    "exit": 1,
+    "detected": true,
+    "stderr": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(maxStep<.01)\n\n    at file:///tmp/a60-negative-3j5oycgl/tests/a60-lane-changes.mjs:9:246\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\n    at async node:internal/modules/esm/loader:647:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v24.22.1\n"
+  }
+]

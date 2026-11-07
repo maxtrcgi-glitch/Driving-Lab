@@ -7,7 +7,8 @@ let minGap=Infinity,maxInitialRoll=0;
 for(const seed of [1,86,917]){
  const h=new Highway(seed);h.density=MAX_TRAFFIC;const p=h.reset();assert.equal(h.cars.length,120);
  assert.ok(h.cars.some(c=>c.dir===1&&c.s<0));assert.ok(h.cars.some(c=>c.dir===1&&c.s>0&&c.s<70));assert.ok(h.cars.some(c=>c.dir===1&&Math.abs(c.s)<25));
- assert.ok(p.speed>20&&p.speed<40);const v=new Vehicle((x,z)=>h.terrain(x,z));v.reset(p.x,p.z,p.yaw,p.speed);
+ const front=h.cars.filter(c=>c.lane===1&&c.s>0).sort((a,b)=>a.s-b.s)[0],rear=h.cars.filter(c=>c.lane===1&&c.s<0).sort((a,b)=>b.s-a.s)[0];
+ assert.ok(Number.isFinite(p.speed)&&p.speed>20&&p.speed<=44,'A60 rolling speed within current driver range');assert.equal(p.speed,front.speed,'Rolling spawn matches its lead');assert.ok(!rear||rear.speed<=p.speed,'No initial fast rear closing');const v=new Vehicle((x,z)=>h.terrain(x,z));v.reset(p.x,p.z,p.yaw,p.speed);
  for(const c of h.cars)assert.ok(Math.abs(c.offset+7.4)>2.8||Math.abs(c.s)>55,'Spawn clearance');
  for(const w of v.wheels)assert.ok(Math.abs(w.omega*GR86.tireRadius-p.speed)<1e-9);
  assert.ok(Math.abs(v.engineOmega-v.wheels[2].omega*GR86.gears[v.gear-1]*GR86.finalDrive)<1e-6);

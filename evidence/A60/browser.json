@@ -1,0 +1,308 @@
+{
+  "status": "PASS",
+  "stub": false,
+  "pageErrors": [],
+  "consoleErrors": [],
+  "failedRequests": [],
+  "httpErrors": [],
+  "resources": [
+    {
+      "url": "/",
+      "status": 200
+    },
+    {
+      "url": "/style.css",
+      "status": 200
+    },
+    {
+      "url": "/app.js",
+      "status": 200
+    },
+    {
+      "url": "/camera-road.js",
+      "status": 200
+    },
+    {
+      "url": "/camera-rig.js",
+      "status": 200
+    },
+    {
+      "url": "/camera-settings.js",
+      "status": 200
+    },
+    {
+      "url": "/telemetry.js",
+      "status": 200
+    },
+    {
+      "url": "/sensors.js",
+      "status": 200
+    },
+    {
+      "url": "/vehicle-spec.js",
+      "status": 200
+    },
+    {
+      "url": "/controls.js",
+      "status": 200
+    },
+    {
+      "url": "/driving-experience.js",
+      "status": 200
+    },
+    {
+      "url": "/steering-trace.js",
+      "status": 200
+    },
+    {
+      "url": "/traffic-trace.js",
+      "status": 200
+    },
+    {
+      "url": "/physics.js",
+      "status": 200
+    },
+    {
+      "url": "/course.js",
+      "status": 200
+    },
+    {
+      "url": "/world.js",
+      "status": 200
+    },
+    {
+      "url": "/highway.js",
+      "status": 200
+    },
+    {
+      "url": "/highway-world.js",
+      "status": 200
+    },
+    {
+      "url": "/three.module.js",
+      "status": 200
+    },
+    {
+      "url": "/camera-profiles.js",
+      "status": 200
+    },
+    {
+      "url": "/camera-observation.js",
+      "status": 200
+    },
+    {
+      "url": "/vehicle-state.js",
+      "status": 200
+    },
+    {
+      "url": "/steering-reference.js",
+      "status": 200
+    },
+    {
+      "url": "/driving-diagnostics.js",
+      "status": 200
+    },
+    {
+      "url": "/slip-detector.js",
+      "status": 200
+    },
+    {
+      "url": "/steering-predictor.js",
+      "status": 200
+    },
+    {
+      "url": "/road-geometry.js",
+      "status": 200
+    },
+    {
+      "url": "/gr86-model.js",
+      "status": 200
+    },
+    {
+      "url": "/three.core.js",
+      "status": 200
+    },
+    {
+      "url": "/",
+      "status": 200
+    },
+    {
+      "url": "/style.css",
+      "status": 200
+    },
+    {
+      "url": "/app.js",
+      "status": 200
+    },
+    {
+      "url": "/camera-rig.js",
+      "status": 200
+    },
+    {
+      "url": "/camera-road.js",
+      "status": 200
+    },
+    {
+      "url": "/camera-settings.js",
+      "status": 200
+    },
+    {
+      "url": "/vehicle-spec.js",
+      "status": 200
+    },
+    {
+      "url": "/sensors.js",
+      "status": 200
+    },
+    {
+      "url": "/telemetry.js",
+      "status": 200
+    },
+    {
+      "url": "/controls.js",
+      "status": 200
+    },
+    {
+      "url": "/driving-experience.js",
+      "status": 200
+    },
+    {
+      "url": "/traffic-trace.js",
+      "status": 200
+    },
+    {
+      "url": "/steering-trace.js",
+      "status": 200
+    },
+    {
+      "url": "/physics.js",
+      "status": 200
+    },
+    {
+      "url": "/course.js",
+      "status": 200
+    },
+    {
+      "url": "/world.js",
+      "status": 200
+    },
+    {
+      "url": "/camera-observation.js",
+      "status": 200
+    },
+    {
+      "url": "/highway-world.js",
+      "status": 200
+    },
+    {
+      "url": "/camera-profiles.js",
+      "status": 200
+    },
+    {
+      "url": "/three.module.js",
+      "status": 200
+    },
+    {
+      "url": "/highway.js",
+      "status": 200
+    },
+    {
+      "url": "/driving-diagnostics.js",
+      "status": 200
+    },
+    {
+      "url": "/steering-reference.js",
+      "status": 200
+    },
+    {
+      "url": "/vehicle-state.js",
+      "status": 200
+    },
+    {
+      "url": "/slip-detector.js",
+      "status": 200
+    },
+    {
+      "url": "/steering-predictor.js",
+      "status": 200
+    },
+    {
+      "url": "/gr86-model.js",
+      "status": 200
+    },
+    {
+      "url": "/road-geometry.js",
+      "status": 200
+    },
+    {
+      "url": "/three.core.js",
+      "status": 200
+    }
+  ],
+  "warnings": [],
+  "executableOverride": null,
+  "stage": "reset-position",
+  "browser": "151.0.7922.34",
+  "webgl": {
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "width": 844,
+    "height": 390
+  },
+  "drivingFramesObserved": 4,
+  "screenshotWarnings": [
+    "TimeoutError: page.screenshot: Timeout 5000ms exceeded.\nCall log:\n  - taking page screenshot\n  - waiting for fonts to load...\n  - fonts loaded\n",
+    "TimeoutError: page.screenshot: Timeout 5000ms exceeded.\nCall log:\n  - taking page screenshot\n  - waiting for fonts to load...\n  - fonts loaded\n"
+  ],
+  "seat": {
+    "settings": {
+      "mode": 1,
+      "firstPerson": "driver",
+      "seatHeight": -0.1,
+      "seatForward": -0.15,
+      "inertia": true,
+      "intensity": 25,
+      "headPreset": "natural",
+      "gazePreset": "natural",
+      "gazeIntensity": 100,
+      "gazeMax": 25,
+      "horizon": true,
+      "autoLook": true,
+      "drift": false,
+      "dynamicFov": 0,
+      "fov": 60,
+      "chaseDistance": 5.6,
+      "chaseHeight": 2.15,
+      "recenter": true,
+      "recenterSpeed": 1
+    },
+    "position": [
+      -7.029999999999979,
+      1.0303456926128742,
+      23.493679118557957
+    ],
+    "stored": {
+      "mode": 1,
+      "firstPerson": "driver",
+      "seatHeight": -0.1,
+      "seatForward": -0.15,
+      "inertia": true,
+      "intensity": 25,
+      "headPreset": "natural",
+      "gazePreset": "natural",
+      "gazeIntensity": 100,
+      "gazeMax": 25,
+      "horizon": true,
+      "autoLook": true,
+      "drift": false,
+      "dynamicFov": 0,
+      "fov": 60,
+      "chaseDistance": 5.6,
+      "chaseHeight": 2.15,
+      "recenter": true,
+      "recenterSpeed": 1
+    }
+  },
+  "reloadPersistence": true,
+  "resetPosition": true
+}

@@ -27,11 +27,11 @@ const result = {status: 'BROWSER NOT VERIFIED', stub: false, pageErrors: [], con
 let browser, page;
 const stage = name => { result.stage = name; console.log(`Browser stage: ${name}`); };
 const timeout = setTimeout(async () => {
-  result.error = 'Browser smoke exceeded 180s';
+  result.error = 'Browser smoke exceeded 240s';
   await fs.writeFile(path.join(out, 'smoke.json'), JSON.stringify(result, null, 2));
   console.error(result.error);
   process.exit(1);
-}, 180000);
+}, 240000);
 try {
   const extraArgs = JSON.parse(process.env.CHROMIUM_EXTRA_ARGS || '[]');
   assert.ok(Array.isArray(extraArgs) && extraArgs.every(value => typeof value === 'string'));
@@ -41,6 +41,7 @@ try {
   result.browser = browser.version();
   page = await browser.newPage({viewport: {width: 844, height: 390}, deviceScaleFactor: 1});
   page.setDefaultTimeout(30000);
+  await page.context().grantPermissions(['clipboard-read','clipboard-write'], {origin:baseURL});
   page.on('pageerror', error => result.pageErrors.push(String(error)));
   page.on('console', message => {
     if (message.type() === 'error') result.consoleErrors.push(message.text());
@@ -53,8 +54,9 @@ try {
   });
   stage('load');
   assert.equal((await page.goto(baseURL, {waitUntil: 'domcontentloaded'})).status(), 200);
-  await page.waitForFunction(() => window.drivingLab?.version === '0.14A.5.2');
-  assert.match(await page.title(), /v0\.14A\.5\.2.*Cockpit Seat Adjustment/);
+  await page.waitForFunction(() => window.drivingLab?.version === '0.14A.6.0');
+  assert.match(await page.title(), /v0\.14A\.6\.0.*Traffic AI R3\.4 Experimental/);
+  assert.equal(await page.evaluate(()=>window.drivingLab.trafficRevision),'R3.4 Experimental');
   assert.equal(await page.locator('#fatal').isVisible(), false);
   stage('webgl');
   result.webgl = await page.evaluate(() => {
@@ -73,6 +75,32 @@ try {
   await page.screenshot({path: path.join(out, 'highway.png'), timeout: 5000}).catch(error => {
     (result.screenshotWarnings ||= []).push(String(error));
   });
+  stage('traffic-diagnostics');
+  assert.equal(await page.locator('#traffic-debug').isChecked(), false);
+  assert.equal(await page.locator('#traffic-debug-overlay').isVisible(), false);
+  await page.locator('#pause-btn').click();await page.locator('#settings-btn').click();
+  await page.getByText('Circuit & conditions', {exact:true}).click();
+  await page.locator('#traffic-debug').check();
+  await page.locator('#close-settings').click();await page.locator('#resume-btn').click();
+  await page.waitForFunction(() => /NPC \d+\/\d+/.test(document.querySelector('#traffic-debug-overlay').textContent));
+  const first=await page.locator('#traffic-debug-overlay').textContent();
+  await page.waitForFunction(previous => document.querySelector('#traffic-debug-overlay').textContent !== previous, first, {timeout:20000});
+  const observed=await page.evaluate(() => ({text:document.querySelector('#traffic-debug-overlay').textContent, diagnostics:!!window.drivingLab.highway.diagnostics, overlay:(()=>{const r=document.querySelector('#traffic-debug-overlay').getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom};})(),controls:[...document.querySelectorAll('.steer-pad,.pedal')].filter(e=>e.getClientRects().length).map(e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom};})}));
+  assert.ok(observed.diagnostics && observed.text.includes('Motivation '));
+  assert.match(observed.text,/Frustum seen \d+ · ≥0.5s \d+/);
+  assert.match(observed.text,/Traffic \d+\/\d+ · eval \d+ · candidate rejects \d+/);
+  assert.ok(observed.controls.length>0);
+  for(const c of observed.controls)assert.ok(observed.overlay.right<=c.left||observed.overlay.left>=c.right||observed.overlay.bottom<=c.top||observed.overlay.top>=c.bottom,'Overlay must not cover steering or pedals');
+  await page.locator('#pause-btn').click();await page.locator('#settings-btn').click();
+  await page.locator('#traffic-debug-copy').click();
+  await page.waitForFunction(() => document.querySelector('#traffic-debug-status').textContent.length>0);
+  const status=await page.locator('#traffic-debug-status').textContent();
+  if(status==='Copied.')assert.ok((await page.evaluate(()=>navigator.clipboard.readText())).includes('NPC '));
+  else {assert.ok(await page.locator('#traffic-debug-copy-fallback').isVisible());assert.match(await page.locator('#traffic-debug-copy-fallback').inputValue(),/NPC /);}
+  await page.locator('#traffic-debug').uncheck();await page.locator('#close-settings').click();await page.locator('#resume-btn').click();
+  assert.equal(await page.locator('#traffic-debug-overlay').isVisible(),false);
+  assert.equal(await page.evaluate(()=>window.drivingLab.highway.diagnostics),null);
+  result.trafficDiagnostics={defaultOff:true,enabled:true,nearestNpc:true,overlayDoesNotCoverDrivingControls:true,copyStatus:status,disabled:true,first,observed:observed.text};
   stage('camera-settings');
   await page.locator('#pause-btn').click();
   await page.locator('#settings-btn').click();
@@ -99,7 +127,7 @@ try {
   });
   stage('reload');
   await page.reload({waitUntil: 'domcontentloaded'});
-  await page.waitForFunction(() => window.drivingLab?.version === '0.14A.5.2');
+  await page.waitForFunction(() => window.drivingLab?.version === '0.14A.6.0');
   const restored = await page.evaluate(() => ({height: window.drivingLab.cameraRig.settings.seatHeight, forward: window.drivingLab.cameraRig.settings.seatForward}));
   assert.deepEqual(restored, {height: -.10, forward: -.15});
   // Reopen the real controls and exercise Reset Position without rewriting state in evaluate().
@@ -112,7 +140,7 @@ try {
   const reset = await page.evaluate(() => JSON.parse(localStorage.getItem('driving-lab-camera-v014a4')));
   assert.equal(reset.seatHeight, 0); assert.equal(reset.seatForward, 0);
   for (const key of Object.keys(result.seat.stored).filter(key => !key.startsWith('seat'))) assert.deepEqual(reset[key], result.seat.stored[key], `Reset preserves ${key}`);
-  for (const resource of ['/app.js', '/three.module.js', '/three.core.js', '/camera-rig.js', '/camera-settings.js', '/style.css'])
+  for (const resource of ['/app.js', '/three.module.js', '/three.core.js', '/camera-rig.js', '/camera-settings.js', '/style.css', '/traffic-diagnostics.js', '/traffic-diagnostics.css'])
     assert.ok(result.resources.some(item => item.url === resource && item.status === 200), `Browser loaded ${resource}`);
   for (const key of ['pageErrors', 'consoleErrors', 'failedRequests', 'httpErrors']) assert.deepEqual(result[key], [], key);
   result.status = 'PASS'; result.reloadPersistence = true; result.resetPosition = true;
@@ -126,3 +154,4 @@ try {
   await fs.writeFile(path.join(out, 'smoke.json'), JSON.stringify(result, null, 2));
   console.log(JSON.stringify(result, null, 2));
 }
+

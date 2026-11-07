@@ -4,14 +4,14 @@
  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
  <meta name="theme-color" content="#111719"><meta name="description" content="Driving Lab: an experimental vehicle simulator with a dedicated handling circuit.">
  <link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
- <title>DRIVING LAB v0.14A.5.2 — Cockpit Seat Adjustment</title><link rel="stylesheet" href="./style.css">
+ <title>DRIVING LAB v0.14A.6.0 — Traffic AI R3.4 Experimental</title><link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./traffic-diagnostics.css">
 </head>
 <body>
  <main id="app">
   <section id="stage" aria-label="Driving simulator">
    <canvas id="view" aria-label="3D view of the car and handling circuit"></canvas>
    <div class="hud-top">
-    <div class="session"><span class="eyebrow">DRIVING LAB v0.14A.5.2 — Cockpit Seat Adjustment</span><span class="eyebrow" id="location">HANDLING CIRCUIT</span><span id="lap-time">00:00.0</span><small id="lap-info">Lap 1</small></div>
+    <div class="session"><span class="eyebrow">DRIVING LAB v0.14A.6.0 — Traffic AI R3.4 Experimental</span><span class="eyebrow" id="location">HANDLING CIRCUIT</span><span id="lap-time">00:00.0</span><small id="lap-info">Lap 1</small></div>
     <button id="pause-btn" class="pause-button" aria-label="Pause and menu" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button>
    </div>
    <div id="camera-orbit" class="camera-orbit" aria-label="Drag to orbit chase camera" hidden><span>Camera · drag</span></div>
@@ -33,12 +33,12 @@
     <div class="pedals"><button id="handbrake" class="handbrake" aria-label="Hold handbrake" aria-pressed="false">Handbrake</button><button id="reverse-btn" class="direction" aria-label="Switch between forward and reverse" aria-pressed="false">D</button><button id="brake" class="pedal brake" aria-label="Brake: move higher for more pressure"><span>Brake</span></button><button id="gas" class="pedal gas" aria-label="Throttle: move higher for more pressure"><span>Throttle</span></button></div>
    </div>
    <div id="welcome" class="welcome">
-    <div class="welcome-inner"><span class="eyebrow">DRIVING LAB v0.14A.5.2 — Cockpit Seat Adjustment</span><h1>Find your rhythm.</h1><div class="welcome-buttons"><button id="start-highway" class="primary">Endless highway</button><button id="start-track">Drive circuit</button><button id="start-pad">Test pad</button></div><p>Steer on the left. Drag your thumb; release to center.<br>Pedals on the right. Move higher for more pressure.</p><p class="welcome-hint">Rolling start in traffic · 2.08 km circuit · test pad<br>Tilt steering and car setup are in the pause menu.</p><button id="welcome-settings">Controls & setup</button><small class="prototype-note">Independent head & drift gaze presets · A/B without reload</small></div>
+    <div class="welcome-inner"><span class="eyebrow">DRIVING LAB v0.14A.6.0 — Traffic AI R3.4 Experimental</span><h1>Find your rhythm.</h1><div class="welcome-buttons"><button id="start-highway" class="primary">Endless highway</button><button id="start-track">Drive circuit</button><button id="start-pad">Test pad</button></div><p>Steer on the left. Drag your thumb; release to center.<br>Pedals on the right. Move higher for more pressure.</p><p class="welcome-hint">Rolling start in traffic · 2.08 km circuit · test pad<br>Tilt steering and car setup are in the pause menu.</p><button id="welcome-settings">Controls & setup</button><small class="prototype-note">Independent head & drift gaze presets · A/B without reload</small></div>
    </div>
    <div id="fatal" class="fatal" hidden role="alert"></div>
   </section>
   <dialog id="pause-menu" class="pause-menu" aria-labelledby="pause-title">
-   <div class="dialog-head"><h2 id="pause-title">Pause</h2><span class="eyebrow">DRIVING LAB v0.14A.5.2 — Cockpit Seat Adjustment</span></div>
+   <div class="dialog-head"><h2 id="pause-title">Pause</h2><span class="eyebrow">DRIVING LAB v0.14A.6.0 — Traffic AI R3.4 Experimental</span></div>
    <button id="resume-btn" class="primary wide">Resume driving</button>
    <div class="menu-actions"><button id="settings-btn">Controls & setup</button><button id="camera-btn">Cockpit</button><button id="reset-btn">Return to start</button><button id="repair-btn">Repair car</button><button id="fullscreen-btn">Fullscreen</button></div>
    <details class="setting-group"><summary>Telemetry</summary><div class="setup-section">
@@ -51,7 +51,7 @@
    </div></details>
    <p class="settings-note">Keyboard: WASD / arrows · Space: handbrake · P: pause</p>
   </dialog>
-  <dialog id="settings">
+  <aside id="traffic-debug-overlay" hidden aria-live="off"></aside><dialog id="settings">
    <div class="dialog-head"><div><span class="eyebrow">DRIVING LAB</span><h2>Settings</h2></div><button id="close-settings" aria-label="Close">✕</button></div>
    <details class="setting-group" open><summary>Controls</summary><div class="setup-section">
     <label>Thumb travel <output id="steering-travel-out">100%</output><input id="steering-travel" type="range" min="0.7" max="1.5" step="0.05" value="1"></label><label>Center precision <output id="steering-precision-out">1.45</output><input id="steering-precision" type="range" min="1" max="2.2" step="0.05" value="1.45"></label><p class="settings-note">More travel and precision make small corrections easier. Fine corrections adapt to speed. Full thumb travel reaches mechanical steering lock.</p><button id="tilt-btn">Enable tilt steering</button><p id="steer-status" role="status">Touch steering · release to center</p><a id="sensor-open" href="https://max-driving-lab.maxtrcgi.chatgpt.site" target="_blank" rel="noopener" hidden>Open standalone game</a>
@@ -94,7 +94,7 @@
     <label>Graphics<select id="graphics-quality"><option value="performance">Performance</option><option value="balanced" selected>Balanced</option><option value="high">High detail</option></select></label><label class="switch"><input id="sound" type="checkbox" checked> Engine sound</label><label class="switch"><input id="telemetry" type="checkbox"> Wheel loads</label>
    </div></details>
    <details class="setting-group"><summary>Circuit & conditions</summary><div class="setup-section">
-    <label>Location<select id="spawn"><option value="highway">Endless highway · traffic</option><option value="track">Handling Circuit · 2.08 km</option><option value="pad">Test pad · braking & slalom</option><option value="bumps">Bump lane</option></select></label><button id="move-btn">Go to location</button><label>Highway traffic<select id="traffic-density"><option value="0">Empty road</option><option value="18">Light</option><option value="28" selected>Normal</option><option value="42">Busy · 42 cars</option><option value="72">Dense · 72 cars</option><option value="120">Very dense · 120 cars</option></select></label><button id="new-route">New highway route</button><label class="switch"><input id="wet" type="checkbox"> Wet road</label>
+    <label>Location<select id="spawn"><option value="highway">Endless highway · traffic</option><option value="track">Handling Circuit · 2.08 km</option><option value="pad">Test pad · braking & slalom</option><option value="bumps">Bump lane</option></select></label><button id="move-btn">Go to location</button><label>Highway traffic<select id="traffic-density"><option value="0">Empty road</option><option value="18">Light</option><option value="28" selected>Normal</option><option value="42">Busy · 42 cars</option><option value="72">Dense · 72 cars</option><option value="120">Very dense · 120 cars</option></select></label><button id="new-route">New highway route</button><label class="switch"><input id="traffic-debug" type="checkbox"> Traffic diagnostics</label><button id="traffic-debug-copy">Copy traffic diagnostics</button><textarea id="traffic-debug-copy-fallback" hidden readonly aria-label="Traffic diagnostics to copy"></textarea><p id="traffic-debug-status" class="settings-note" role="status"></p><label class="switch"><input id="wet" type="checkbox"> Wet road</label>
    </div></details>
    <details class="setting-group"><summary>Car</summary><div class="setup-section">
     <label>Drivetrain<select id="drive"><option value="rwd">RWD · rear-wheel drive</option></select></label>
@@ -108,3 +108,4 @@
  <script type="module" src="./app.js"></script>
 </body>
 </html>
+
