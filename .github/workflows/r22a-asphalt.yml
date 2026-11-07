@@ -1,11 +1,8 @@
 name: R2.2a Asphalt PBR comparison
 on:
-  push:
-    branches: [visual/asset-poc-r2]
-    paths: ['.github/workflows/r22a-asphalt.yml']
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 jobs:
   compare:
     runs-on: ubuntu-24.04
@@ -18,7 +15,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps --only-shell chromium
-      - run: python3 experiments/asset-poc-r2/tools/r22a-download.py
+      - name: Verify committed source hashes
+        run: python3 experiments/asset-poc-r2/tools/r22a-verify.py
       - run: node experiments/asset-poc-r2/tests/r22a-webgl.mjs
       - uses: actions/upload-artifact@v5
         if: always()
@@ -26,14 +24,3 @@ jobs:
           name: r22a-asphalt-comparison
           path: reports/road-r22a/
           if-no-files-found: warn
-      - name: Commit downloaded source textures and manifest
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add experiments/asset-poc-r2/assets/asphalt-track/
-          if ! git diff --cached --quiet; then
-            git commit -m 'R2.2a: add CC0 asphalt source textures'
-            git push origin HEAD:visual/asset-poc-r2
-          fi
-
-# Source API can return duplicate URLs.
