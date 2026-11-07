@@ -55,7 +55,7 @@ try {
   stage('load');
   assert.equal((await page.goto(baseURL, {waitUntil: 'domcontentloaded'})).status(), 200);
   await page.waitForFunction(() => window.drivingLab?.version === '0.14A.6.0');
-  assert.match(await page.title(), /v0\.14A\.6\.0.*Traffic AI 3.0/);
+  assert.match(await page.title(), /v0\.14A\.6\.0.*Traffic AI R3\.4 Experimental/);
   assert.equal(await page.locator('#fatal').isVisible(), false);
   stage('webgl');
   result.webgl = await page.evaluate(() => {

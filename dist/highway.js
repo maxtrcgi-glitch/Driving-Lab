@@ -121,25 +121,54 @@ export class Highway{
   }
   if(!this._useLaneIndex){this._intentActors.clear();for(const actor of this.cars)this._intentActors.set(actor.id,actor);}
   this.decisions++;const current=this.laneInfo(car,car.targetLane,player,this._current);let acc=this.accelerationFor(car,current.gap,current.leadSpeed);
-  const oldIntentTarget=car.intent?.targetId;const wasPassed=car.intent?.passCompleted;const intention=updateIntent(car,current.lead,current.gap<Math.max(120,car.speed*car.headway)&&current.leadSpeed<this.targetSpeed(car)-1.5,this.clock,this._intentActors);
-  if(!wasPassed&&intention.passCompleted&&this.diagnostics)this.diagnostics.event(car,'ACTUAL_PASS_COMPLETED','target_passed');
-  if(oldIntentTarget!=null&&intention.targetId===null&&intention.abandonReason!=='returned_to_cruise'&&this.diagnostics)this.diagnostics.event(car,'INTENT_ABANDONED',intention.abandonReason);
-  const diag=this.diagnostics;if(diag){const state=diag.state(car);state.leaderGap=current.gap;state.leaderSpeed=current.gap===Infinity?null:current.leadSpeed;if(car.changing)state.lastDecisionReason='already_changing';else if(car.cooldown>0)state.lastDecisionReason='cooldown_active';}
-  if(!car.changing&&car.cooldown<=0&&this.clock>=intention.reconsiderAt){let best=-1,bestScore=.3+((car.traits?.patience??.5)-.5)*.32;if(diag)diag.event(car,'PASS_CONSIDERED','candidate_evaluation');
+  const oldIntentTarget=car.intent?.targetId,oldIntentState=car.intent?.state;
+  const wasPassed=car.intent?.passCompleted;
+  const slower=current.gap<Math.max(120,car.speed*car.headway)&&current.leadSpeed<this.targetSpeed(car)-1.5;
+  const intention=updateIntent(car,current.lead,slower,this.clock,this._intentActors);
+  const eligible=!car.changing&&car.cooldown<=0&&this.clock>=intention.reconsiderAt;
+  const diag=this.diagnostics;
+  if(diag){
+   const state=diag.state(car);
+   state.leaderGap=current.gap;state.leaderSpeed=current.gap===Infinity?null:current.leadSpeed;
+   if(car.changing)state.lastDecisionReason='already_changing';else if(car.cooldown>0)state.lastDecisionReason='cooldown_active';
+   if(oldIntentTarget==null&&intention.targetId!==null){state.intentSafe=false;state.wait10=false;state.verifiedPass=false;diag.increment('INTENT_CREATED');}
+   if(!wasPassed&&intention.passCompleted){
+    if(oldIntentState==='EXECUTE_PASS'){
+     state.verifiedPass=true;
+     diag.event(car,'ACTUAL_PASS_COMPLETED','target_passed');
+     if(car.s>player?.s&&car.s-player.s<=250)diag.increment('ACTUAL_PASS_AHEAD_250');
+    }else diag.increment('UNCOMMITTED_TARGET_CLEARED');
+   }
+   if(oldIntentTarget!=null&&intention.targetId===null&&!wasPassed&&intention.abandonReason!=='returned_to_cruise'){
+    diag.event(car,'INTENT_ABANDONED',intention.abandonReason);
+    diag.increment(`ABANDON_${intention.abandonReason}`);
+    if(oldIntentState==='CONSIDER_PASS'||oldIntentState==='WAIT_FOR_GAP')diag.increment('INTENT_REJECTED');
+   }
+   diag.decision(car,current.lead,slower&&current.lead!==null,this.clock,eligible);
+  }
+  if(eligible){let best=-1,bestScore=.3+((car.traits?.patience??.5)-.5)*.32,safe=false;if(diag)diag.event(car,'PASS_CONSIDERED','candidate_evaluation');
    const pace=this.lanePace(car,current),target=this.targetSpeed(car),closing=Math.max(0,car.speed-current.leadSpeed);
    const blocked=current.gap<Math.max(120,car.speed*car.headway+closing*8)&&current.leadSpeed<target-1.5;
+   if(diag&&blocked)diag.increment('BLOCKED_EVALUATIONS');
    const cruise=car.cruiseLane??Math.floor(car.lane/3)*3+1;
    for(let delta=-1;delta<=1;delta+=2){const lane=car.lane+delta;if(lane<0||lane>5||Math.floor(lane/3)!==Math.floor(car.lane/3))continue;
     const next=this.laneInfo(car,lane,player,this._candidate);
     if(!this.laneSafe(car,next)){this.rejectedChanges++;if(diag){const fc=Math.max(0,car.speed-next.leadSpeed),rc=Math.max(0,next.rearSpeed-car.speed),duration=car.changeDuration??4;let reason=next.gap<=Math.max(12,car.speed*.7,fc*duration+8)?'insufficient_front_gap':next.rearGap<=Math.max(12,next.rearSpeed*.8,rc*duration+10)?(next.rear?'insufficient_rear_gap_npc':rc>0?'player_closing':'insufficient_rear_gap_player'):'unsafe_braking';diag.event(car,'PASS_REJECTED',reason);}continue;}
+    if(diag){safe=true;diag.increment('SAFE_CANDIDATE_EVALUATIONS');}
     const nextAcc=this.accelerationFor(car,next.gap,next.leadSpeed),nextPace=this.lanePace(car,next),preference=Math.abs(car.lane-cruise)-Math.abs(lane-cruise);
     // Speed gain motivates a pass; stable driver/type lane preference motivates return.
     // Do not demand a longer gap when the adjacent leader is moving faster.
     const gapWait=Number.isFinite(next.rearGap)?Math.max(0,1-next.rearGap/80)*(car.traits?.cooperation??.5)*.12:0;
     const score=nextAcc-acc+.16*(nextPace-pace)+preference*(.18+.36*(car.traits?.laneDiscipline??.5))+(blocked&&delta<0?.15:0)-gapWait;
-    if(score>bestScore&&(blocked?nextPace>pace+1||nextAcc>acc+.3:preference>0&&nextPace>pace-1&&nextAcc>-.15)){best=lane;bestScore=score;}else if(diag)diag.event(car,'PASS_REJECTED','incentive_or_preference_not_met');
+    if(score>bestScore&&(blocked?nextPace>pace+1||nextAcc>acc+.3:preference>0&&nextPace>pace-1&&nextAcc>-.15)){best=lane;bestScore=score;}else if(diag){diag.increment('INCENTIVE_OR_PREFERENCE_REJECTED');diag.event(car,'PASS_REJECTED','incentive_or_preference_not_met');}
    }
-   if(best>=0&&!(intention.state==='EXECUTE_PASS'&&!intention.passCompleted)){intention.targetLane=best;if(intention.targetId!==null&&!intention.passCompleted)intention.state='EXECUTE_PASS';if(diag){diag.state(car).motivation=blocked?'slower_leader':'cruising_lane';diag.event(car,'PASS_ACCEPTED','candidate_selected');diag.startManeuver(car,player?.s,diag.state(car).motivation);}car.targetLane=best;this.reserveLane(car,best);car.startOffset=car.offset;car.startLateralV=car.startLateralA=0;car.aborting=false;car.changing=car.changeDuration;car.cooldown=12+hash(car.id+this.trafficSeed+this.clock)*7;this.laneChanges++;const next=this.laneInfo(car,best,player,this._candidate);acc=Math.min(acc,this.accelerationFor(car,next.gap,next.leadSpeed));}
+   if(diag&&safe){
+    diag.safeOpportunity(car);
+    if(blocked)diag.increment('BLOCKED_SAFE_EVALUATIONS');
+    if(best<0)diag.increment(blocked?'BLOCKED_SAFE_WITHOUT_INCENTIVE':'FREE_SAFE_WITHOUT_INCENTIVE');
+   }
+   if(diag&&best>=0&&intention.state==='EXECUTE_PASS'&&!intention.passCompleted)diag.increment('COMMITTED_TARGET_HOLD');
+   if(best>=0&&!(intention.state==='EXECUTE_PASS'&&!intention.passCompleted)){intention.targetLane=best;if(intention.targetId!==null&&!intention.passCompleted){intention.state='EXECUTE_PASS';diag?.increment('INTENT_ACCEPTED');}if(diag){diag.state(car).motivation=blocked?'slower_leader':'cruising_lane';diag.event(car,'PASS_ACCEPTED','candidate_selected');diag.startManeuver(car,player?.s,diag.state(car).motivation);}car.targetLane=best;this.reserveLane(car,best);car.startOffset=car.offset;car.startLateralV=car.startLateralA=0;car.aborting=false;car.changing=car.changeDuration;car.cooldown=12+hash(car.id+this.trafficSeed+this.clock)*7;this.laneChanges++;const next=this.laneInfo(car,best,player,this._candidate);acc=Math.min(acc,this.accelerationFor(car,next.gap,next.leadSpeed));}
   }
   // Reserve both lanes throughout the manoeuvre; brake for either lead.
   let sourceEmergency=false;
@@ -164,7 +193,7 @@ export class Highway{
     const q3=10*D-6*V-1.5*A,q4=-15*D+8*V+1.5*A,q5=6*D-3*V-.5*A;
     c.offset=c.startOffset+V*t+.5*A*t*t+q3*t**3+q4*t**4+q5*t**5;
     c.lateralV=(V+A*t+3*q3*t*t+4*q4*t**3+5*q5*t**4)/T;c.lateralA=(A+6*q3*t+12*q4*t*t+20*q5*t**3)/(T*T);
-    if(c.changing===0){if(this.diagnostics){this.diagnostics.endManeuver(c);this.diagnostics.event(c,'LANE_CHANGE_COMPLETED',c.aborting?'abort_completed':'completed');}c.lane=c.targetLane;c.lateralV=c.lateralA=0;c.aborting=false;}
+    if(c.changing===0){if(this.diagnostics){this.diagnostics.endManeuver(c);this.diagnostics.event(c,c.aborting?'LANE_CHANGE_ABORT_SETTLED':'LANE_CHANGE_COMPLETED',c.aborting?'abort_completed':'completed');}c.lane=c.targetLane;c.lateralV=c.lateralA=0;c.aborting=false;}
    }
    const p=this.point(c.s,c.offset),oldX=c.x,oldZ=c.z;c.x=p.x;c.z=p.z;c.y=p.y;c.pitch=p.pitch*c.dir;c.vx=(c.x-oldX)/dt;c.vz=(c.z-oldZ)/dt;c.yaw=Math.hypot(c.vx,c.vz)>.01?Math.atan2(c.vx,c.vz):p.yaw+(c.dir<0?Math.PI:0);c.yawRate=0;this.barrierContact(c,true);
    const ahead=(c.s-player.s);if(ahead>5)c.wasAhead=true;if(c.dir>0&&c.wasAhead&&ahead<-5&&!c.passed&&this.clock-c.hitAt>5){c.passed=true;this.passes++;}c.lastAhead=ahead;

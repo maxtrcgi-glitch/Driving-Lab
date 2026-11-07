@@ -52,7 +52,7 @@ for(const density of [28,72,120])for(const kmh of [100,150,200,250])for(const se
   meanNearestAhead:nearestN?nearest/nearestN:null,meanNearestBehind:rearN?nearestRear/rearN:null,distances,clustering,
   bins:bins.map(n=>n/samples),laneOccupancy:lanes.map(n=>n/samples),laneAhead500:localLanes.map(n=>n/samples),gaps,
   spawned:highway.spawned,recycled:highway.retired,spawnFailures:highway.spawnFailures,npcContacts:highway.npcContacts,
-  playerPasses:highway.passes,traffic:highway.diagnostics.counts});
+  playerPasses:highway.passes,safetyRejectedCandidates:highway.rejectedChanges,traffic:highway.diagnostics.counts});
 }
 const path=process.argv[2]??'reports/A60/r34-density.json';
 fs.mkdirSync(path.slice(0,path.lastIndexOf('/'))||'.',{recursive:true});
