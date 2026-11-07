@@ -55,8 +55,8 @@ try {
     await Promise.all(pending);
     assert.ok(bytes.size >= (dir === 'r34' ? 10 : 3));
     if (dir === 'r34') {
-      assert.ok([...bytes].some(([url, size]) => url.endsWith('/guardrail.glb') && size > 0));
-      assert.ok([...bytes].some(([url, size]) => url.endsWith('/jersey-barrier.glb') && size > 0));
+      assert.ok([...bytes].some(([url, size]) => url.endsWith('/guardrail-mobile.glb') && size > 0));
+      assert.ok([...bytes].some(([url, size]) => url.endsWith('/jersey-barrier-mobile.glb') && size > 0));
     }
     results.push({dir, assetTransfer: Object.fromEntries(bytes), assetBytes: [...bytes.values()].reduce((a,b) => a+b, 0)});
     await page.close();

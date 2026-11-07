@@ -1,0 +1,35 @@
+name: R3.4 mobile loading recovery
+on:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths: ['experiments/asset-poc-r2/r34/**', '.github/workflows/r34-mobile.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  packaged-webgl:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps --only-shell chromium
+      - name: Package exact deployment layout
+        run: |
+          src=experiments/asset-poc-r2
+          mkdir -p demo/assets/asphalt-track demo/r31/assets demo/viewer
+          cp -r "$src/r34" "$src/r23c" demo/
+          cp -r "$src/viewer/vendor" demo/viewer/
+          cp "$src"/assets/asphalt-track/*_1k.jpg demo/assets/asphalt-track/
+          cp "$src/assets/asphalt-track/manifest.json" demo/assets/asphalt-track/
+          cp "$src/r31/assets/guardrail.glb" demo/r31/assets/
+          echo '<!doctype html><meta http-equiv="refresh" content="0; url=r34/"><a href="r34/">R3.4 highway</a>' > demo/index.html
+      - run: node experiments/asset-poc-r2/r34/mobile-test.mjs demo
+      - uses: actions/upload-artifact@v5
+        with:
+          name: r34-mobile-showcase
+          path: demo/
