@@ -1,0 +1,39 @@
+name: R3.1 original asset inspection
+on:
+  workflow_dispatch:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths: ['.github/workflows/r31-asset-inspection.yml','experiments/asset-poc-r2/r31/**']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps --only-shell chromium
+      - run: python3 -m pip install --user --break-system-packages Pillow
+      - name: Download original assets and license metadata
+        run: |
+          mkdir -p experiments/asset-poc-r2/r31/assets reports/r31
+          curl -fL --retry 2 'https://grab3d.com/dl/highway-segment/highway-segment.glb' -o experiments/asset-poc-r2/r31/assets/highway-segment.glb
+          curl -fL --retry 2 'https://grab3d.com/dl/highway-segment/LICENSE.txt' -o reports/r31/grab3d-LICENSE.txt
+          curl -fL --retry 2 'https://grab3d.com/dl/highway-segment/manifest.json' -o reports/r31/grab3d-manifest.json
+          curl -fL --retry 2 'https://www.innerscene.com/api/library/guardrail-4b2b2ff5/download' -o experiments/asset-poc-r2/r31/assets/guardrail.glb
+          cp experiments/asset-poc-r2/r31/assets/*.glb reports/r31/
+      - run: python3 experiments/asset-poc-r2/r31/inspect.py
+      - run: node experiments/asset-poc-r2/r31/test.mjs
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: r31-original-assets-inspection
+          path: reports/r31/
+          if-no-files-found: warn
