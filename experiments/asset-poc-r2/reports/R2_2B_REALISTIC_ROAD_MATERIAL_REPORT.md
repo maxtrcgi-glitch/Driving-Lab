@@ -45,3 +45,31 @@ Distance control should attenuate micro-detail smoothly with screen footprint an
 - Source textures and licenses remain those recorded in [`R2_2A_ROAD_PBR_REPORT.md`](R2_2A_ROAD_PBR_REPORT.md) and its manifest. No external code or new assets are bundled. No production game files changed.
 - R2.2a captured one draw call, two triangles, three maps on a single plane, but no iPhone GPU timings. Estimated RGBA8+mips: 16 MiB for three 1K maps; actual allocations and GPU texture cost UNKNOWN. B/C sample cost, frame time, anti-tiling effectiveness, normal orientation, reference-matched daylight and motion quality all UNKNOWN.
 - Report commit SHA is obtainable from Git history; a commit cannot contain its own final SHA. This checkpoint does not start R2.2b-2 or R2.2b-3.
+
+---
+
+## R2.2b-2 — experimental implementation, validation BLOCKED
+
+**Status: INCOMPLETE / NOT ACCEPTED.** The implementation below and an isolated showcase are committed as a checkpoint, but neither has been run in Chromium or on a GPU in this session. Consequently anti-tiling quality, shader compilation, camera-motion stability and adjacent segment seams remain **UNKNOWN**. No claim of visual improvement, acceptance, or iPhone readiness is justified. The available R2.2a images and run above are baseline evidence only. No new Actions run, screenshot artifact, measured performance or HTTPS preview exists for R2.2b-2.
+
+### Implementation
+
+- `road/road-surface-improved.mjs` extends the local `MeshStandardMaterial` instance with `onBeforeCompile`, retaining Three.js PBR lighting; no global patch or external shader code. It asserts the expected shader include anchors and fails loudly if the shader structure changes. A matching Three.js ShaderLib patch was exercised locally, but actual GLSL compile/link is still unverified.
+- The base uses the unchanged Asphalt Track 1K color, GL normal and roughness maps, with the R2.2a 2 m UV scale, sRGB albedo, non-color normal/roughness, metalness zero, mipmaps and anisotropy settings. No wheel wear, repairs or production files were added.
+- Candidate B mixes two translations of each map with a shared slow coordinate mask; offset `(0.371, 0.613)` is identical across albedo, roughness and normal, with no rotation or flip, and mixed normals are normalized. Two sinusoidal components at 43 m and 71 m provide a limited modulation; color multiplier range is approximately 0.99–1.01. These parameters are **unvalidated prototypes**, not measurements from road references. The source texture is still 2 m periodic in each sample; a smooth mask is not guaranteed to eliminate repetition and may introduce banding, double-image blur, correlation or obvious periodic structure. Empirical A/B evaluation must decide whether to retain it.
+- In theory up to six texture samples per fragment vs three for A, three GPU textures per material, roughly 16 MiB for three 1K RGBA8 maps plus full mip chains (estimate, excluding overhead/CPU copies). Actual compiled shader, GPU bandwidth, frame time and real iPhone performance are UNKNOWN.
+
+### Road coordinates and scene
+
+A required per-vertex `roadLocalMetres` attribute represents lateral and longitudinal road coordinates local to each chunk. CPU phase offsets derive from signed `BigInt` millimetre chainage modulo 43 m and 71 m; base textures independently require 2 m phase using `tilePhaseFromMillimetres`. To maintain seams, consumers must provide consistent road coordinates, UV direction, per-chunk phase and tangent frames; independently rounded local coordinates, curved roads and rebasing are not tested. The combined macro pattern repeats after 3,053 m longitudinally, so the requested non-repeating endless highway is **not established**. This is an explicit design limitation, not an accepted solution.
+
+`road/showcase.html` contains five adjacent 50 m segments, 12 m width, two switchable materials, low/driver/overview cameras, two daylight directions and moving camera control. It is an isolated visual test plane; no road markings, traffic or environment are present. Interactive controls change the actual scene. It has not been executed; correctness and usability are not asserted. The road width corresponds approximately to three lanes but lane/shoulder geometry is not separately implemented.
+
+### Verification and next steps
+
+- `tests/r22b2-foundation.mjs` verifies signed and large coordinate modulo, required inputs, and patching of the repository's matching vendored Three.js shader strings. Locally run against identical `three.module.js` Git blob `477ca4dafa7af919a2b9818e01b5ae25198d4aa4`: **passed**. This is a JavaScript unit/structural test, not WebGL compilation.
+- `tests/r22b2-webgl.mjs` is a prepared Playwright test for matched A/B near, far, grazing, overview, close and seam views, plus eight camera-position frames. It is **unrun**, so it is not proof of continuity, temporal quality or performance. The frame series is not a real-time speed validation and the script currently records renderer counters, not a controlled benchmark or reliable GPU timings.
+- Execution was blocked: no local Chromium binary was available; the GitHub connector exposed no workflow dispatch tool, and the existing dispatch-only workflow executes R2.2a rather than R2.2b-2. Creating or changing `.github/workflows` would violate the requested restriction that all work stay under `experiments/asset-poc-r2/`. Existing unrelated tree CI was not repurposed.
+- A permitted CI route or browser-enabled environment is needed to run the prepared test, inspect all frames, compare seam continuity and the shader error logs, measure controlled A/B frame timings, and tune/reject the material accordingly. On completion, test on target iPhone. Separately validate negative/large-origin chunk joins, normal orientation and physically plausible lighting. Do not proceed to R2.2b-3 until these gates are resolved and the Director authorizes it.
+
+The material checkpoint commit was `b07a5a9c87bb810d06913ae975c29d021683f951`; the commit containing this addendum and showcase is available from Git history.
