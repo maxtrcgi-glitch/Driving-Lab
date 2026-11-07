@@ -6,7 +6,7 @@ const loader=new T.TextureLoader();const maps=await Promise.all(['diff','nor_gl'
 const asphalt=new T.MeshStandardMaterial({map:maps[0],normalMap:maps[1],roughnessMap:maps[2],roughness:1,metalness:0});const shoulder=new T.MeshStandardMaterial({color:0x555452,roughness:1});const paint=new T.MeshStandardMaterial({color:0xd4d1c5,roughness:.78});const ground=new T.MeshStandardMaterial({color:0x858b6e,roughness:1});const metal=new T.MeshStandardMaterial({color:0x9b9d99,metalness:.55,roughness:.58});
 function plane(w,l,x,y,mat){let m=new T.Mesh(new T.PlaneGeometry(w,l),mat);m.rotation.x=-Math.PI/2;m.position.set(x,y,-150);scene.add(m);return m}
 // 3 x 3.5 m lanes, one paved 3 m shoulder, 2% crown.
-const road=plane(13.5,300,1.5,0,asphalt);let pos=road.geometry.attributes.position;for(let i=0;i<pos.count;i++)pos.setZ(i,-Math.abs(pos.getX(i))*.02);road.geometry.computeVertexNormals();plane(2,300,-6.75,-.14,shoulder);plane(2,300,10.75,-.14,shoulder);plane(210,600,0,-.22,ground);
+const road=plane(13.5,300,1.5,0,asphalt);let pos=road.geometry.attributes.position;for(let i=0;i<pos.count;i++)pos.setZ(i,-Math.abs(pos.getX(i))*.02);road.geometry.computeVertexNormals();plane(2,300,-6.25,-.14,shoulder);plane(2,300,9.25,-.14,shoulder);plane(210,600,0,-.22,ground);
 function strip(x,z,length,width=.15){let y=.008-Math.abs(x-1.5)*.02;let m=new T.Mesh(new T.PlaneGeometry(width,length),paint);m.rotation.x=-Math.PI/2;m.position.set(x,y,z);scene.add(m)}
 for(let x of [-5.15,5.15])strip(x,-150,300,.2);for(let x of [-1.75,1.75])for(let z=0;z<300;z+=18)strip(x,-z-3,6);
 // W-beam-like rails and posts, instanced. Dimensions are approximate, not certified engineering.
