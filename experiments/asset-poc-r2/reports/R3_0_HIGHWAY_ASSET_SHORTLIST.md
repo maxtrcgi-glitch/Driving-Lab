@@ -57,7 +57,7 @@
 
 ### C. Modular Safety Rail Kit — Quixel / Fab — visual and license caveat
 
-[Fab listing / preview](https://www.fab.com/listings/8454a187-319b-4df5-a2c5-68fab8fe7452?lang=en), [seller image](https://media.fab.com/image_previews/gallery_images/fc470058-be0f-4e49-8903-ca1aceb77acf/8475e8f0.jpg) (if the direct image changes, use the listing gallery). Listing identifies Quixel Megascans, free, FBX plus converted GLB/glTF/USDZ, ~3.1 m long; base color, normal, roughness and other maps, texel density 5356 px/m. It is tagged pedestrian/footpath and may not be an appropriate highway crash barrier. Polygon count and specific texture size tiers **UNKNOWN**.
+[Fab listing / preview](https://www.fab.com/listings/8454a187-319b-4df5-a2c5-68fab8fe7452?lang=en), [seller gallery](https://www.fab.com/listings/8454a187-319b-4df5-a2c5-68fab8fe7452?lang=en). Listing identifies Quixel Megascans, free, FBX plus converted GLB/glTF/USDZ, ~3.1 m long; base color, normal, roughness and other maps, texel density 5356 px/m. It is tagged pedestrian/footpath and may not be an appropriate highway crash barrier. Polygon count and specific texture size tiers **UNKNOWN**.
 - The retrieved listing displays license terms as a dash. Do not infer CC0 or assume raw WebGL redistribution is permitted; account access, terms of acquisition and non-Unreal usage must be checked. No download attempted. This is an optional infrastructure alternative, not the recommended motorway W-beam.
 
 ## Sources considered, limitations and next gate
