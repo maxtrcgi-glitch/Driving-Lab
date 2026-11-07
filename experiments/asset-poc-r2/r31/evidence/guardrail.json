@@ -1,0 +1,187 @@
+{
+  "file": "guardrail.glb",
+  "bytes": 3540124,
+  "sha256": "188c8b1510d9e19d5add90be91cd83cf2ee234dc62269263b6a504dd9f865ac6",
+  "mesh_count": 3,
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "Hot-dip galvanized steel",
+      "normalTexture": {
+        "index": 0
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicFactor": 0.6499999761581421,
+        "roughnessFactor": 0.550000011920929
+      }
+    },
+    {
+      "doubleSided": true,
+      "name": "Recycled plastic blockout",
+      "normalTexture": {
+        "index": 2
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 3
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 0.800000011920929
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "Button-head bolts"
+    },
+    {
+      "mesh": 1,
+      "name": "Galvanized W-beam rail"
+    },
+    {
+      "mesh": 2,
+      "name": "Steel posts and blockouts"
+    },
+    {
+      "children": [
+        0,
+        1,
+        2
+      ],
+      "extras": {
+        "license": "CC0-1.0",
+        "original_design": true
+      },
+      "name": "Guardrail"
+    }
+  ],
+  "primitives": [
+    {
+      "name": "Button-head bolts",
+      "triangles": 1584,
+      "vertices": 1958,
+      "position_bounds": {
+        "min": [
+          -5.015999794006348,
+          0.5376999974250793,
+          -0.0005000012461096048
+        ],
+        "max": [
+          5.015999794006348,
+          0.7252999544143677,
+          0.09350000321865082
+        ]
+      },
+      "uv": true,
+      "material": 0
+    },
+    {
+      "name": "Galvanized W-beam rail",
+      "triangles": 292,
+      "vertices": 304,
+      "position_bounds": {
+        "min": [
+          -6,
+          0.47600001096725464,
+          -0.0027000000700354576
+        ],
+        "max": [
+          6,
+          0.7870000004768372,
+          0.08299999684095383
+        ]
+      },
+      "uv": true,
+      "material": 0
+    },
+    {
+      "name": "Steel posts and blockouts",
+      "triangles": 264,
+      "vertices": 432,
+      "position_bounds": {
+        "min": [
+          -5.051000118255615,
+          0,
+          -0.3529999852180481
+        ],
+        "max": [
+          5.051000118255615,
+          0.796999990940094,
+          -0.2029999941587448
+        ]
+      },
+      "uv": true,
+      "material": 0
+    },
+    {
+      "name": "Steel posts and blockouts",
+      "triangles": 72,
+      "vertices": 144,
+      "position_bounds": {
+        "min": [
+          -5.074999809265137,
+          0.4514999985694885,
+          -0.2029999941587448
+        ],
+        "max": [
+          5.074999809265137,
+          0.8115000128746033,
+          0
+        ]
+      },
+      "uv": true,
+      "material": 1
+    }
+  ],
+  "images": [
+    {
+      "name": "road5_galvanized_normal",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGB",
+      "sha256": "7f1adbf9c1d76a3569981b51e56d451e875b58431951b96b04715601e002f0bc"
+    },
+    {
+      "name": "road5_galvanized_basecolor",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGB",
+      "sha256": "625342041bc56f137fcbb1aaea9ace673337955fca05c069d8dcd5f032824e51"
+    },
+    {
+      "name": "road5_rubber_grain_normal",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGB",
+      "sha256": "0619235a3232ec405fff32e8115c730ab3b6d0b23ce8d7077b27eec1bc233b87"
+    },
+    {
+      "name": "road5_paint_dark_grey_basecolor",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGB",
+      "sha256": "d0274b3da42f631ed0c1995e9266f2cd498bc21b8e8ecfc6d8941da6fb8d5434"
+    }
+  ],
+  "extensionsUsed": []
+}

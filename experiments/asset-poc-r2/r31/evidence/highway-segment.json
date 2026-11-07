@@ -1,0 +1,409 @@
+{
+  "file": "highway-segment.glb",
+  "bytes": 14260872,
+  "sha256": "178f41be4922db5d4e70f6e08b054d2c303ad9c4663f3e4a18bb8fd94c33594e",
+  "mesh_count": 5,
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "highway-segment_asphalt",
+      "normalTexture": {
+        "index": 0
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicFactor": 0,
+        "metallicRoughnessTexture": {
+          "index": 2
+        }
+      }
+    },
+    {
+      "doubleSided": true,
+      "name": "highway-segment_body_pbr",
+      "normalTexture": {
+        "index": 3
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 4
+        },
+        "metallicRoughnessTexture": {
+          "index": 5
+        }
+      }
+    },
+    {
+      "doubleSided": true,
+      "name": "highway-segment_median_grass",
+      "normalTexture": {
+        "index": 6,
+        "scale": 0.800000011920929
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 7
+        },
+        "metallicFactor": 0,
+        "metallicRoughnessTexture": {
+          "index": 8
+        }
+      }
+    },
+    {
+      "doubleSided": true,
+      "name": "highway-segment_road_marking",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 9
+        },
+        "metallicFactor": 0,
+        "metallicRoughnessTexture": {
+          "index": 10
+        }
+      }
+    },
+    {
+      "doubleSided": true,
+      "name": "highway-segment_verge_gravel",
+      "normalTexture": {
+        "index": 11,
+        "scale": 0.800000011920929
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 12
+        },
+        "metallicFactor": 0,
+        "metallicRoughnessTexture": {
+          "index": 13
+        }
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "highway-segment_asphalt",
+      "translation": [
+        0,
+        -0.20000000298023224,
+        0
+      ]
+    },
+    {
+      "mesh": 1,
+      "name": "highway-segment_body",
+      "translation": [
+        0,
+        -0.20000000298023224,
+        0
+      ]
+    },
+    {
+      "mesh": 2,
+      "name": "highway-segment_median_grass",
+      "translation": [
+        0,
+        -0.20000000298023224,
+        0
+      ]
+    },
+    {
+      "mesh": 3,
+      "name": "highway-segment_road_marking",
+      "translation": [
+        0,
+        -0.20000000298023224,
+        0
+      ]
+    },
+    {
+      "mesh": 4,
+      "name": "highway-segment_verge",
+      "translation": [
+        0,
+        -0.20000000298023224,
+        0
+      ]
+    },
+    {
+      "children": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "extras": {
+        "license": "CC0-1.0",
+        "source": "grab3d.com",
+        "dimensions_m": "23.600 x 23.600 x 1.158",
+        "triangles": 37532,
+        "textures": "PBR 2048px: base color, roughness, metallic, normal (baked)",
+        "generator": "Created by grab3d",
+        "created": "2026-10-25",
+        "real_size": "23.6 x 23.6 m motorway tile (2 x 2 kit grid): 2 x (0.5 m edge strip + 2 x 3.75 m lanes + 2.2 m hard shoulder) of asphalt, 2.0 m grass median with double-sided steel guard rail (A-profile on sigma posts every 1.97 m), 0.6 m gravel verges, one delineator post per side",
+        "notes": "Tileable along X: seam edges at x = +-11.8 m, guard rails sit in base position at both seams, posts and markings repeat with an 11.8 m period (lane line 4 m dash / 7.8 m gap, seams mid-gap; 0.15 m left edge line, 0.30 m right edge line). Right-hand traffic: the -Y carriageway runs towards +X. Asphalt map 11.8 m long (repeats twice per tile), lanes with wheel tracks, longitudinal paving joints. Pivot on the carriageway surface (z = 0), base -0.20 m. No bottom faces. Guard rail and delineators baked PBR, road surfaces keep their texture sets.",
+        "set": "Urban Street Kit"
+      },
+      "name": "highway-segment"
+    }
+  ],
+  "primitives": [
+    {
+      "name": "highway-segment_asphalt",
+      "triangles": 20,
+      "vertices": 40,
+      "position_bounds": {
+        "min": [
+          -11.800000190734863,
+          0,
+          -11.199999809265137
+        ],
+        "max": [
+          11.800000190734863,
+          0.20000000298023224,
+          11.199999809265137
+        ]
+      },
+      "uv": true,
+      "material": 0
+    },
+    {
+      "name": "highway-segment_body",
+      "triangles": 37336,
+      "vertices": 41108,
+      "position_bounds": {
+        "min": [
+          -11.800000190734863,
+          0.09000000357627869,
+          -11.550000190734863
+        ],
+        "max": [
+          11.800000190734863,
+          1.1575000286102295,
+          11.550000190734863
+        ]
+      },
+      "uv": true,
+      "material": 1
+    },
+    {
+      "name": "highway-segment_median_grass",
+      "triangles": 60,
+      "vertices": 84,
+      "position_bounds": {
+        "min": [
+          -11.800000190734863,
+          0,
+          -1
+        ],
+        "max": [
+          11.800000190734863,
+          0.17000000178813934,
+          1
+        ]
+      },
+      "uv": true,
+      "material": 2
+    },
+    {
+      "name": "highway-segment_road_marking",
+      "triangles": 64,
+      "vertices": 128,
+      "position_bounds": {
+        "min": [
+          -11.800000190734863,
+          0.19900000095367432,
+          -9.300000190734863
+        ],
+        "max": [
+          11.800000190734863,
+          0.2029999941587448,
+          9.300000190734863
+        ]
+      },
+      "uv": true,
+      "material": 3
+    },
+    {
+      "name": "highway-segment_verge",
+      "triangles": 52,
+      "vertices": 68,
+      "position_bounds": {
+        "min": [
+          -11.800000190734863,
+          0,
+          -11.800000190734863
+        ],
+        "max": [
+          11.800000190734863,
+          0.19499999284744263,
+          11.800000190734863
+        ]
+      },
+      "uv": true,
+      "material": 4
+    }
+  ],
+  "images": [
+    {
+      "name": "highway-segment_asphalt_normal",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        4096,
+        3540
+      ],
+      "mode": "RGB",
+      "sha256": "3de15d34833594133bafdc08160b1d89c0b87f516c1148dd69390da3260f9edf"
+    },
+    {
+      "name": "highway-segment_asphalt_basecolor",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        4096,
+        3540
+      ],
+      "mode": "RGB",
+      "sha256": "4630baafc4ab8d517d69ae7bc9c2603db927b330507a65ba8a9bdc8d5e4a600a"
+    },
+    {
+      "name": "highway-segment_asphalt_roughness",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        2048,
+        1770
+      ],
+      "mode": "RGB",
+      "sha256": "cc621b0850f228d046ac3530c0bdf9dd9c62e0a76f085f17ae4497c2e05b30d2"
+    },
+    {
+      "name": "highway-segment_body_normal",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGB",
+      "sha256": "cc8d3a7222fd98fbdd6015a9b2a440ec5d1a825731c8d6c5ee245194f4932906"
+    },
+    {
+      "name": "highway-segment_body_basecolor",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGB",
+      "sha256": "2f3b898c138938ece97ab4f49652a915b749d286ceea052d89635939fea60488"
+    },
+    {
+      "name": "highway-segment_body_metallic-highway-segment_body_roughness",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGB",
+      "sha256": "5d3adc8aa49832807a9eb3a2972082f6c5c2be84256d0056044fe01f6b0232a8"
+    },
+    {
+      "name": "highway-segment_grass_normal",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        1536,
+        1536
+      ],
+      "mode": "RGB",
+      "sha256": "05992caf0b92ffe04ef06251a579f09d13824ea61f06bd7110d20667fc9fd731"
+    },
+    {
+      "name": "highway-segment_grass_basecolor",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        3072,
+        3072
+      ],
+      "mode": "RGB",
+      "sha256": "b1ea5360dee6882abe0fd010c619c9acd1ac6330cde307daa570fb4eac9c98b2"
+    },
+    {
+      "name": "highway-segment_grass_roughness",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        1536,
+        1536
+      ],
+      "mode": "RGB",
+      "sha256": "34a1a31b232c30c0a9ca599aee2491321d5971933cd169f7154969c183f13bd1"
+    },
+    {
+      "name": "road-segment_marking_basecolor",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "sha256": "34bdcfa64c07b18317a9d703c8910d7baca193500cce6cf4320758da06841310"
+    },
+    {
+      "name": "road-segment_marking_roughness",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "sha256": "0d5691fe607176c49247df0de6f72ba0de367a65d9d4a4dc996274d169847ed1"
+    },
+    {
+      "name": "highway-segment_verge_normal",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGB",
+      "sha256": "9a9526b61ec3f13f21d8c8c1f5e63ba2f3a11a18bf680ea3e25ce9652e9443a5"
+    },
+    {
+      "name": "highway-segment_verge_basecolor",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        2048,
+        2048
+      ],
+      "mode": "RGB",
+      "sha256": "fe582510ca7b1e868b40703144b8042d3ed8431e01f2e7ac075f1cad7e53ac63"
+    },
+    {
+      "name": "highway-segment_verge_roughness",
+      "embedded": true,
+      "mime": "image/jpeg",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "sha256": "b82a9c4f9311cff3f841e763900666fa7e6ab236c8e09644ad3f0bfb2702ff53"
+    }
+  ],
+  "extensionsUsed": []
+}

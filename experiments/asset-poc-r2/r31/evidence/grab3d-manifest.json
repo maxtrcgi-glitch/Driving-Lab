@@ -1,0 +1,55 @@
+{
+ "slug": "highway-segment",
+ "triangles": 37532,
+ "texture_px": 4096,
+ "triangles_light": 18864,
+ "texture_px_light": 1024,
+ "files": {
+  "glb": {
+   "name": "highway-segment.glb",
+   "bytes": 14260872
+  },
+  "blend": {
+   "name": "highway-segment.blend",
+   "bytes": 13910282
+  },
+  "fbx": {
+   "name": "highway-segment.fbx",
+   "bytes": 15851260
+  },
+  "obj": {
+   "name": "highway-segment-obj.zip",
+   "bytes": 14272813
+  },
+  "usdz": {
+   "name": "highway-segment.usdz",
+   "bytes": 15929617
+  },
+  "glb_light": {
+   "name": "highway-segment-light.glb",
+   "bytes": 2006344
+  },
+  "fbx_light": {
+   "name": "highway-segment-light.fbx",
+   "bytes": 3387244
+  }
+ },
+ "extras": {
+  "license": "CC0-1.0",
+  "source": "grab3d.com",
+  "dimensions_m": "23.600 x 23.600 x 1.158",
+  "triangles": 37532,
+  "textures": "PBR 2048px: base color, roughness, metallic, normal (baked)",
+  "generator": "Created by grab3d",
+  "created": "2026-10-25",
+  "real_size": "23.6 x 23.6 m motorway tile (2 x 2 kit grid): 2 x (0.5 m edge strip + 2 x 3.75 m lanes + 2.2 m hard shoulder) of asphalt, 2.0 m grass median with double-sided steel guard rail (A-profile on sigma posts every 1.97 m), 0.6 m gravel verges, one delineator post per side",
+  "notes": "Tileable along X: seam edges at x = +-11.8 m, guard rails sit in base position at both seams, posts and markings repeat with an 11.8 m period (lane line 4 m dash / 7.8 m gap, seams mid-gap; 0.15 m left edge line, 0.30 m right edge line). Right-hand traffic: the -Y carriageway runs towards +X. Asphalt map 11.8 m long (repeats twice per tile), lanes with wheel tracks, longitudinal paving joints. Pivot on the carriageway surface (z = 0), base -0.20 m. No bottom faces. Guard rail and delineators baked PBR, road surfaces keep their texture sets.",
+  "set": "Urban Street Kit"
+ },
+ "origin": {
+  "method": "procedural",
+  "detail": "Built procedurally with Blender scripts. The scripts were written with the help of an AI coding assistant. No generative AI model produced the geometry or textures directly.",
+  "ai_content": false,
+  "ai_assisted_code": true
+ }
+}
