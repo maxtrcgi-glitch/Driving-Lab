@@ -1,0 +1,49 @@
+name: R4.1 Blender motorway art study
+on:
+  workflow_dispatch:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths:
+      - experiments/asset-poc-r2/r41-highway-master/*.py
+      - .github/workflows/r41-highway-master.yml
+permissions:
+  contents: read
+jobs:
+  blender-highway:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      R41: experiments/asset-poc-r2/r41-highway-master
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Install Blender as in R4.0
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender python3-numpy
+          blender --version
+      - name: Fetch free photographic assets
+        run: python3 "$R41/fetch_assets.py" "$RUNNER_TEMP/r41-inputs"
+      - name: Author and render in Blender
+        run: |
+          mkdir -p "$RUNNER_TEMP/r41-output"
+          cp "$RUNNER_TEMP/r41-inputs/download-manifest.json" "$RUNNER_TEMP/r41-output/"
+          cp "$R41/ASSET_MANIFEST.md" "$RUNNER_TEMP/r41-output/"
+          blender --background --factory-startup --python-exit-code 1 --python "$R41/build_scene.py" -- "$GITHUB_WORKSPACE" "$RUNNER_TEMP/r41-inputs" "$RUNNER_TEMP/r41-output"
+      - name: Verify native master and inspection renders
+        run: |
+          cd "$RUNNER_TEMP/r41-output"
+          test -s highway-master.blend
+          for name in driver roadside overview; do
+            test -s "$name.png"
+          done
+          blender --background highway-master.blend --python-exit-code 1 --python-expr 'import bpy; assert len([o for o in bpy.context.scene.objects if o.type == "CAMERA"]) == 3; assert all(im.packed_file for im in bpy.data.images if im.source == "FILE"); print("Native master opens with 3 cameras and packed inputs")'
+          sha256sum highway-master.blend driver.png roadside.png overview.png > SHA256SUMS.txt
+      - name: Preserve native master and renders
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: r41-highway-master
+          path: ${{ runner.temp }}/r41-output/
+          if-no-files-found: warn
