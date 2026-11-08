@@ -56,7 +56,8 @@ def land_z(s, x):
     d = abs(x - edge)
     toe = -0.62 * math.sin(min(d, 9) / 9 * math.pi)
     relief = min(d / 10, 1) * (0.33 * math.sin(s / 18 + d / 11))
-    bank = min(d / 18, 1) * (1.45 + 0.58 * math.sin(s / 24 + d / 19))
+    bank_height = 3.4 if x >= outer else 1.65
+    bank = min(d / 15, 1) * (bank_height + 0.72 * math.sin(s / 24 + d / 19))
     return road_z(s, edge) - 0.018 + toe + relief + bank
 
 
@@ -115,7 +116,7 @@ gravel = texture_mat("Verge | compacted gravel, muted",
                      maps(base / "r34/assets", "gravel_road", "1k"),
                      (0.63, 0.64, 0.62), 0.46)
 grass = texture_mat("Verge | leafy grass", [next(inputs.glob(f"grass-{k}.*"))
-                    for k in ("diff", "nor_gl", "rough")], (0.74, 0.84, 0.72), 0.48)
+                    for k in ("diff", "nor_gl", "rough")], (0.58, 0.98, 0.58), 0.48)
 paint, paint_shader = material("Markings | weathered off-white", (0.66, 0.66, 0.61), 0.76)
 source_normal = next(n.image for n in asphalt.node_tree.nodes
                      if n.type == "TEX_IMAGE" and "_nor_gl_" in n.image.name)
@@ -182,12 +183,13 @@ def pavement_tone(s, x):
     if x < inner:
         x = -5.5 - x
     if x > 10.75:
-        return 0.91 + 0.024 * math.sin(s * 0.11)
+        return 1.28 + 0.027 * math.sin(s * 0.11)
     if x < 0:
-        return 0.95
+        return 1.12
     tracks = [c + offset for c in (1.75, 5.25, 8.875) for offset in (-0.77, 0.77)]
     wear = max(math.exp(-((x - track) / 0.31) ** 2) for track in tracks)
-    return 0.91 + wear * (0.065 + 0.019 * math.sin(s / 19 + x))
+    lane_base = 1.20 if x >= 7.0 else (1.02 if x >= 3.5 else 1.14)
+    return lane_base + wear * (0.055 + 0.018 * math.sin(s / 19 + x))
 
 
 def surface_rows(a, b, xs, step=1.0, lift=0.0):
@@ -227,6 +229,16 @@ for edge, side in [(outer, 1), (opposite_edge, -1)]:
          mask=lambda s, x: min(1, max(0, (abs(x - edge) - .54
                                           + .18 * math.sin(s * 1.77)
                                           + .12 * math.sin(s * .42)) / .92)))
+def ridge_z(s, x):
+    d = s - end
+    return grade(end) - 0.80 + min(d / 120, 1) * (
+        10.5 + 3.7 * math.sin(x / 42) + 1.9 * math.cos(x / 23 + d / 51))
+
+
+grid("Distant rolling land behind crest", landscape, grass,
+     [[(s, x, ridge_z(s, x)) for x in range(-130, 131, 5)]
+      for s in range(end, end + 171, 5)], 2.2)
+
 grid("Median gravel bed", landscape, gravel,
      [[(s, x, grade(s) - .075) for x in (-3.9, -3.4, -2.7, -2.0, -1.5, inner)]
       for s in range(start, end + 1)], 1.55)
@@ -295,12 +307,26 @@ for side, edge in ((1, outer), (-1, opposite_edge)):
             d = rng.uniform(5, 10) + layer * rng.uniform(4.8, 8.0)
             d += 1.7 * math.sin(s / 13)
             x = edge + side * d
-            kind = rng.choices((0, 1), (8, 3))[0]
+            kind = rng.choices((0, 1), (11, 3))[0]
             height = rng.uniform(.75, 1.42) if kind == 0 else rng.uniform(.85, 1.7)
             instance("Woodland | broadleaf" if kind == 0 else "Woodland | pine",
-                     vegetation, trees[kind], s, x, land_z(s, x) - .04,
+                     vegetation, trees[kind], s, x, land_z(s, x) - .12,
                      rng.uniform(0, math.tau), height)
             s += rng.uniform(3.4, 8.7)
+
+
+for centre in (6, 18, 37, 51, 74, 92, 128, 156, 181):
+    for _ in range(rng.randint(3, 7)):
+        s = centre + rng.uniform(-3.8, 3.8)
+        x = outer + rng.uniform(2.2, 7.2)
+        instance("Verge | low broadleaf clump", vegetation, trees[0], s, x,
+                 land_z(s, x) - .12, rng.uniform(0, math.tau), rng.uniform(.12, .26))
+
+for x in range(-98, 99, 6):
+    s = 260 + rng.uniform(-12, 13)
+    xx = x + rng.uniform(-1.6, 1.6)
+    instance("Distant ridge | broadleaf", vegetation, trees[0], s, xx,
+             ridge_z(s, xx) - .12, rng.uniform(0, math.tau), rng.uniform(.52, .92))
 
 
 def camera(name, s, x, height, target_s, target_x, target_height, lens):
@@ -319,8 +345,8 @@ def camera(name, s, x, height, target_s, target_x, target_height, lens):
 
 cameras = {
     "driver": camera("A | Driver eye · 1.20 m", 5, 8.875, 1.2, 76, 8.7, 0.9, 34),
-    "roadside": camera("B | Shoulder and restraint", 13, 15.85, 0.75, 28, 11.5, 0.7, 34),
-    "overview": camera("C | Carriageway cross-section", 1, 29, 16.0, 34, 5.2, 0.05, 43),
+    "roadside": camera("B | Shoulder and restraint", 13, 11.9, 0.72, 27, 14.6, 0.45, 30),
+    "overview": camera("C | Carriageway cross-section", 0, 13.0, 22.0, 31, 0.0, 0.05, 36),
 }
 
 scene.world.use_nodes = True
@@ -332,6 +358,7 @@ background = nodes.get("Background")
 links.new(environment.outputs["Color"], background.inputs["Color"])
 background.inputs["Strength"].default_value = 0.85
 scene.view_settings.view_transform = "AgX"
+scene.view_settings.exposure = 0.82
 scene.render.engine = "CYCLES"
 scene.cycles.samples = 28
 scene.cycles.use_adaptive_sampling = True
