@@ -1,0 +1,126 @@
+name: R4.1b native Blender art correction
+on:
+  workflow_dispatch:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths:
+      - experiments/asset-poc-r2/r41-highway-master/r41b/*.py
+      - .github/workflows/r41b-highway-art-correction.yml
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  R41B: experiments/asset-poc-r2/r41-highway-master/r41b
+
+jobs:
+  checkpoint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Retrieve the actual approved starting checkpoint
+        uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ github.token }}
+          run-id: 42467736194
+          artifact-ids: 13612198638
+          path: ${{ runner.temp }}/r41-baseline
+      - name: Install the R4.1 Blender version
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender python3-numpy
+          blender --version
+      - name: Verify source and edit the existing project
+        run: |
+          echo '6f477ed75a95e27c1d879e2c52a82e4309898f0f450e807256573e8fd66870bc  highway-master.blend' | (cd "$RUNNER_TEMP/r41-baseline" && sha256sum -c -)
+          out="$RUNNER_TEMP/r41b-checkpoint"
+          mkdir -p "$out"
+          cp "$RUNNER_TEMP/r41-baseline/ASSET_MANIFEST.md" "$out/"
+          cp "$RUNNER_TEMP/r41-baseline/download-manifest.json" "$out/"
+          cp "$RUNNER_TEMP/r41-baseline/scene-stats.json" "$out/r41-source-scene-stats.json"
+          cp "$RUNNER_TEMP/r41-baseline/SHA256SUMS.txt" "$out/r41-source-SHA256SUMS.txt"
+          blender --background "$RUNNER_TEMP/r41-baseline/highway-master.blend" --python-exit-code 1 --python "$R41B/edit_scene.py" -- "$out"
+          cd "$out"
+          test -s highway-master-r41b.blend
+          sha256sum highway-master-r41b.blend > SHA256SUMS.txt
+      - name: Preserve the corrected native checkpoint before rendering
+        uses: actions/upload-artifact@v5
+        with:
+          name: r41b-native-master
+          path: ${{ runner.temp }}/r41b-checkpoint/
+          if-no-files-found: error
+          compression-level: 0
+
+  render:
+    needs: checkpoint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    strategy:
+      fail-fast: false
+      matrix:
+        view: [driver, roadside, overview]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v5
+        with:
+          name: r41b-native-master
+          path: ${{ runner.temp }}/r41b-checkpoint
+      - name: Install Blender
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender python3-numpy
+      - name: Reopen checkpoint and render the original camera in Cycles
+        env:
+          VIEW: ${{ matrix.view }}
+        run: |
+          source="$RUNNER_TEMP/r41b-checkpoint"
+          out="$RUNNER_TEMP/r41b-frame"
+          mkdir -p "$out"
+          (cd "$source" && sha256sum -c SHA256SUMS.txt)
+          blender --background "$source/highway-master-r41b.blend" --python-exit-code 1 --python "$R41B/render_view.py" -- "$VIEW" "$out/$VIEW.png" "$source/art-correction-stats.json"
+          test -s "$out/$VIEW.png"
+          (cd "$out" && sha256sum "$VIEW.png" > "$VIEW.sha256")
+      - uses: actions/upload-artifact@v5
+        with:
+          name: r41b-frame-${{ matrix.view }}
+          path: ${{ runner.temp }}/r41b-frame/
+          if-no-files-found: error
+
+  comparison:
+    needs: render
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ github.token }}
+          run-id: 42467736194
+          artifact-ids: 13612542319
+          path: ${{ runner.temp }}/r41b-comparison/before
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: r41b-frame-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/r41b-comparison/after
+      - name: Validate all three same-camera pairs
+        run: |
+          cd "$RUNNER_TEMP/r41b-comparison"
+          (cd before && sha256sum -c --ignore-missing SHA256SUMS.txt)
+          (cd after && cat driver.sha256 roadside.sha256 overview.sha256 | sha256sum -c -)
+          for dir in before after; do
+            for view in driver roadside overview; do
+              test -s "$dir/$view.png"
+            done
+          done
+          mv before/primary-reference.jpg .
+      - uses: actions/upload-artifact@v5
+        with:
+          name: r41b-before-after-pngs
+          path: ${{ runner.temp }}/r41b-comparison/
+          if-no-files-found: error
