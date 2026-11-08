@@ -21,14 +21,14 @@ jobs:
       - name: Install Ubuntu Blender package
         run: |
           sudo apt-get update
-          sudo apt-get install -y blender
+          sudo apt-get install -y blender python3-numpy
           blender --version
       - run: npm ci
       - run: npx playwright install --with-deps --only-shell chromium
       - name: Import, render and export in Blender
         run: |
           d=experiments/asset-poc-r2/r40-blender-pipeline
-          blender --background --factory-startup --python "$d/build_blender_scene.py" --python-exit-code 1 -- experiments/asset-poc-r2/r31/assets/guardrail.glb "$d"
+          blender --background --factory-startup --python-exit-code 1 --python "$d/build_blender_scene.py" -- experiments/asset-poc-r2/r31/assets/guardrail.glb "$d"
       - name: Verify Blender project and exported model
         run: |
           d=experiments/asset-poc-r2/r40-blender-pipeline
