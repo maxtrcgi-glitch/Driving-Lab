@@ -1,0 +1,130 @@
+name: R4.1c Blender roadside environment
+on:
+  workflow_dispatch:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths:
+      - experiments/asset-poc-r2/r41-highway-master/r41c/*.py
+      - .github/workflows/r41c-roadside-environment.yml
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  R41C: experiments/asset-poc-r2/r41-highway-master/r41c
+
+jobs:
+  checkpoint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Retrieve the actual approved starting checkpoint
+        uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ github.token }}
+          run-id: 42469944678
+          artifact-ids: 13612719395
+          path: ${{ runner.temp }}/r41b-baseline
+      - name: Install the R4.1 Blender version
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender python3-numpy
+          blender --version
+      - name: Verify source and edit the existing project
+        run: |
+          echo 'c9ce30eebb133c4a10dcd70f7e542d5e0af6ceeb4b467c158462fc854aa6c92b  highway-master-r41b.blend' | (cd "$RUNNER_TEMP/r41b-baseline" && sha256sum -c -)
+          out="$RUNNER_TEMP/r41c-checkpoint"
+          mkdir -p "$out"
+          cp "$R41C/ASSET_MANIFEST.md" "$out/"
+          cp "$RUNNER_TEMP/r41b-baseline/download-manifest.json" "$out/r41-original-download-manifest.json"
+          cp "$RUNNER_TEMP/r41b-baseline/art-correction-stats.json" "$out/r41b-source-art-correction-stats.json"
+          inputs="$RUNNER_TEMP/r41c-vegetation"
+          python3 "$R41C/fetch_vegetation.py" "$inputs"
+          cp "$inputs/vegetation-download-manifest.json" "$out/"
+          blender --background "$RUNNER_TEMP/r41b-baseline/highway-master-r41b.blend" --python-exit-code 1 --python "$R41C/edit_roadside.py" -- "$inputs" "$out"
+          cd "$out"
+          test -s highway-master-r41c.blend
+          sha256sum highway-master-r41c.blend > SHA256SUMS.txt
+      - name: Preserve the corrected native checkpoint before rendering
+        uses: actions/upload-artifact@v5
+        with:
+          name: r41c-native-master
+          path: ${{ runner.temp }}/r41c-checkpoint/
+          if-no-files-found: error
+          compression-level: 0
+
+  render:
+    needs: checkpoint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    strategy:
+      fail-fast: false
+      matrix:
+        view: [driver, roadside, overview]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v5
+        with:
+          name: r41c-native-master
+          path: ${{ runner.temp }}/r41c-checkpoint
+      - name: Install Blender
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender python3-numpy
+      - name: Reopen checkpoint and render the original camera in Cycles
+        env:
+          VIEW: ${{ matrix.view }}
+        run: |
+          source="$RUNNER_TEMP/r41c-checkpoint"
+          out="$RUNNER_TEMP/r41c-frame"
+          mkdir -p "$out"
+          (cd "$source" && sha256sum -c SHA256SUMS.txt)
+          blender --background "$source/highway-master-r41c.blend" --python-exit-code 1 --python "$R41C/../r41b/render_view.py" -- "$VIEW" "$out/$VIEW.png" "$source/roadside-art-stats.json"
+          test -s "$out/$VIEW.png"
+          (cd "$out" && sha256sum "$VIEW.png" > "$VIEW.sha256")
+      - uses: actions/upload-artifact@v5
+        with:
+          name: r41c-frame-${{ matrix.view }}
+          path: ${{ runner.temp }}/r41c-frame/
+          if-no-files-found: error
+
+  comparison:
+    needs: render
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ github.token }}
+          run-id: 42469944678
+          artifact-ids: 13613510791
+          path: ${{ runner.temp }}/r41c-comparison/r41b
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: r41c-frame-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/r41c-comparison/after
+      - name: Validate all three same-camera pairs
+        run: |
+          cd "$RUNNER_TEMP/r41c-comparison"
+          mv r41b/after before
+          mv r41b/primary-reference.jpg .
+          rm -r r41b
+          (cd before && cat driver.sha256 roadside.sha256 overview.sha256 | sha256sum -c -)
+          (cd after && cat driver.sha256 roadside.sha256 overview.sha256 | sha256sum -c -)
+          for dir in before after; do
+            for view in driver roadside overview; do
+              test -s "$dir/$view.png"
+            done
+          done
+      - uses: actions/upload-artifact@v5
+        with:
+          name: r41c-before-after-pngs
+          path: ${{ runner.temp }}/r41c-comparison/
+          if-no-files-found: error
