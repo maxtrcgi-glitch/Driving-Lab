@@ -1,0 +1,51 @@
+name: R4.0 Blender pipeline verification
+on:
+  workflow_dispatch:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths: ['experiments/asset-poc-r2/r40-blender-pipeline/**', '.github/workflows/r40-blender-pipeline.yml']
+permissions:
+  contents: read
+jobs:
+  blender-webgl:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install Ubuntu Blender package
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender
+          blender --version
+      - run: npm ci
+      - run: npx playwright install --with-deps --only-shell chromium
+      - name: Import, render and export in Blender
+        run: |
+          d=experiments/asset-poc-r2/r40-blender-pipeline
+          blender --background --factory-startup --python "$d/build_blender_scene.py" --python-exit-code 1 -- experiments/asset-poc-r2/r31/assets/guardrail.glb "$d"
+      - name: Verify Blender project and exported model
+        run: |
+          d=experiments/asset-poc-r2/r40-blender-pipeline
+          test -s "$d/guardrail-master.blend"
+          test -s "$d/guardrail-export.glb"
+          test -s "$d/blender-full.png"
+          test -s "$d/blender-close.png"
+          sha256sum "$d"/*.blend "$d"/*.glb
+      - run: node experiments/asset-poc-r2/r40-blender-pipeline/test.mjs
+      - name: Preserve actual Blender project and evidence
+        uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: r40-blender-pipeline-evidence
+          path: |
+            experiments/asset-poc-r2/r40-blender-pipeline/*.blend
+            experiments/asset-poc-r2/r40-blender-pipeline/*.glb
+            experiments/asset-poc-r2/r40-blender-pipeline/*.png
+            experiments/asset-poc-r2/r40-blender-pipeline/*-stats.json
+          if-no-files-found: warn
