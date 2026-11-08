@@ -1,0 +1,44 @@
+name: R4.2 WebGL capture recovery
+on:
+  workflow_dispatch:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths: ['experiments/asset-poc-r2/r42-capture-recovery/**', '.github/workflows/r42-capture-recovery.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ github.token }}
+          run-id: 42482391076
+          artifact-ids: 13617904335
+          path: experiments/asset-poc-r2/r42-fidelity
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps --only-shell chromium
+      - name: Verify GLB and capture from WebGL canvas
+        run: |
+          cd experiments/asset-poc-r2/r42-fidelity
+          sha256sum -c SHA256SUMS.txt
+          cd ../../..
+          node experiments/asset-poc-r2/r42-capture-recovery/test.mjs
+      - name: Save captured evidence
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: r42-capture-recovery
+          path: |
+            experiments/asset-poc-r2/r42-fidelity/*.png
+            experiments/asset-poc-r2/r42-fidelity/*.json
+          if-no-files-found: warn
