@@ -1,0 +1,62 @@
+name: R4.2 Blender to WebGL fidelity
+on:
+  workflow_dispatch:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths: ['experiments/asset-poc-r2/r42-fidelity/**', '.github/workflows/r42-fidelity.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  fidelity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ github.token }}
+          run-id: 42480836413
+          artifact-ids: 13617741101
+          path: ${{ runner.temp }}/source-r41c
+      - uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ github.token }}
+          run-id: 42480836413
+          artifact-ids: 13617577163
+          path: ${{ runner.temp }}/reference-r41c
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install Blender and browser
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender python3-numpy
+          npm ci
+          npx playwright install --with-deps --only-shell chromium
+      - name: Verify original and export native scene
+        run: |
+          echo '1f84a2418e39050d93667a466a7d579dc2e10f88a1dbe91748e5f4327b17996b  highway-master-r41c.blend' | (cd "$RUNNER_TEMP/source-r41c" && sha256sum -c -)
+          d=experiments/asset-poc-r2/r42-fidelity
+          cp "$RUNNER_TEMP/reference-r41c/after/driver.png" "$d/blender-driver.png"
+          blender --background "$RUNNER_TEMP/source-r41c/highway-master-r41c.blend" --python-exit-code 1 --python "$d/export_scene.py" -- "$d" 2>&1 | tee "$d/export.log"
+          test -s "$d/highway-r42.glb"
+          sha256sum "$d/highway-r42.glb" > "$d/SHA256SUMS.txt"
+      - name: Load the GLB and capture Chromium WebGL
+        run: node experiments/asset-poc-r2/r42-fidelity/test.mjs
+      - name: Preserve actual export and evidence
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: r42-fidelity-evidence
+          path: |
+            experiments/asset-poc-r2/r42-fidelity/*.glb
+            experiments/asset-poc-r2/r42-fidelity/*.png
+            experiments/asset-poc-r2/r42-fidelity/*.json
+            experiments/asset-poc-r2/r42-fidelity/*.log
+            experiments/asset-poc-r2/r42-fidelity/SHA256SUMS.txt
+          if-no-files-found: warn
+          compression-level: 0
