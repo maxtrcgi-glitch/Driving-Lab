@@ -14,10 +14,11 @@ try {
  await page.waitForFunction(()=>window.result||window.failure,null,{timeout:600000});
  const result=await page.evaluate(()=>({result:window.result,failure:window.failure}));
  if(result.failure)throw Error(result.failure);
- await page.screenshot({path:out+'/webgl-driver.png',timeout:120000});
  result.errors=errors;
  result.glbBytes=(await fs.stat(out+'/highway-r42.glb')).size;
  await fs.writeFile(out+'/webgl-stats.json',JSON.stringify(result,null,2));
+ const pixels=await page.locator('canvas').evaluate(canvas=>canvas.toDataURL('image/png'),{timeout:300000});
+ await fs.writeFile(out+'/webgl-driver.png',Buffer.from(pixels.split(',')[1],'base64'));
  console.log(JSON.stringify(result));
  if(result.result.glError||errors.length)throw Error('WebGL or browser errors detected');
 }finally{await browser?.close();server.kill()}

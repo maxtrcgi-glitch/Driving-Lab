@@ -57,6 +57,48 @@ for instance in instances:
         temp.objects.link(clone)
         clone.matrix_world = instance.matrix_world @ Matrix.Translation(-source.instance_offset) @ original.matrix_world
         selected.append(clone)
+# Make export-only material copies for Blender node graphs that the glTF
+# exporter cannot represent. Reconnect the original PBR maps without changing
+# the saved source master; procedural terrain blends remain a known limitation.
+material_map = {}
+for obj in list(selected):
+    if obj.type != "MESH" or not obj.data.materials:
+        continue
+    replacements = []
+    for material in obj.data.materials:
+        if material and material.name.startswith("Paving |"):
+            stem = "asphalt_track"
+        elif material and (material.name.startswith("Verge | gravel to") or
+                           material.name.startswith("Verge | leafy")):
+            stem = "grass"
+        else:
+            replacements.append(material)
+            continue
+        if material.name not in material_map:
+            converted = material.copy()
+            converted.name = "R4.2 PBR | " + material.name
+            tree = converted.node_tree
+            shader = tree.nodes.get("Principled BSDF")
+            for input_name, token in (("Base Color", stem + ("_diff" if stem == "asphalt_track" else "-diff")),
+                                      ("Roughness", stem + ("_rough" if stem == "asphalt_track" else "-rough"))):
+                image = next((im for im in bpy.data.images if im.name.startswith(token)), None)
+                if not image:
+                    raise ValueError("Missing original PBR image " + token)
+                node = tree.nodes.new("ShaderNodeTexImage")
+                node.image = image
+                tree.links.new(node.outputs["Color"], shader.inputs[input_name])
+            material_map[material.name] = converted
+        replacements.append(material_map[material.name])
+    if any(a != b for a,b in zip(replacements, obj.data.materials)):
+        copy = obj.copy()
+        copy.data = obj.data.copy()
+        temp.objects.link(copy)
+        copy.matrix_world = obj.matrix_world.copy()
+        for i,material in enumerate(replacements):
+            copy.data.materials[i] = material
+        selected.remove(obj)
+        selected.append(copy)
+print("R42 compatible PBR materials:", list(material_map), flush=True)
 bpy.ops.object.select_all(action="DESELECT")
 for obj in selected:
     obj.select_set(True)
