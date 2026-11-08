@@ -60,14 +60,41 @@ for asset in ("tree_small_02", "pine_sapling_medium"):
         if uri and not uri.startswith("data:") and not (folder / uri).is_file():
             raise FileNotFoundError(f"{asset}: missing glTF resource {uri}")
 
+def available_files(value):
+    if not isinstance(value, dict):
+        return
+    if "url" in value:
+        yield value
+        return
+    for entry in value.values():
+        yield from available_files(entry)
+
+
 asset = "leafy_grass"
-entries = files(asset)
-for name, formats in {"diff": ("jpg", "png"), "nor_gl": ("jpg", "png", "exr"),
-                      "rough": ("jpg", "png", "exr")}.items():
-    options = entries[name]["2k"]
-    fmt = next(fmt for fmt in formats if fmt in options)
-    download(options[fmt], root / f"grass-{name}.{fmt}", asset)
+entries = list(available_files(files(asset)))
+for name in ("diff", "nor_gl", "rough"):
+    stem = f"{asset}_{name}_2k"
+    for ext in ("jpg", "png", "exr"):
+        match = next((entry for entry in entries if entry["url"].endswith(f"/{stem}.{ext}")), None)
+        if match:
+            download(match, root / f"grass-{name}.{ext}", asset)
+            break
+    else:
+        raise RuntimeError(f"No 2K {name} map available for {asset}")
 
 asset = "kloppenheim_03_puresky"
-download(files(asset)["hdr"]["4k"]["hdr"], root / "daylight.hdr", asset)
+entries = list(available_files(files(asset)))
+for ext in ("hdr", "exr"):
+    match = next((entry for entry in entries if entry["url"].endswith(f"/{asset}_4k.{ext}")), None)
+    if match:
+        download(match, root / f"daylight.{ext}", asset)
+        break
+else:
+    raise RuntimeError(f"No 4K HDR image available for {asset}")
+
+try:
+    retrieve("https://upload.wikimedia.org/wikipedia/commons/8/8e/Auf_der_A_9_in_Richtung_Berlin.jpg",
+             root / "primary-reference.jpg")
+except OSError as error:
+    print(f"Reference download unavailable. See Wikimedia link in manifest: {error}", flush=True)
 (root / "download-manifest.json").write_text(json.dumps(records, indent=2) + "\n")

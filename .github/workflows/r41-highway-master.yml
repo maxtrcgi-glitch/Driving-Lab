@@ -30,6 +30,9 @@ jobs:
           mkdir -p "$RUNNER_TEMP/r41-output"
           cp "$RUNNER_TEMP/r41-inputs/download-manifest.json" "$RUNNER_TEMP/r41-output/"
           cp "$R41/ASSET_MANIFEST.md" "$RUNNER_TEMP/r41-output/"
+          if test -s "$RUNNER_TEMP/r41-inputs/primary-reference.jpg"; then
+            cp "$RUNNER_TEMP/r41-inputs/primary-reference.jpg" "$RUNNER_TEMP/r41-output/"
+          fi
           blender --background --factory-startup --python-exit-code 1 --python "$R41/build_scene.py" -- "$GITHUB_WORKSPACE" "$RUNNER_TEMP/r41-inputs" "$RUNNER_TEMP/r41-output"
       - name: Verify native master and inspection renders
         run: |
@@ -46,4 +49,16 @@ jobs:
         with:
           name: r41-highway-master
           path: ${{ runner.temp }}/r41-output/
+          if-no-files-found: warn
+      - name: Preserve lightweight visual review
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: r41-visual-review
+          path: |
+            ${{ runner.temp }}/r41-output/*.png
+            ${{ runner.temp }}/r41-output/primary-reference.jpg
+            ${{ runner.temp }}/r41-output/*-stats.json
+            ${{ runner.temp }}/r41-output/*manifest.json
+            ${{ runner.temp }}/r41-output/SHA256SUMS.txt
           if-no-files-found: warn

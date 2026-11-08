@@ -326,7 +326,7 @@ cameras = {
 scene.world.use_nodes = True
 nodes, links = scene.world.node_tree.nodes, scene.world.node_tree.links
 environment = nodes.new("ShaderNodeTexEnvironment")
-environment.image = bpy.data.images.load(str(inputs / "daylight.hdr"))
+environment.image = bpy.data.images.load(str(next(inputs.glob("daylight.*"))))
 environment.label = "Poly Haven | Kloppenheim 03 pure sky"
 background = nodes.get("Background")
 links.new(environment.outputs["Color"], background.inputs["Color"])
@@ -355,7 +355,7 @@ unpacked = [im.name for im in bpy.data.images if im.source == "FILE" and not im.
 if unpacked:
     raise RuntimeError(f"Unpacked source textures: {unpacked}")
 scene.render.filepath = "//driver.png"
-bpy.ops.wm.save_as_mainfile(filepath=str(output / "highway-master.blend"))
+bpy.ops.wm.save_as_mainfile(filepath=str(output / "highway-master.blend"), compress=True)
 stats = {
     "blender": bpy.app.version_string,
     "engine": scene.render.engine,
