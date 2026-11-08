@@ -29,9 +29,7 @@ jobs:
       - run: npx playwright install --with-deps --only-shell chromium
       - name: Verify GLB and capture from WebGL canvas
         run: |
-          cd experiments/asset-poc-r2/r42-fidelity
-          sha256sum -c SHA256SUMS.txt
-          cd ../../..
+          sha256sum -c experiments/asset-poc-r2/r42-fidelity/SHA256SUMS.txt
           node experiments/asset-poc-r2/r42-capture-recovery/test.mjs
       - name: Save captured evidence
         if: always()
