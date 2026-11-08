@@ -44,7 +44,7 @@ full=camera('Camera Full',(8,-12,5.0),center,42)
 close=camera('Camera Close',(1,-2.7,1.6),(0,0,center.z),42)
 scene=bpy.context.scene
 scene.render.engine='CYCLES';scene.cycles.samples=16
-scene.cycles.use_denoising=True
+scene.cycles.use_denoising=False
 scene.render.resolution_x=1000;scene.render.resolution_y=650;scene.render.resolution_percentage=100
 scene.render.image_settings.file_format='PNG'
 scene.camera=full
