@@ -26,7 +26,7 @@ jobs:
       - name: Install Blender and Chromium
         run: |
           sudo apt-get update
-          sudo apt-get install -y blender
+          sudo apt-get install -y blender python3-numpy python3-pil imagemagick
           npm ci
           npx playwright install --with-deps --only-shell chromium
       - name: Export and validate checkpoint
