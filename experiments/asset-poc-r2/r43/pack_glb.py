@@ -31,7 +31,7 @@ for i, view in enumerate(doc["bufferViews"]):
         with Image.open(io.BytesIO(data)) as original:
             alpha = "A" in original.getbands() or "transparency" in original.info
             name = descriptor.get("name","").lower()
-            edge = 1024 if "48 m art study" in name or alpha else 512
+            edge = 352 if "nor" in name and "asphalt" not in name else 1024 if "48 m art study" in name or alpha else 512
             image = original.convert("RGBA" if alpha else "RGB")
             image.thumbnail((edge,edge), Image.Resampling.LANCZOS)
             encoded = io.BytesIO()

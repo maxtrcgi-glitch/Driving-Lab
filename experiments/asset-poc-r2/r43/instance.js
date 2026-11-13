@@ -7,7 +7,11 @@ export function instanceRepeatedMeshes(scene) {
     if (!mesh.isMesh || mesh.isInstancedMesh || mesh.children.length ||
         Array.isArray(mesh.material) || mesh.material.transparent ||
         mesh.matrixWorld.determinant() <= 0) return;
-    const key = mesh.geometry.uuid + ':' + mesh.material.uuid;
+    // Keep tree batches local so whole stands outside the camera frustum can be culled.
+    const tree = /tree_small|pine_sapling/i.test(mesh.name) || /tree_small|pine_sapling/i.test(mesh.material.name);
+    const pos = mesh.matrixWorld.elements;
+    const cell = tree ? `:${Math.floor(pos[12] / 18)}:${Math.floor(pos[14] / 18)}` : '';
+    const key = mesh.geometry.uuid + ':' + mesh.material.uuid + cell;
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(mesh);
   });
