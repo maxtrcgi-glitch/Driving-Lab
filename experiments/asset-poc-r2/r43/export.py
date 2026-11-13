@@ -202,7 +202,7 @@ for o in surface_objects:
     bake_surface(o)
 select(surface_objects + placed)
 bpy.ops.export_scene.gltf(filepath=str(out/"highway.glb"),export_format="GLB",
-                           use_selection=True, export_gpu_instances=True)
+                           use_selection=True)
 camera_info = {k:{"matrix":[list(row) for row in o.matrix_world],
                  "fov":math.degrees(2*math.atan(o.data.sensor_width*9/16/(2*o.data.lens)))}
                for k,o in cameras.items()}

@@ -2,7 +2,8 @@ name: R4.3 Highway WebGL checkpoint
 on:
   push:
     branches: [visual/asset-poc-r2]
-    paths: ['experiments/asset-poc-r2/r43/phase']
+    paths: ['experiments/asset-poc-r2/r43/phase', '.github/workflows/r43-highway.yml']
+    # Each checkpoint changes phase or the workflow itself.
   workflow_dispatch:
 permissions:
   contents: read
@@ -35,14 +36,26 @@ jobs:
           echo '1f84a2418e39050d93667a466a7d579dc2e10f88a1dbe91748e5f4327b17996b  highway-master-r41c.blend' | (cd "$RUNNER_TEMP/r41c" && sha256sum -c -)
           cp "$RUNNER_TEMP/r41c/highway-master-r41c.blend" "$RUNNER_TEMP/r43-working.blend"
           stage=$(cat "$d/phase")
-          blender -b "$RUNNER_TEMP/r43-working.blend" -t 4 --python-exit-code 1 --python "$d/export.py" -- "$d/evidence" --stage "$stage" > "$d/evidence/blender.log" 2>&1
+          blender -b "$RUNNER_TEMP/r43-working.blend" -t 4 --python-exit-code 1 --python "$d/export.py" -- "$d/evidence" --stage "$stage" > "$d/evidence/blender.log" 2>&1 || { tail -60 "$d/evidence/blender.log"; exit 1; }
           cp "$d"/{index.html,viewer.js} "$d/evidence/"
           cp -r experiments/asset-poc-r2/viewer/vendor "$d/evidence/vendor"
           python3 -m http.server 8173 --bind 127.0.0.1 --directory "$d/evidence" &
           trap 'kill $!' EXIT
           for i in {1..30}; do curl -fs http://127.0.0.1:8173/ >/dev/null && break; sleep 1; done
           node "$d/test.cjs" http://127.0.0.1:8173/ "$d/evidence" "$stage"
+      - name: Preserve small comparison previews in job logs
+        if: always()
+        run: |
+          d=experiments/asset-poc-r2/r43/evidence
+          for file in "$d"/*driver.png "$d"/webgl-roadside.png "$d"/webgl-overview.png; do
+            if test -f "$file"; then
+              echo "R43_PREVIEW_BEGIN $(basename "$file")"
+              convert "$file" -resize 768x -quality 80 jpeg:- | base64 -w 2500
+              echo "R43_PREVIEW_END"
+            fi
+          done
       - uses: actions/upload-artifact@v5
+        continue-on-error: true
         if: always()
         with:
           name: r43-checkpoint
