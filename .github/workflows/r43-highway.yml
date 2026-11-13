@@ -44,6 +44,7 @@ jobs:
           python3 -m http.server 8173 --bind 127.0.0.1 --directory "$d/evidence" &
           trap 'kill $!' EXIT
           for i in {1..30}; do curl -fs http://127.0.0.1:8173/ >/dev/null && break; sleep 1; done
+          (cd "$d/evidence" && sha256sum highway.glb index.html scene.json viewer.js instance.js vendor/* utils/* | tee SHA256SUMS.txt)
           cat "$d/evidence/scene.json"
           node "$d/test.cjs" http://127.0.0.1:8173/ "$d/evidence" "$stage"
       - name: Preserve small comparison previews in job logs
