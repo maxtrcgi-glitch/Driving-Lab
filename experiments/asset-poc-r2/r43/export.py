@@ -24,7 +24,7 @@ cameras = {k: next(o for o in scene.objects if o.type == "CAMERA" and o.name.sta
 bpy.context.view_layer.update()
 work = bpy.data.collections.new("R4.3 export")
 scene.collection.children.link(work)
-ymin, ymax = (-3, 29) if args.stage == "a" else (-16, 170)
+ymin, ymax = (-3, 29) if args.stage == "a" else (-16, 216) if args.stage == "c" else (-16, 170)
 limit = 34 if args.stage == "a" else 72
 surface_objects, placed, source_meshes = [], [], {}
 stats = {}
@@ -72,7 +72,7 @@ def place(inst, optimized=False):
             clone.matrix_world = matrix
             before = triangle_count(clone.data)
             if optimized and before > 16000:
-                target = (58000 if "tree_small" in source.name else 36000) if args.stage != "a" else 12000
+                target = (58000 if "tree_small" in source.name else 48000 if args.stage == "c" else 36000) if args.stage != "a" else 12000
                 modifier = clone.modifiers.new("R4.3 silhouette reduction", "DECIMATE")
                 modifier.ratio = min(1, target / before)
                 select([clone])
@@ -117,7 +117,8 @@ else:
         # continuation more sparsely. No positions are synthesized.
         trees = [o for i,o in enumerate(trees) if
                  (0 < o.location.y < 58 and 14 < o.location.x < 37)
-                 or i % (4 if o.location.y < 90 else 6) == 0]
+                 or (o.location.y > 60 and i % 3 == 0)
+                 or i % 5 == 0]
     for o in trees:
         place(o,True)
     for i,o in enumerate(bpy.data.collections["04b | Cut verge and bank grasses"].objects):

@@ -13,6 +13,13 @@ raw = args.glb.read_bytes()
 magic, version, total, json_size, kind = struct.unpack_from("<4sIIII", raw)
 assert (magic, version, total, kind) == (b"glTF", 2, len(raw), 0x4E4F534A)
 doc = json.loads(raw[20:20+json_size])
+# These source foliage textures contain cutout silhouettes. A depth-writing
+# alpha test allows repeated plants to batch without sorting individual cards.
+for material in doc.get("materials", []):
+    if material.get("name", "").startswith(("tree_small_02_leaves", "grass_bermuda_01", "grass_medium_02")):
+        if material.get("alphaMode") == "BLEND":
+            material["alphaMode"] = "MASK"
+            material["alphaCutoff"] = 0.35
 binary = memoryview(raw)[28+json_size:]
 images = {i["bufferView"]:i for i in doc["images"]}
 rebuilt = bytearray()
