@@ -24,8 +24,8 @@ cameras = {k: next(o for o in scene.objects if o.type == "CAMERA" and o.name.sta
 bpy.context.view_layer.update()
 work = bpy.data.collections.new("R4.3 export")
 scene.collection.children.link(work)
-ymin, ymax = (-3, 29) if args.stage == "a" else (-16, 108)
-limit = 34 if args.stage == "a" else 66
+ymin, ymax = (-3, 29) if args.stage == "a" else (-16, 170)
+limit = 34 if args.stage == "a" else 72
 surface_objects, placed, source_meshes = [], [], {}
 stats = {}
 
@@ -72,7 +72,7 @@ def place(inst, optimized=False):
             clone.matrix_world = matrix
             before = triangle_count(clone.data)
             if optimized and before > 16000:
-                target = 22000 if "tree_small" in source.name else 12000
+                target = (58000 if "tree_small" in source.name else 36000) if args.stage != "a" else 12000
                 modifier = clone.modifiers.new("R4.3 silhouette reduction", "DECIMATE")
                 modifier.ratio = min(1, target / before)
                 select([clone])
@@ -107,6 +107,17 @@ if args.stage == "a":
     tree = next(o for o in trees if "pine" in o.instance_collection.name.lower())
     place(tree,True)
 else:
+    if args.stage == "b":
+        candidates = sorted(trees, key=lambda o: (abs(o.location.y-31) + abs(o.location.x-20), o.name))
+        seen = set()
+        trees = [o for o in candidates if o.instance_collection.name not in seen
+                 and not seen.add(o.instance_collection.name)]
+    else:
+        # Fill the near right bank with its authored plants and sample the longer
+        # continuation more sparsely. No positions are synthesized.
+        trees = [o for i,o in enumerate(trees) if
+                 (0 < o.location.y < 58 and 14 < o.location.x < 37)
+                 or i % (4 if o.location.y < 90 else 6) == 0]
     for o in trees:
         place(o,True)
     for i,o in enumerate(bpy.data.collections["04b | Cut verge and bank grasses"].objects):
@@ -165,7 +176,7 @@ def bake_surface(obj):
         if not socket.is_linked:
             continue
         name = f"{obj.name.replace(' | ','-').replace('/','-')}-{suffix}"
-        size = 1024 if args.stage == "a" else 1536
+        size = 1536 if "48 m art study" in obj.name else 1024
         image = bpy.data.images.new(name,width=size,height=size,alpha=False)
         image.colorspace_settings.name = "sRGB" if suffix == "base" else "Non-Color"
         target = nodes.new("ShaderNodeTexImage")

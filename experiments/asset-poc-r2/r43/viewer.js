@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
+import { instanceRepeatedMeshes } from './instance.js';
 
 const status = document.getElementById('status');
 const stats = document.getElementById('stats');
@@ -53,7 +54,7 @@ try {
   const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.AgXToneMapping;
-  renderer.toneMappingExposure = 1.28;
+  renderer.toneMappingExposure = 1.39;
   renderer.domElement.addEventListener('webglcontextlost', event => {
     event.preventDefault();
     window.fail('WebGL context lost. Reload to retry.');
@@ -63,9 +64,10 @@ try {
   if (window.loadFailure) throw new Error(window.loadFailure);
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xaabacb);
+  diagnostics.instancedDrawsAvoided = instanceRepeatedMeshes(gltf.scene);
   scene.add(gltf.scene);
-  scene.add(new THREE.HemisphereLight(0xe8f1ff, 0xaca494, 2.25));
-  const sun = new THREE.DirectionalLight(0xfff4df, 2.15);
+  scene.add(new THREE.HemisphereLight(0xe8f1ff, 0xb1b2b2, 2.55));
+  const sun = new THREE.DirectionalLight(0xfffaf3, 2.15);
   sun.position.set(-45, 60, 20);
   scene.add(sun);
   const conversion = new THREE.Matrix4().set(1,0,0,0, 0,0,1,0, 0,-1,0,0, 0,0,0,1);
