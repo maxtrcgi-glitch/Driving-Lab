@@ -2,7 +2,7 @@ name: R4.3 Highway WebGL checkpoint
 on:
   push:
     branches: [visual/asset-poc-r2]
-    paths: ['experiments/asset-poc-r2/r43/phase', '.github/workflows/r43-highway.yml']
+    paths: ['experiments/asset-poc-r2/r43/phase', '.github/workflows/r43-highway.yml', 'experiments/asset-poc-r2/r43/asphalt.py']
     # Each checkpoint changes phase or the workflow itself.
   workflow_dispatch:
 permissions:
@@ -41,27 +41,52 @@ jobs:
           cp "$d"/{index.html,viewer.js,instance.js} "$d/evidence/"
           cp -r experiments/asset-poc-r2/viewer/vendor "$d/evidence/vendor"
           cp -r experiments/asset-poc-r2/viewer/utils "$d/evidence/utils"
+          mv "$d/evidence/highway.glb" "$d/evidence/baseline.glb"
+          blender -b "$RUNNER_TEMP/r43-working.blend" -t 4 --python-exit-code 1 --python "$d/asphalt.py" -- "$d/evidence" --source-only
+          python3 "$d/prepare_asphalt.py" "$d/evidence"
+          blender -b "$RUNNER_TEMP/r43-working.blend" -t 4 --python-exit-code 1 --python "$d/asphalt.py" -- "$d/evidence" --skip-review
+          python3 "$d/replace_asphalt.py" "$d/evidence/baseline.glb" "$d/evidence/asphalt-material.glb" "$d/evidence/highway.glb"
+          python3 "$d/verify_asphalt.py" "$d/evidence/baseline.glb" "$d/evidence/highway.glb"
           python3 -m http.server 8173 --bind 127.0.0.1 --directory "$d/evidence" &
-          trap 'kill $!' EXIT
+          server=$!
+          trap 'kill "$server"' EXIT
           for i in {1..30}; do curl -fs http://127.0.0.1:8173/ >/dev/null && break; sleep 1; done
-          (cd "$d/evidence" && sha256sum highway.glb index.html scene.json viewer.js instance.js vendor/* utils/* | tee SHA256SUMS.txt)
-          cat "$d/evidence/scene.json"
-          node "$d/test.cjs" http://127.0.0.1:8173/ "$d/evidence" "$stage"
+          sha256sum "$d/evidence/"{baseline,highway}.glb
+          cp "$d/evidence/highway.glb" "$d/evidence/corrected.glb"
+          for version in before after; do
+            model=baseline
+            if [ "$version" = after ]; then model=corrected; fi
+            cp "$d/evidence/$model.glb" "$d/evidence/highway.glb"
+            mkdir -p "$d/evidence/$version"
+            node "$d/test.cjs" http://127.0.0.1:8173/ "$d/evidence/$version" "$stage"
+          done
+          python3 - "$d/evidence" <<'PYTHON'
+          import json, pathlib, sys
+          root = pathlib.Path(sys.argv[1])
+          before, after = [json.loads((root / version / 'webgl-stats.json').read_text())['records']
+                           for version in ('before','after')]
+          for view in before:
+              for key in ('drawCalls','triangles'):
+                  assert before[view][key] == after[view][key], (view,key,before[view][key],after[view][key])
+              assert after[view]['textureMiB'] <= before[view]['textureMiB'] + 1
+          PYTHON
       - name: Preserve small comparison previews in job logs
         if: always()
         run: |
           d=experiments/asset-poc-r2/r43/evidence
-          for file in "$d"/*driver.png "$d"/webgl-roadside.png "$d"/webgl-overview.png; do
-            if test -f "$file"; then
-              echo "R43_PREVIEW_BEGIN $(basename "$file")"
-              convert "$file" -resize 768x -quality 80 jpeg:- | base64 -w 2500
-              echo "R43_PREVIEW_END"
-            fi
+          for version in before after; do
+            for file in "$d/$version"/webgl-*.png; do
+              if test -f "$file"; then
+                echo "R43A_PREVIEW_BEGIN $version-$(basename "$file")"
+                convert "$file" -resize 768x -quality 82 jpeg:- | base64 -w 2500
+                echo "R43A_PREVIEW_END"
+              fi
+            done
           done
       - uses: actions/upload-artifact@v5
         continue-on-error: true
         if: always()
         with:
-          name: r43-checkpoint
+          name: r43a-asphalt
           path: experiments/asset-poc-r2/r43/evidence/
           if-no-files-found: error
