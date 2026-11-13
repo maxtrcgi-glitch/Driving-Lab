@@ -37,8 +37,10 @@ jobs:
           cp "$RUNNER_TEMP/r41c/highway-master-r41c.blend" "$RUNNER_TEMP/r43-working.blend"
           stage=$(cat "$d/phase")
           blender -b "$RUNNER_TEMP/r43-working.blend" -t 4 --python-exit-code 1 --python "$d/export.py" -- "$d/evidence" --stage "$stage" > "$d/evidence/blender.log" 2>&1 || { tail -60 "$d/evidence/blender.log"; exit 1; }
+          python3 "$d/pack_glb.py" "$d/evidence/highway.glb"
           cp "$d"/{index.html,viewer.js} "$d/evidence/"
           cp -r experiments/asset-poc-r2/viewer/vendor "$d/evidence/vendor"
+          cp -r experiments/asset-poc-r2/viewer/utils "$d/evidence/utils"
           python3 -m http.server 8173 --bind 127.0.0.1 --directory "$d/evidence" &
           trap 'kill $!' EXIT
           for i in {1..30}; do curl -fs http://127.0.0.1:8173/ >/dev/null && break; sleep 1; done
