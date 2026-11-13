@@ -1,0 +1,50 @@
+name: R4.3 Highway WebGL checkpoint
+on:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths: ['experiments/asset-poc-r2/r43/phase']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  checkpoint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ github.token }}
+          run-id: 42480836413
+          artifact-ids: 13617741101
+          path: ${{ runner.temp }}/r41c
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Install Blender and Chromium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender
+          npm ci
+          npx playwright install --with-deps --only-shell chromium
+      - name: Export and validate checkpoint
+        run: |
+          d=experiments/asset-poc-r2/r43
+          mkdir -p "$d/evidence"
+          echo '1f84a2418e39050d93667a466a7d579dc2e10f88a1dbe91748e5f4327b17996b  highway-master-r41c.blend' | (cd "$RUNNER_TEMP/r41c" && sha256sum -c -)
+          cp "$RUNNER_TEMP/r41c/highway-master-r41c.blend" "$RUNNER_TEMP/r43-working.blend"
+          stage=$(cat "$d/phase")
+          blender -b "$RUNNER_TEMP/r43-working.blend" -t 4 --python-exit-code 1 --python "$d/export.py" -- "$d/evidence" --stage "$stage" > "$d/evidence/blender.log" 2>&1
+          cp "$d"/{index.html,viewer.js} "$d/evidence/"
+          cp -r experiments/asset-poc-r2/viewer/vendor "$d/evidence/vendor"
+          python3 -m http.server 8173 --bind 127.0.0.1 --directory "$d/evidence" &
+          trap 'kill $!' EXIT
+          for i in {1..30}; do curl -fs http://127.0.0.1:8173/ >/dev/null && break; sleep 1; done
+          node "$d/test.cjs" http://127.0.0.1:8173/ "$d/evidence" "$stage"
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: r43-checkpoint
+          path: experiments/asset-poc-r2/r43/evidence/
+          if-no-files-found: error

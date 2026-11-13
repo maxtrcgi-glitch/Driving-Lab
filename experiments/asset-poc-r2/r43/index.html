@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Driving Lab · Highway R4.3</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#13191c;color:#eef2f0;font:15px system-ui,sans-serif}
+main{max-width:1280px;margin:auto;padding:16px}header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}h1{font-size:18px;margin:0}
+nav{display:flex;gap:6px;flex-wrap:wrap}button{border:1px solid #63716d;border-radius:7px;padding:9px 12px;background:#263430;color:white;font:inherit;cursor:pointer}button[aria-pressed=true]{background:#d0eedc;color:#14251d}
+#view{width:100%;aspect-ratio:16/9;background:#aebcca;overflow:hidden;border-radius:9px}canvas{width:100%;height:100%;display:block}
+#status,#stats{margin:9px 0;color:#c4d3ce}#status[data-error]{color:#ffbaa8}textarea{display:block;width:100%;margin-top:8px}
+</style>
+<main><header><h1>Driving Lab · Highway R4.3</h1><nav aria-label="Camera">
+<button data-camera="driver" aria-pressed="true">Driver Eye</button><button data-camera="roadside" aria-pressed="false">Roadside</button><button data-camera="overview" aria-pressed="false">Overview</button><button id="copy">Copy diagnostics</button></nav></header>
+<div id="view"></div><div id="status" role="status">Connecting…</div><div id="stats"></div></main>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+<script>
+window.fail = message => {
+ const status = document.getElementById('status');
+ status.dataset.error = '';
+ status.textContent = String(message);
+ window.loadFailure = String(message);
+};
+window.deadline = setTimeout(() => window.fail('Loading timed out. Reload to retry.'), 35000);
+addEventListener('error', event => window.fail(event.message || 'A required viewer file could not load.'), true);
+</script>
+<script type="module" src="./viewer.js"></script>
