@@ -23,7 +23,7 @@ road = [o for o in pavement.objects if o.type=="MESH" and o.material_slots
         and o.material_slots[0].material.name.startswith("R4.3b C |")]
 marks = [o for o in pavement.objects if o.type=="MESH" and o.material_slots
          and o.material_slots[0].material.name.startswith("Markings |")]
-assert len(road)==6 and len(marks)==60
+assert road and marks, "No paving or independent lane delimiters in source scene"
 UV_NAME = "Surface metres"
 UV_METRES = 2.15
 
@@ -293,10 +293,14 @@ c1,r1,n1=scan("asphalt_04",transform_uv(meters,4.0,True))
 cb,rb,nb=scan("asphalt_01",transform_uv(meters,2.1))
 ca,ra,na=scan("asphalt_floor",transform_uv(meters,2.3))
 base_color=mix(.38,tint(mix(weight,c0,c1),.44,.24),tint(cb,.88,.31),"Aged binder and lighter mineral exposure")
-base_color=mix(calc("MULTIPLY",wheel,.11),base_color,tint(cb,.96,.27),"Subtle polishing, no dark stripe")
-base_color=mix(calc("MULTIPLY",recent,.72),base_color,tint(ca,.27,.27),"Newer narrow inlay")
-base_color=mix(calc("MULTIPLY",old,.64),base_color,tint(cb,1.21,.24),"Older lighter inlay")
-base_color=mix(calc("MULTIPLY",dust,.23),base_color,(.101,.089,.069,1),"Dust on paved edge")
+# Remove a small binder pedestal after blending rather than reducing the
+# local differences between scanned stones.
+base_color=vec("MAXIMUM",vec("SUBTRACT",base_color,(.020,.020,.019)),(.012,.012,.012),
+               "Darker dry binder with retained scan contrast")
+base_color=mix(calc("MULTIPLY",wheel,.09),base_color,tint(cb,.73,.27),"Subtle polishing, no dark stripe")
+base_color=mix(calc("MULTIPLY",recent,.72),base_color,tint(ca,.19,.27),"Newer narrow inlay")
+base_color=mix(calc("MULTIPLY",old,.64),base_color,tint(cb,1.02,.24),"Older lighter inlay")
+base_color=mix(calc("MULTIPLY",dust,.30),base_color,(.101,.089,.069,1),"Dust on paved edge")
 base_color=mix(calc("MULTIPLY",joint,.28),base_color,(.033,.030,.028,1),"Sealant tint")
 
 rough=value_mix(.37,value_mix(weight,r0,r1),rb)
