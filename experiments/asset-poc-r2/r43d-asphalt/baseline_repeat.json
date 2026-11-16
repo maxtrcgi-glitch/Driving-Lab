@@ -1,0 +1,52 @@
+{
+  "source_maps": {
+    "asphalt_01_diff_2k.jpg": {
+      "variance": 0.0001100329730217315,
+      "low_band_energy_fraction": 0.06838679517525743
+    },
+    "asphalt_01_nor_gl_2k.jpg": {
+      "variance": 0.014204286567948978,
+      "low_band_energy_fraction": 0.002690341005028914
+    },
+    "asphalt_01_rough_2k.jpg": {
+      "variance": 1.2911415582758043e-05,
+      "low_band_energy_fraction": 0.0535753779134939
+    },
+    "asphalt_04_diff_4k.jpg": {
+      "variance": 0.001470285966447727,
+      "low_band_energy_fraction": 0.14063993659793905
+    },
+    "asphalt_04_nor_gl_4k.jpg": {
+      "variance": 0.00312005953657332,
+      "low_band_energy_fraction": 0.009152394785184807
+    },
+    "asphalt_04_rough_4k.jpg": {
+      "variance": 6.842715607848408e-05,
+      "low_band_energy_fraction": 0.13355639183841506
+    }
+  },
+  "orthographic_measurements": {
+    "r43d/source/long-overview.png": {
+      "4m_amplitude_8bit": 2.088288148595311,
+      "2_1m_amplitude_8bit": 0.3417039706160624,
+      "peaks": [
+        [
+          4.0,
+          2.088288148595312
+        ],
+        [
+          2.0,
+          1.4559070694487215
+        ],
+        [
+          3.67,
+          0.31457495729727025
+        ],
+        [
+          5.01,
+          0.28212182964857385
+        ]
+      ]
+    }
+  }
+}
