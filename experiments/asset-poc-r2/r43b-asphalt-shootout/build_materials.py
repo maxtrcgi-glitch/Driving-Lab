@@ -113,8 +113,8 @@ def repair_mask(tree, world):
 
 settings = {
     "A": ("Clean Modern Highway","asphalt_floor","2k",2.3,.39,.18,.29,.035),
-    "B": ("Lightly Worn Highway","asphalt_01","2k",2.1,1.38,.23,.46,.073),
-    "C": ("Slightly Aged / Repaired Highway","asphalt_04","4k",4.0,.72,.23,.39,.09),
+    "B": ("Lightly Worn Highway","asphalt_01","2k",2.1,.96,.30,.46,.073),
+    "C": ("Slightly Aged / Repaired Highway","asphalt_04","4k",4.0,.62,.23,.39,.09),
 }
 
 def make_material(letter):
@@ -133,12 +133,12 @@ def make_material(letter):
         # locations. A cleaner scan tempers the repeated crack contrast.
         floor, floor_rough, floor_norm = map_set(tree,uv.outputs[0],"asphalt_floor","2k",2.3)
         worn, worn_rough, worn_norm = map_set(tree,uv.outputs[0],"asphalt_01","2k",2.1)
-        base = mix_color(tree,.52,polish(tree,worn,1.47,.24),base,"Restrained aged scan")
+        base = mix_color(tree,.52,polish(tree,worn,1.02,.24),base,"Restrained aged scan")
         normal = mix_color(tree,.52,worn_norm,normal,"Restrained aged normals")
         roughness = mix_color(tree,.52,remap(tree,worn_rough,(.20,.98),(.56,.93),"Worn binder"),
                               roughness,"Aged roughness")
         repair = repair_mask(tree,world)
-        base = mix_color(tree,repair,base,polish(tree,floor,.43,.20),"Local resurfacing")
+        base = mix_color(tree,repair,base,polish(tree,floor,.32,.20),"Local resurfacing")
         roughness = mix_color(tree,repair,roughness,remap(tree,floor_rough,(.20,.98),(.50,.86),
                                                         "Repair roughness"),"Repair response")
         normal = mix_color(tree,repair,normal,floor_norm,"Repair normal response")
@@ -179,6 +179,7 @@ for obj in asphalt:
     obj.material_slots[0].material = variants["A"]
 for letter, scene in scenes.items():
     scene.name = f"{letter} — {settings[letter][0]}"
+    scene.use_fake_user = True
     scene["Shootout asphalt"] = variants[letter].name
     assert scene.camera == master.camera and scene.world == master.world
     assert all(o.data in [a.data for a in asphalt] for o in scene.objects
