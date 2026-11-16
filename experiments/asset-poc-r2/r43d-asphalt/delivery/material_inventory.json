@@ -1,0 +1,9 @@
+{
+  "baseline_nodes": 133,
+  "candidate_top_level_nodes": 108,
+  "stochastic_group_nodes": 103,
+  "baseline_image_nodes": 14,
+  "candidate_image_nodes": 17,
+  "unique_pbr_maps": 9,
+  "unique_history_maps": 2
+}

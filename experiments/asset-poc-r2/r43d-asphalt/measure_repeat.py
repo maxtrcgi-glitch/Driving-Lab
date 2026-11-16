@@ -52,7 +52,13 @@ def station_metrics(file):
             distinct.append(peak)
         if len(distinct)==4:
             break
-    return {"4m_amplitude_8bit":amplitude(4),"2_1m_amplitude_8bit":amplitude(2.1),"peaks":distinct}
+    phase=2*np.mean(residual*np.exp(-2j*np.pi*s/4),axis=1)
+    strongest=int(np.argmax(abs(phase)))
+    return {"4m_amplitude_8bit":amplitude(4),"2m_amplitude_8bit":amplitude(2),
+            "2_1m_amplitude_8bit":amplitude(2.1),"peaks":distinct,
+            "4m_per_traverse_amplitude":dict(zip(map(str,lateral.ravel()),map(float,abs(phase)))),
+            "strongest_traverse_m":float(lateral[strongest,0]),
+            "strongest_bright_phase_station_mod4_m":float((-np.angle(phase[strongest])*4/(2*np.pi))%4)}
 
 result={"source_maps":{p.name:stats(p) for p in sorted(args.maps.glob("*.jpg"))},
         "orthographic_measurements":{str(p):station_metrics(p) for p in args.images}}

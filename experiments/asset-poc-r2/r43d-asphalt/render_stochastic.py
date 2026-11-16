@@ -14,6 +14,7 @@ parser.add_argument("output",type=Path)
 parser.add_argument("--primary-only",action="store_true")
 parser.add_argument("--inspection-only",action="store_true")
 parser.add_argument("--long-only",action="store_true")
+parser.add_argument("--raking-only",action="store_true")
 parser.add_argument("--time-baseline",action="store_true")
 args=parser.parse_args(sys.argv[sys.argv.index("--")+1:])
 out=args.output.resolve()
@@ -42,28 +43,29 @@ def render(scene,camera,name,width=1152,height=648,samples=48,adaptive=.04):
 
 existing={p:next(o for o in candidate.objects if o.type=="CAMERA" and o.name.startswith(p+" |"))
           for p in "ABC"}
-if not args.inspection_only and not args.long_only:
+if not (args.inspection_only or args.long_only or args.raking_only):
     for p,name in zip("ABC",("driver","roadside","overview")):
         render(candidate,existing[p],name)
 if args.primary_only:
     raise SystemExit(0)
 
-# An additional image deliberately shows a long section at a fixed scale.
-inspect_bpy=bpy.data.cameras.new("Temporary repeat-check lens")
-inspect_cam=bpy.data.objects.new("Temporary repeat-check camera",inspect_bpy)
-candidate.collection.objects.link(inspect_cam)
-inspect_cam.location=(-4,57,105)
-inspect_cam.rotation_euler=(0,0,-math.pi/2)
-inspect_bpy.type="ORTHO"
-inspect_bpy.ortho_scale=138
-render(candidate,inspect_cam,"long-overview",1536,720,48)
-if args.time_baseline:
-    candidate.render.use_persistent_data=False
-    old.collection.objects.link(inspect_cam)
-    render(old,inspect_cam,"long-overview-baseline",1536,720,48)
-    old.render.use_persistent_data=False
-if args.long_only:
-    raise SystemExit(0)
+if not args.raking_only:
+    # An additional image deliberately shows a long section at a fixed scale.
+    inspect_bpy=bpy.data.cameras.new("Temporary repeat-check lens")
+    inspect_cam=bpy.data.objects.new("Temporary repeat-check camera",inspect_bpy)
+    candidate.collection.objects.link(inspect_cam)
+    inspect_cam.location=(-4,57,105)
+    inspect_cam.rotation_euler=(0,0,-math.pi/2)
+    inspect_bpy.type="ORTHO"
+    inspect_bpy.ortho_scale=138
+    render(candidate,inspect_cam,"long-overview",1536,720,48)
+    if args.time_baseline:
+        candidate.render.use_persistent_data=False
+        old.collection.objects.link(inspect_cam)
+        render(old,inspect_cam,"long-overview-baseline",1536,720,48)
+        old.render.use_persistent_data=False
+    if args.long_only:
+        raise SystemExit(0)
 
 # Keep the existing Roadside camera for the sunlight-only inspection. The
 # diagnostic camera is separate and uses exactly the same raking rig for A/B.

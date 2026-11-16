@@ -1,6 +1,7 @@
 """Insert a shared three-neighbor Asphalt 04 sampler into the saved C material."""
 import argparse
 import json
+import math
 from pathlib import Path
 import sys
 import bpy
@@ -81,6 +82,13 @@ def combine(x,y):
     gbind(n,"Y",y)
     return n.outputs[0]
 
+def rotate_z(value,angle,label):
+    n=create("ShaderNodeVectorRotate",label)
+    n.rotation_type="Z_AXIS"
+    gbind(n,"Vector",value)
+    gbind(n,"Angle",angle)
+    return n.outputs[0]
+
 inputs=create("NodeGroupInput","Original station coordinates")
 outputs=create("NodeGroupOutput","Coherent Asphalt 04 contribution")
 road=inputs.outputs["Road metres"]
@@ -120,14 +128,20 @@ for identity,weight in zip(ids,weights):
     hash_node=create("ShaderNodeTexWhiteNoise","Deterministic sub-tile offset")
     hash_node.noise_dimensions="2D"
     gbind(hash_node,"Vector",identity)
-    uv=vec("ADD",base_uv,hash_node.outputs["Color"])
+    hash_axes=create("ShaderNodeSeparateColor","Offset and quarter-turn selector")
+    gbind(hash_axes,0,hash_node.outputs["Color"])
+    quadrant=calc("FLOOR",calc("MULTIPLY",hash_axes.outputs["Blue"],4))
+    theta=calc("MULTIPLY",quadrant,math.pi/2)
+    uv=vec("ADD",rotate_z(base_uv,theta,"Rotate all three PBR channel coordinates"),
+           hash_node.outputs["Color"])
     sampled=[]
     for im in maps:
         n=create("ShaderNodeTexImage",im.name)
         n.image=im
         gbind(n,"Vector",uv)
         sampled.append(n.outputs["Color"])
-    normal=vec("NORMALIZE",vec("SUBTRACT",vec("SCALE",sampled[2],2),(1,1,1)))
+    signed=vec("NORMALIZE",vec("SUBTRACT",vec("SCALE",sampled[2],2),(1,1,1)))
+    normal=rotate_z(signed,calc("MULTIPLY",theta,-1),"Inverse quarter-turn to common tangent frame")
     rough=create("ShaderNodeSeparateColor","Linear roughness channel")
     gbind(rough,0,sampled[1])
     results.append((vec("SCALE",sampled[0],weight),calc("MULTIPLY",rough.outputs["Red"],weight),
