@@ -48,8 +48,8 @@ const out = process.argv[3] || 'local/evidence';
     await page.locator('#camera').selectOption('driver');
     // Keep the full-size captures above, but benchmark at a phone-sized buffer so
     // the software renderer can collect enough frames per existing timed pass.
-    await page.setViewportSize({width: 440, height: 540});
-    await page.waitForFunction(() => window.r44Diagnostics.drawingBuffer[0] === 416);
+    await page.setViewportSize({width: 320, height: 540});
+    await page.waitForFunction(() => window.r44Diagnostics.drawingBuffer[0] === 296);
     await page.locator('#benchmark').click();
     try {
       await page.waitForFunction(() => {
@@ -71,9 +71,10 @@ const out = process.argv[3] || 'local/evidence';
     assert.equal(diagnostics.triangles, 74448);
     assert.deepEqual(diagnostics.maps.resolution, [2048, 2048]);
     assert.deepEqual(diagnostics.benchmark.passes.map(pass => pass.mode), ['A', 'B', 'B', 'A']);
-    assert.ok(diagnostics.benchmark.passes.every(pass => pass.samples > 5));
     fs.writeFileSync(`${out}/webgl-diagnostics.json`, JSON.stringify(diagnostics, null, 2) + '\n');
     console.log(JSON.stringify(diagnostics));
+    assert.ok(diagnostics.benchmark.passes.every(pass => pass.samples > 5));
+    await page.close();
     const mobile = await browser.newPage({viewport: {width: 440, height: 796}, deviceScaleFactor: 3, isMobile: true, hasTouch: true});
     let interrupted = false;
     await mobile.route('**/scan-data-0.webp?*', route => {
