@@ -55,7 +55,7 @@ const out = process.argv[3] || 'local/evidence';
       await page.waitForFunction(() => {
         const result = document.querySelector('#benchmark-result').textContent;
         return result && !result.startsWith('Sampling ');
-      }, undefined, {polling: 250, timeout: 65000});
+      }, undefined, {polling: 250, timeout: 180000});
       const result = await page.locator('#benchmark-result').textContent();
       assert.ok(await page.evaluate(() => window.r44Diagnostics.benchmark), result);
     } catch (error) {
@@ -73,7 +73,7 @@ const out = process.argv[3] || 'local/evidence';
     assert.deepEqual(diagnostics.benchmark.passes.map(pass => pass.mode), ['A', 'B', 'B', 'A']);
     fs.writeFileSync(`${out}/webgl-diagnostics.json`, JSON.stringify(diagnostics, null, 2) + '\n');
     console.log(JSON.stringify(diagnostics));
-    assert.ok(diagnostics.benchmark.passes.every(pass => pass.samples > 5));
+    assert.ok(diagnostics.benchmark.passes.every(pass => pass.samples >= 12));
     await page.close();
     const mobile = await browser.newPage({viewport: {width: 440, height: 796}, deviceScaleFactor: 3, isMobile: true, hasTouch: true});
     let interrupted = false;

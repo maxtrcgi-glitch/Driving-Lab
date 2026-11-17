@@ -266,15 +266,29 @@ function sampleMode(mode, warmup = 1500, duration = 4500) {
   setMode(mode);
   const after = performance.now() + warmup;
   const sample = measurement = { after, samples: [], submit: [] };
-  return new Promise((resolve, reject) => setTimeout(() => {
-    measurement = null;
-    if (benchmarkCancelled || contextLost || sample.samples.length < 5) {
-      reject(new Error('Timing interrupted. Keep the tab visible and the viewport steady.'));
-      return;
+  const minimumSamples = 12;
+  const deadline = after + 30000;
+  return new Promise((resolve, reject) => {
+    function finishWhenReady() {
+      if (benchmarkCancelled || contextLost) {
+        measurement = null;
+        reject(new Error('Timing interrupted. Keep the tab visible and the viewport steady.'));
+        return;
+      }
+      if (sample.samples.length < minimumSamples && performance.now() < deadline) {
+        setTimeout(finishWhenReady, 1000);
+        return;
+      }
+      measurement = null;
+      if (sample.samples.length < minimumSamples) {
+        reject(new Error(`Timing pass ${mode} collected ${sample.samples.length}/${minimumSamples} frames in 30 seconds.`));
+        return;
+      }
+      const submit = summarize(sample.submit);
+      resolve({ ...summarize(sample.samples), submitMedianMs: submit.medianMs, submitP95Ms: submit.p95Ms });
     }
-    const submit = summarize(sample.submit);
-    resolve({ ...summarize(sample.samples), submitMedianMs: submit.medianMs, submitP95Ms: submit.p95Ms });
-  }, warmup + duration));
+    setTimeout(finishWhenReady, warmup + duration);
+  });
 }
 
 async function benchmark() {
