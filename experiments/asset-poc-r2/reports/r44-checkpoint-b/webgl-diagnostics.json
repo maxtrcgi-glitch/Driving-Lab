@@ -1,0 +1,105 @@
+{
+  "material": "B",
+  "camera": "driver",
+  "shader": {
+    "A": "ready",
+    "B": "ready"
+  },
+  "shaderErrors": [],
+  "webglErrors": [],
+  "frameTime": {
+    "samples": 1,
+    "meanMs": 1283.1999999999825,
+    "medianMs": 1283.1999999999825,
+    "p95Ms": 1283.1999999999825,
+    "fps": 0.7793017456359208
+  },
+  "benchmark": {
+    "camera": "driver",
+    "drawingBuffer": [
+      296,
+      167
+    ],
+    "passes": [
+      {
+        "mode": "A",
+        "samples": 12,
+        "meanMs": 1420.7750000000003,
+        "medianMs": 1266.6000000000058,
+        "p95Ms": 4166.600000000006,
+        "fps": 0.7038412134222518,
+        "submitMedianMs": 0.29999999998835847,
+        "submitP95Ms": 0.9000000000232831
+      },
+      {
+        "mode": "B",
+        "samples": 12,
+        "meanMs": 490.25833333333384,
+        "medianMs": 449.8999999999942,
+        "p95Ms": 916.6000000000058,
+        "fps": 2.03974095289898,
+        "submitMedianMs": 0.20000000001164153,
+        "submitP95Ms": 0.5
+      },
+      {
+        "mode": "B",
+        "samples": 12,
+        "meanMs": 793.0249999999991,
+        "medianMs": 466.70000000001164,
+        "p95Ms": 2516.600000000006,
+        "fps": 1.2609942940008212,
+        "submitMedianMs": 0.20000000001164153,
+        "submitP95Ms": 0.30000000004656613
+      },
+      {
+        "mode": "A",
+        "samples": 12,
+        "meanMs": 1686.0500000000004,
+        "medianMs": 1283.2999999999884,
+        "p95Ms": 2566.600000000006,
+        "fps": 0.5931022211678181,
+        "submitMedianMs": 0.29999999998835847,
+        "submitP95Ms": 0.9000000000232831
+      }
+    ]
+  },
+  "failure": null,
+  "drawingBuffer": [
+    296,
+    167
+  ],
+  "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+  "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36",
+  "assets": {
+    "road.glb": {
+      "bytes": 1728444,
+      "sha256": "953c29ad0c30d6c5d3992aa13032535030a4ad99ec5c09cc2d7e22457aae6531"
+    },
+    "scan-color.webp": {
+      "bytes": 2076906,
+      "sha256": "0874e08b5734167ef6fb1fccff9a54fe6a68406175a5ecff5a779141fe35a7a4"
+    },
+    "scan-data-0.webp": {
+      "bytes": 4229586,
+      "sha256": "4ac29c1c74b4b606deb42828110f8562375e7ebab2a4d7aeb215730447f36bc5"
+    },
+    "scan-data-1.webp": {
+      "bytes": 4249924,
+      "sha256": "b67720cd7259d4c191bc953700df7db8b128b59348984e5caa4abc989c6605c9"
+    },
+    "scene.json": {
+      "bytes": 1989,
+      "sha256": "e63c430348e44b578cbadca4027f54d8335b9d8bb621ce86368d4876701a86c6"
+    }
+  },
+  "maps": {
+    "resolution": [
+      2048,
+      2048
+    ],
+    "anisotropy": 8
+  },
+  "drawCalls": 2,
+  "triangles": 74448
+}
