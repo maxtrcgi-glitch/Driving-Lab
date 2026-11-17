@@ -46,8 +46,22 @@ const out = process.argv[3] || 'local/evidence';
       }
     }
     await page.locator('#camera').selectOption('driver');
+    // Keep the full-size captures above, but benchmark at a phone-sized buffer so
+    // the software renderer can collect enough frames per existing timed pass.
+    await page.setViewportSize({width: 440, height: 540});
+    await page.waitForFunction(() => window.r44Diagnostics.drawingBuffer[0] === 416);
     await page.locator('#benchmark').click();
-    await page.waitForFunction(() => window.r44Diagnostics?.benchmark, undefined, {timeout: 65000});
+    try {
+      await page.waitForFunction(() => {
+        const result = document.querySelector('#benchmark-result').textContent;
+        return result && !result.startsWith('Sampling ');
+      }, undefined, {polling: 250, timeout: 65000});
+      const result = await page.locator('#benchmark-result').textContent();
+      assert.ok(await page.evaluate(() => window.r44Diagnostics.benchmark), result);
+    } catch (error) {
+      console.error(await page.locator('#benchmark-result').textContent(), await page.evaluate(() => window.r44Diagnostics));
+      throw error;
+    }
     let diagnostics = await page.evaluate(() => window.r44Diagnostics);
     assert.deepEqual(errors, []);
     assert.deepEqual(diagnostics.shader, {A:'ready',B:'ready'});
