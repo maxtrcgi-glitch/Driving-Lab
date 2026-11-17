@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>R4.4 WebGL2 compile check</title>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+<body>
+<script type="module">
+import * as T from 'three';
+import {createAsphalt} from './asphalt.js';
+const renderer = new T.WebGLRenderer();
+renderer.setSize(256, 256);
+document.body.append(renderer.domElement);
+const errors = [];
+renderer.debug.onShaderError = (gl, program, vertex, fragment) =>
+  errors.push(gl.getProgramInfoLog(program), gl.getShaderInfoLog(vertex), gl.getShaderInfoLog(fragment));
+const scene = new T.Scene();
+const camera = new T.PerspectiveCamera(50, 1, .1, 50);
+camera.position.z = 5;
+// Centred UVs and neutral packed maps isolate the shader from asset I/O.
+const scanColor = new T.DataTexture(new Uint8Array([91, 93, 95, 255]), 1, 1);
+const scanData = new T.DataTexture(new Uint8Array([128, 128, 210, 255]), 1, 1);
+for (const texture of [scanColor, scanData]) texture.needsUpdate = true;
+const road = new T.Mesh(new T.PlaneGeometry(4, 4));
+scene.add(road, new T.HemisphereLight(0xffffff, 0x555555, 2));
+for (const mode of [false, true]) {
+  road.material = createAsphalt({scanColor, scanData}, mode);
+  renderer.render(scene, camera);
+}
+const gl = renderer.getContext();
+window.result = {
+  errors, glError: gl.getError(), gl: gl.getParameter(gl.VERSION),
+  programs: renderer.info.programs.length, triangles: renderer.info.render.triangles,
+};
+</script>
+</body></html>

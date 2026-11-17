@@ -1,0 +1,31 @@
+name: R4.4 Mobile stochastic asphalt
+on:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths:
+      - 'experiments/asset-poc-r2/r44-asphalt/**'
+      - '.github/workflows/r44-asphalt.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  webgl:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npx playwright install --with-deps --only-shell chromium
+      - name: Compile both Three.js materials in Chromium WebGL2
+        run: |
+          root=experiments/asset-poc-r2
+          www=$(mktemp -d)
+          cp "$root/r44-asphalt/"*.{html,js} "$www/" 2>/dev/null || cp "$root/r44-asphalt/"{smoke.html,asphalt.js} "$www/"
+          cp -r "$root/viewer/"{vendor,utils} "$www/"
+          python3 -m http.server 8194 --bind 127.0.0.1 --directory "$www" &
+          trap 'kill "$!"' EXIT
+          for i in {1..20}; do curl -fs http://127.0.0.1:8194/smoke.html >/dev/null && break; sleep 1; done
+          node "$root/r44-asphalt/test.cjs" http://127.0.0.1:8194/
