@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Driving Lab · R4.4 Asphalt</title>
+<link rel="stylesheet" href="./viewer.css">
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+</head>
+<body>
+<main>
+  <h1>R4.4 Asphalt</h1>
+  <div class="controls">
+    <div class="modes" role="group" aria-label="Asphalt material">
+      <button disabled data-mode="A" aria-pressed="true">A · Tiled PBR</button>
+      <button disabled data-mode="B" aria-pressed="false">B · Stochastic</button>
+    </div>
+    <label class="camera">Camera
+      <select id="camera" disabled>
+        <option value="driver">Driver Eye</option>
+        <option value="roadside">Roadside</option>
+        <option value="overview">Overview</option>
+      </select>
+    </label>
+    <button id="motion" aria-pressed="false" disabled>Dolly</button>
+  </div>
+  <div id="stage">
+    <canvas id="road" aria-label="WebGL view of the asphalt test road"></canvas>
+    <div id="loading">
+      <p id="status" role="status">Starting WebGL viewer…</p>
+      <progress id="progress" aria-label="Scene loading progress"></progress>
+      <button id="retry" type="button" hidden>Retry</button>
+    </div>
+  </div>
+  <div class="diagnostics">
+    <p id="stats">Waiting for the first frame.</p>
+    <p id="render-status"></p>
+    <button id="benchmark" disabled>Run A/B timing</button>
+    <button id="copy" disabled>Copy Diagnostics</button>
+    <span id="feedback" role="status"></span>
+    <pre id="benchmark-result" aria-live="polite"></pre>
+    <textarea id="diagnostics-output" aria-label="Diagnostics to copy" readonly hidden></textarea>
+  </div>
+</main>
+<script>
+  const showModuleError = () => {
+    document.querySelector('#status').textContent = 'The viewer code could not load.';
+    document.querySelector('#progress').hidden = true;
+    const retry = document.querySelector('#retry');
+    retry.hidden = false;
+    retry.onclick = () => location.reload();
+  };
+  window.addEventListener('error', event => {
+    if (event.target.id === 'viewer') showModuleError();
+  }, true);
+</script>
+<script id="viewer" type="module" src="./viewer.js"></script>
+</body>
+</html>

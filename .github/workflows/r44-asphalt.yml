@@ -29,3 +29,20 @@ jobs:
           trap 'kill "$!"' EXIT
           for i in {1..20}; do curl -fs http://127.0.0.1:8194/smoke.html >/dev/null && break; sleep 1; done
           node "$root/r44-asphalt/test.cjs" http://127.0.0.1:8194/
+      - name: Render the Blender-derived scene and measure A/B on SwiftShader
+        run: |
+          root=experiments/asset-poc-r2
+          www=$(mktemp -d)
+          cp "$root/r44-asphalt/"{index.html,viewer.css,viewer.js,asphalt.js,asset-manifest.json} "$www/"
+          cp -r "$root/r44-asphalt/assets" "$root/viewer/"{vendor,utils} "$www/"
+          python3 -m http.server 8195 --bind 127.0.0.1 --directory "$www" &
+          trap 'kill "$!"' EXIT
+          for i in {1..20}; do curl -fs http://127.0.0.1:8195/ >/dev/null && break; sleep 1; done
+          node "$root/r44-asphalt/capture.cjs" http://127.0.0.1:8195/ "$RUNNER_TEMP/r44-evidence"
+      - name: Upload WebGL comparison evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: r44-webgl-evidence
+          path: ${{ runner.temp }}/r44-evidence

@@ -1,0 +1,22 @@
+{
+  "road.glb": {
+    "bytes": 1728444,
+    "sha256": "953c29ad0c30d6c5d3992aa13032535030a4ad99ec5c09cc2d7e22457aae6531"
+  },
+  "scan-color.webp": {
+    "bytes": 2076906,
+    "sha256": "0874e08b5734167ef6fb1fccff9a54fe6a68406175a5ecff5a779141fe35a7a4"
+  },
+  "scan-data-0.webp": {
+    "bytes": 4229586,
+    "sha256": "4ac29c1c74b4b606deb42828110f8562375e7ebab2a4d7aeb215730447f36bc5"
+  },
+  "scan-data-1.webp": {
+    "bytes": 4249924,
+    "sha256": "b67720cd7259d4c191bc953700df7db8b128b59348984e5caa4abc989c6605c9"
+  },
+  "scene.json": {
+    "bytes": 1989,
+    "sha256": "e63c430348e44b578cbadca4027f54d8335b9d8bb621ce86368d4876701a86c6"
+  }
+}

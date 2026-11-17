@@ -1,0 +1,19 @@
+:root { color-scheme: dark; font: 16px/1.45 system-ui, sans-serif; background: #171b1e; color: #eff1f0; }
+body { margin: 0; }
+main { max-width: 1152px; margin: auto; padding: 14px max(12px, env(safe-area-inset-right)) 14px max(12px, env(safe-area-inset-left)); }
+h1 { font-size: 1.28rem; margin: 0 0 12px; }
+.controls, .modes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.controls { margin-bottom: 10px; }
+.camera { display: inline-flex; gap: 6px; align-items: center; }
+button, select { font: inherit; min-height: 44px; padding: 6px 10px; color: inherit; border: 1px solid #66716f; border-radius: 6px; background: #29302f; }
+button[aria-pressed="true"] { background: #cae5d5; color: #13281f; border-color: #cae5d5; }
+button:disabled, select:disabled { opacity: .6; }
+#stage { position: relative; aspect-ratio: 16 / 9; background: #252c31; overflow: hidden; }
+canvas { display: block; width: 100%; height: 100%; }
+#loading { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; text-align: center; padding: 8px; }
+#loading p { margin: 0 0 8px; }
+[hidden] { display: none !important; }
+.diagnostics { font-size: .875rem; }
+.diagnostics p { margin: 6px 0; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; margin: 8px 0 0; }
+textarea { display: block; width: 100%; min-height: 12em; margin-top: 6px; box-sizing: border-box; font: inherit; }
