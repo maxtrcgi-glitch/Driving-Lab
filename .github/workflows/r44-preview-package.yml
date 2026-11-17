@@ -1,0 +1,62 @@
+name: R4.4 preview package
+on:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths:
+      - '.github/workflows/r44-preview-package.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+      - name: Stage and verify static viewer
+        shell: bash
+        run: |
+          set -euo pipefail
+          root=experiments/asset-poc-r2
+          stage="$RUNNER_TEMP/r44-package"
+          mkdir -p "$stage/assets"
+          cp "$root/r44-asphalt/"{index.html,viewer.css,viewer.js,asphalt.js,asset-manifest.json} "$stage/"
+          cp -r "$root/r44-asphalt/assets/." "$stage/assets/"
+          cp -r "$root/viewer/"{vendor,utils} "$stage/"
+          export R44_STAGE="$stage"
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["R44_STAGE"])
+          manifest = json.loads((root / "asset-manifest.json").read_text())
+          expected = {"road.glb", "scan-color.webp", "scan-data-0.webp", "scan-data-1.webp", "scene.json"}
+          assert set(manifest) == expected
+          for name, item in manifest.items():
+              data = (root / "assets" / name).read_bytes()
+              digest = hashlib.sha256(data).hexdigest()
+              assert len(data) == item["bytes"] and digest == item["sha256"], name
+              print(f"PASS {name} bytes={len(data)} sha256={digest}")
+          for name in ("index.html", "viewer.css", "viewer.js", "asphalt.js",
+                       "vendor/three.module.js", "vendor/three.core.js",
+                       "vendor/GLTFLoader.js", "utils/BufferGeometryUtils.js"):
+              assert (root / name).is_file(), name
+          (root / "build-info.json").write_text(json.dumps({"source_commit": os.environ["GITHUB_SHA"]}, indent=2) + "\n")
+          files = sorted(p for p in root.rglob("*") if p.is_file())
+          (root / "SHA256SUMS").write_text("".join(f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.relative_to(root).as_posix()}\n" for p in files))
+          PY
+          (cd "$stage" && sha256sum -c SHA256SUMS)
+          mkdir -p experiments/asset-poc-r2/reports/r44-preview-package
+          (cd "$stage" && zip -qr "$GITHUB_WORKSPACE/experiments/asset-poc-r2/reports/r44-preview-package/r44-preview.zip" .)
+          unzip -t experiments/asset-poc-r2/reports/r44-preview-package/r44-preview.zip
+          sha256sum experiments/asset-poc-r2/reports/r44-preview-package/r44-preview.zip
+      - name: Preserve verified package on branch
+        run: |
+          set -euo pipefail
+          git config user.name github-actions\[bot\]
+          git config user.email 41898282+github-actions\[bot\]@users.noreply.github.com
+          git add -f experiments/asset-poc-r2/reports/r44-preview-package/r44-preview.zip
+          if ! git diff --cached --quiet; then
+            git commit -m "R4.4 C: preserve verified static preview package"
+            git push origin HEAD:refs/heads/visual/asset-poc-r2
+          fi
