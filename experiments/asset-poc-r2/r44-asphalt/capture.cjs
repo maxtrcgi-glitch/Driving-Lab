@@ -25,11 +25,21 @@ const out = process.argv[3] || 'local/evidence';
       await page.locator('#camera').selectOption(camera);
       for (const mode of ['A', 'B']) {
         await page.locator(`[data-mode="${mode}"]`).click();
-        await page.waitForTimeout(500);
-        await canvas.screenshot({path: `${out}/webgl-${camera}-${mode}.png`, timeout: 30000});
+        const {png, jpeg} = await canvas.evaluate(element => new Promise(resolve => {
+          // The viewer's queued frame draws before this callback. Read the buffer
+          // in the same frame, before WebGL's default clearing on presentation.
+          requestAnimationFrame(() => {
+            resolve({
+              png: element.toDataURL('image/png'),
+              jpeg: element.toDataURL('image/jpeg', 0.62),
+            });
+          });
+        }));
+        assert.ok(png.startsWith('data:image/png;base64,'));
+        assert.ok(jpeg.startsWith('data:image/jpeg;base64,'));
+        fs.writeFileSync(`${out}/webgl-${camera}-${mode}.png`, Buffer.from(png.split(',')[1], 'base64'));
         // Retain portable evidence in the job log if artifact storage is full.
-        const jpeg = await canvas.screenshot({type: 'jpeg', quality: 62, timeout: 30000});
-        const encoded = jpeg.toString('base64');
+        const encoded = jpeg.split(',')[1];
         for (let offset = 0; offset < encoded.length; offset += 4096) {
           console.log(`R44_IMAGE ${camera} ${mode} ${offset} ${encoded.slice(offset, offset + 4096)}`);
         }
