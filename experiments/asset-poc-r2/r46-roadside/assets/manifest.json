@@ -1,0 +1,22 @@
+{
+  "source": "https://polyhaven.com/a/gravel_stones",
+  "license": "CC0",
+  "tile_width_m": 2,
+  "files": {
+    "gravel_stones_diff_2k.jpg": {
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/gravel_stones/gravel_stones_diff_2k.jpg",
+      "sha256": "cacad132d39976f66451271b4eeb1e6ee11ecbff2cd3160f2b9d4323aa2b0136",
+      "bytes": 3220057
+    },
+    "gravel_stones_rough_2k.jpg": {
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/gravel_stones/gravel_stones_rough_2k.jpg",
+      "sha256": "90c46bd7875f71c264e418a9dcb12ea0ea871586307d116cc35695ffc28cd55c",
+      "bytes": 2476477
+    },
+    "gravel_stones_nor_gl_2k.jpg": {
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/gravel_stones/gravel_stones_nor_gl_2k.jpg",
+      "sha256": "13a0218f69539da3e8f9ad805213ce311a936d30c05558d8e42ebb46fde5b7eb",
+      "bytes": 5469483
+    }
+  }
+}
