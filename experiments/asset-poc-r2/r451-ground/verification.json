@@ -1,0 +1,22 @@
+{
+  "status": "NOT READY",
+  "base_commit": "2d7a93894d0b9ad9b44fc1c1ed3c5461c7bb9992",
+  "source_zip_sha256": "e25a6e9de4e77c71bcb8c1ff928d040231f9ef05cf652e9b6276f0dcc6528917",
+  "audit_equal": {
+    "geometry": true,
+    "objects": true,
+    "asphalt_graph": true,
+    "exposure": true,
+    "world": true,
+    "cameras": true,
+    "lights": true
+  },
+  "images": {
+    "before/driver.png": "7d8782dfb10b82bc0fb50d4abc41890935c6765240201b4c37ce86ac93dec52a",
+    "before/roadside.png": "0d39f5be04d42588af7cd5ddebdffc92e5b5403ba8d0356bf81c50413b75630e",
+    "before/transition-close.png": "10b794a8b5646f2a2baf47d1ec76d6d24e4cfc4f7d56e29520c36f197ec60a93",
+    "after/driver.png": "30b9d2a9d80c7553cb6bca9efd8f2f937d504cebd3cb11fda6a69c253f8d7bd9",
+    "after/roadside.png": "bc4e2967d7a991fa843bb7ed773059108e4bafbcb633955cc83e35535654beed",
+    "after/transition-close.png": "b43d5667504815c91c4f9fd46bab136a018970a82171df31a9af6ee592b75edf"
+  }
+}

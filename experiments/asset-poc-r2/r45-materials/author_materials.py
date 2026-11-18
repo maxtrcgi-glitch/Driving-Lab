@@ -31,6 +31,40 @@ def ramp(nodes, links, source, low, high):
     links.new(source, node.inputs[0])
     return node.outputs[0]
 
+def blend_tangent_normals(nodes, links, first, second, weight):
+    """Blend alternative surface normals in their shared, untranslated UV basis."""
+    def operation(kind, source, value=None):
+        node = nodes.new('ShaderNodeVectorMath')
+        node.operation = kind
+        links.new(source, node.inputs[0])
+        if value is not None:
+            node.inputs[1].default_value = value
+        return node.outputs[0]
+
+    vectors = []
+    for encoded in (first, second):
+        doubled = operation('MULTIPLY', encoded, (2, 2, 2))
+        signed = operation('ADD', doubled, (-1, -1, -1))
+        vectors.append(operation('NORMALIZE', signed))
+    inverse = nodes.new('ShaderNodeMath')
+    inverse.operation = 'SUBTRACT'
+    inverse.inputs[0].default_value = 1
+    links.new(weight, inverse.inputs[1])
+    weighted = []
+    for normal, factor in zip(vectors, (inverse.outputs[0], weight)):
+        node = nodes.new('ShaderNodeVectorMath')
+        node.operation = 'SCALE'
+        links.new(normal, node.inputs[0])
+        links.new(factor, node.inputs['Scale'])
+        weighted.append(node.outputs[0])
+    added = nodes.new('ShaderNodeVectorMath')
+    added.operation = 'ADD'
+    links.new(weighted[0], added.inputs[0])
+    links.new(weighted[1], added.inputs[1])
+    normal = operation('NORMALIZE', added.outputs[0])
+    half = operation('MULTIPLY', normal, (.5, .5, .5))
+    return operation('ADD', half, (.5, .5, .5))
+
 if a.checkpoint == 'A':
     mat, nodes, links = copy_material('Formed precast concrete', 'R45 | Formed roadside concrete')
     shader = nodes.get('Principled BSDF')
@@ -86,14 +120,29 @@ else:
             other.extension = tex.extension; other.interpolation = tex.interpolation
             links.new(add.outputs[0], other.inputs['Vector'])
             consumers = list(tex.outputs['Color'].links)
-            mix = nodes.new('ShaderNodeMixRGB')
-            links.new(selection.outputs[0], mix.inputs[0])
-            links.new(tex.outputs['Color'], mix.inputs[1]); links.new(other.outputs['Color'], mix.inputs[2])
+            if 'nor_gl' in tex.image.name:
+                result = blend_tangent_normals(nodes, links, tex.outputs['Color'],
+                                               other.outputs['Color'], selection.outputs[0])
+            else:
+                mix = nodes.new('ShaderNodeMixRGB')
+                links.new(selection.outputs[0], mix.inputs[0])
+                links.new(tex.outputs['Color'], mix.inputs[1])
+                links.new(other.outputs['Color'], mix.inputs[2])
+                result = mix.outputs[0]
             for link in consumers:
-                links.new(mix.outputs[0], link.to_socket)
+                links.new(result, link.to_socket)
         mat['R45_sampling'] = 'World-space 8.33 m selection field, thresholds 0.43/0.57; coherent translated PBR samples; no rotation'
-        for node in nodes:
-            if node.type == 'NORMAL_MAP': node.inputs['Strength'].default_value = .55
+        for node in list(nodes):
+            if node.type != 'NORMAL_MAP':
+                continue
+            node.inputs['Strength'].default_value = .55
+            source = node.inputs['Color'].links[0].from_node
+            if source.type == 'MIX_RGB':
+                first = source.inputs[1].links[0].from_socket
+                second = source.inputs[2].links[0].from_socket
+                factor = source.inputs[0].links[0].from_socket
+                result = blend_tangent_normals(nodes, links, first, second, factor)
+                links.new(result, node.inputs['Color'])
 scene['R45_checkpoint'] = a.checkpoint
 for mat in bpy.data.materials:
     if mat.name.startswith('R45 |'):
