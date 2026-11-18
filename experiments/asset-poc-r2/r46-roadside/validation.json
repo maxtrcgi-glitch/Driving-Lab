@@ -1,0 +1,73 @@
+{
+  "checks": {
+    "cameras": true,
+    "lights": true,
+    "exposure": true,
+    "world": true,
+    "terrain_boundary": true,
+    "only_verge_mesh_changes": true,
+    "uv_preserved": true,
+    "only_verge_assignment_changes": true,
+    "protected_materials_preserved": true,
+    "original_image_properties_preserved": true,
+    "packed_dependencies": true,
+    "instance_contact": true,
+    "deterministic_placement": true
+  },
+  "changed_meshes": [
+    "Outer verge and drainage swale",
+    "Outer verge and drainage swale.001"
+  ],
+  "changed_original_objects": [
+    "Outer verge and drainage swale",
+    "Outer verge and drainage swale.001"
+  ],
+  "contact": {
+    "floating_or_fully_buried": [],
+    "paved_overlap": [],
+    "rooted_instances": 529
+  },
+  "budget": {
+    "checkpoint": "B",
+    "seed": 4601,
+    "instances": {
+      "small_stone": 634,
+      "large_stone": 7,
+      "grass": 448,
+      "dry": 81
+    },
+    "placement_sha256": "05e9b052ba7462e601672b9815221b3b0531b76a96d0a39d0beca0c369b08f85",
+    "stone_unique_triangles": 80,
+    "stone_evaluated_triangles": 12820,
+    "vegetation_evaluated_triangles": 201929,
+    "additional_evaluated_triangles": 214749,
+    "unique_assets": 8,
+    "additional_materials_checkpoint_B": 2
+  },
+  "new_images": {
+    "gravel_stones_diff_2k.jpg": {
+      "resolution": [
+        2048,
+        2048
+      ],
+      "colorspace": "sRGB",
+      "packed": true
+    },
+    "gravel_stones_nor_gl_2k.jpg": {
+      "resolution": [
+        2048,
+        2048
+      ],
+      "colorspace": "Non-Color",
+      "packed": true
+    },
+    "gravel_stones_rough_2k.jpg": {
+      "resolution": [
+        2048,
+        2048
+      ],
+      "colorspace": "Non-Color",
+      "packed": true
+    }
+  }
+}

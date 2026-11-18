@@ -18,6 +18,7 @@ from edit_scene import noise_at, smoothstep, uv_metres, world_xy
 parser = argparse.ArgumentParser()
 parser.add_argument('checkpoint', choices=['A', 'B'])
 parser.add_argument('output', type=Path)
+parser.add_argument('--audit-only', action='store_true')
 args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:])
 scene = bpy.data.scenes['C_STOCHASTIC_FINAL']
 bpy.context.window.scene = scene
@@ -106,8 +107,8 @@ else:
         dry.objects.link(obj)
         for slot in obj.material_slots:
             if slot.material:
-                slot.link = 'OBJECT'
                 mat = slot.material.copy()
+                slot.link = 'OBJECT'
                 mat.name = 'R46 | Dry growth'
                 shader = next(n for n in mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
                 input_socket = shader.inputs['Base Color']
@@ -182,8 +183,9 @@ else:
     stats['additional_evaluated_triangles'] = stats['stone_evaluated_triangles'] + grass_triangles
     stats['unique_assets'] = 8
     stats['additional_materials_checkpoint_B'] = 2
-bpy.ops.file.pack_all()
 args.output.parent.mkdir(parents=True, exist_ok=True)
-bpy.ops.wm.save_as_mainfile(filepath=str(args.output.resolve()))
+if not args.audit_only:
+    bpy.ops.file.pack_all()
+    bpy.ops.wm.save_as_mainfile(filepath=str(args.output.resolve()))
 args.output.with_suffix('.json').write_text(json.dumps(stats, indent=2))
 print('R46_CHECKPOINT', json.dumps(stats), flush=True)

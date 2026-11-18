@@ -1,0 +1,19 @@
+{
+  "source": {
+    "name": "R4_6_Hybrid_Roadside_Source.zip",
+    "bytes": 492584679,
+    "sha256": "4c00e3c9335fda766a5f94a2ed7aad7d017734ddf4c1f21cade1fca06e5c180a",
+    "verified_crc_and_sha256": true,
+    "url": "https://chatgpt.com/library?file_id=libfile_aba7fd9461c0819188e9b714ef934a76&account_id=personal"
+  },
+  "evidence": {
+    "name": "R4_6_Hybrid_Roadside_Render_Evidence.zip",
+    "bytes": 19698886,
+    "sha256": "e15ac23b05f0605e325448bc8c02bbcce107ad44820463557d6a355e2e4a885b",
+    "verified_crc_and_sha256": true,
+    "url": "https://chatgpt.com/library?file_id=libfile_d5d0620e61f881919816ce04159ac063&account_id=personal"
+  },
+  "native_sha256": "aad8fe728946ad9ee03fa2494b700f45966319e7d4ffc5b9225de0f23b5ae7fd",
+  "checkpoint_A_commit": "4fddfd3217ca42037c3373ae0efcfe73f68fe7fd",
+  "status": "READY FOR DIRECTOR ART REVIEW; not Director approval"
+}

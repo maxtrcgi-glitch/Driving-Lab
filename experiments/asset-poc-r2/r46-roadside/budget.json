@@ -1,0 +1,17 @@
+{
+  "checkpoint": "B",
+  "seed": 4601,
+  "instances": {
+    "small_stone": 634,
+    "large_stone": 7,
+    "grass": 448,
+    "dry": 81
+  },
+  "placement_sha256": "05e9b052ba7462e601672b9815221b3b0531b76a96d0a39d0beca0c369b08f85",
+  "stone_unique_triangles": 80,
+  "stone_evaluated_triangles": 12820,
+  "vegetation_evaluated_triangles": 201929,
+  "additional_evaluated_triangles": 214749,
+  "unique_assets": 8,
+  "additional_materials_checkpoint_B": 2
+}
