@@ -1,0 +1,91 @@
+name: R4.4 Pages preview
+on:
+  workflow_dispatch:
+  push:
+    branches: [visual/asset-poc-r2]
+    paths:
+      - '.github/workflows/r44-pages.yml'
+      - 'experiments/asset-poc-r2/r44-asphalt/**'
+      - 'experiments/asset-poc-r2/viewer/vendor/**'
+      - 'experiments/asset-poc-r2/viewer/utils/**'
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: r44-pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Assemble and verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          root=experiments/asset-poc-r2
+          out="$RUNNER_TEMP/r44-pages"
+          mkdir -p "$out/assets"
+          cp "$root/r44-asphalt/"{index.html,viewer.css,viewer.js,asphalt.js,asset-manifest.json} "$out/"
+          cp -r "$root/r44-asphalt/assets/." "$out/assets/"
+          cp -r "$root/viewer/"{vendor,utils} "$out/"
+          touch "$out/.nojekyll"
+          export R44_OUT="$out"
+          python3 - <<'PY'
+          import hashlib, json, os, re
+          from pathlib import Path
+          from html.parser import HTMLParser
+          out = Path(os.environ["R44_OUT"])
+          manifest = json.loads((out / "asset-manifest.json").read_text())
+          assert set(manifest) == {"road.glb", "scan-color.webp", "scan-data-0.webp", "scan-data-1.webp", "scene.json"}
+          for name, info in manifest.items():
+              data = (out / "assets" / name).read_bytes()
+              digest = hashlib.sha256(data).hexdigest()
+              assert len(data) == info["bytes"] and digest == info["sha256"], name
+              print(f"PASS {name} {len(data)} {digest}")
+          class HTMLPaths(HTMLParser):
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  for key in ("src", "href"):
+                      value = attrs.get(key, "")
+                      if value.startswith("./"):
+                          assert (out / value).is_file(), value
+          html = (out / "index.html").read_text()
+          HTMLPaths().feed(html)
+          imports = json.loads(re.search(r'<script type="importmap">(.*?)</script>', html, re.S).group(1))["imports"]
+          for target in imports.values():
+              assert (out / target).is_file(), target
+          modules = [out / "viewer.js", out / "asphalt.js"]
+          seen = set()
+          while modules:
+              path = modules.pop()
+              if path in seen:
+                  continue
+              assert path.is_file(), path
+              seen.add(path)
+              source = path.read_text()
+              refs = re.findall(r"""(?:\b(?:import|export)\s+(?:[^;]*?\s+from\s+)?|\bimport\s*\()\s*['"]([^'"]+)['"]""", source)
+              for ref in refs:
+                  target = path.parent / ref if ref.startswith(".") else out / imports[ref]
+                  assert target.resolve().is_relative_to(out.resolve()) and target.is_file(), (path, ref)
+                  modules.append(target.resolve())
+          print("Verified modules:", *sorted(str(p.relative_to(out)) for p in seen))
+          for value in re.findall(r"""['"](\./[^'"]+)['"]""", (out / "viewer.js").read_text()):
+              if "${" not in value and not value.endswith("/"):
+                  assert (out / value).is_file(), value
+          assert (out / "index.html").is_file() and (out / ".nojekyll").is_file()
+          PY
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ runner.temp }}/r44-pages
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
