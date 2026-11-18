@@ -1,0 +1,18 @@
+{
+  "source_zip_sha256": "2cfe657fd4f5519364e099f79c7c45115387aabf73e99db15ab7f973ede681d8",
+  "audit_equal": {
+    "A": true,
+    "B": true
+  },
+  "images": {
+    "before/driver.png": "7246fe099f1280a17f587dae34df3918c1882a28758b665875cdf8bef09fac84",
+    "before/overview.png": "1dfc885ad9a33dfd1af40608d755188f29a01af5803ff086009eba6e0377605c",
+    "before/roadside.png": "75a2934a30a3c622e883c2ee98e0e12db75062a157d6b3c114e9836f27c2a02a",
+    "after/driver.png": "53c110f28d1effc3178b998535367d8a6daccc042ef3ce6bf05f855a712aa9f4",
+    "after/overview.png": "c9fc23f2eb6e0c1e7ec07642fc5c564491f4b890911e981cbfd5e8592d831c1b",
+    "after/roadside.png": "471ba8d65df809c4c3c06a2489b516097b6cca4535a09c27889e1ea78a09cb90",
+    "A/driver.png": "faea639099848be9735fa501ae6e810e1feac6a576840525bb9824ca3569db9d",
+    "A/overview.png": "7ba6602f0260a2d084fd314b80abc90df80a63254e188219576be33ba2e5c97b",
+    "A/roadside.png": "cac77f813acf215b97235b596ddbfa9e3ae3e9001065c8fa532a25758a1cdb53"
+  }
+}

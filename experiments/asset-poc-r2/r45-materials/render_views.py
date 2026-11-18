@@ -5,6 +5,8 @@ import bpy
 out = Path(sys.argv[sys.argv.index('--') + 1]); out.mkdir(parents=True, exist_ok=True)
 s = bpy.data.scenes['C_STOCHASTIC_FINAL']; bpy.context.window.scene = s
 for prefix, name in zip('ABC', ['driver', 'roadside', 'overview']):
+    if (out / (name + '.png')).exists():
+        continue
     s.camera = next(o for o in s.objects if o.type == 'CAMERA' and o.name.startswith(prefix + ' |'))
     s.render.engine = 'CYCLES'; s.cycles.samples = 48
     s.cycles.use_denoising = False; s.cycles.adaptive_threshold = .04

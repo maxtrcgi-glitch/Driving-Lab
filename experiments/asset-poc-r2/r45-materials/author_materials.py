@@ -66,6 +66,15 @@ else:
         # Translate a secondary sample consistently across all PBR channels.
         # No rotations, so the existing tangent normal convention is retained.
         images = [n for n in nodes if n.type == 'TEX_IMAGE']
+        position = nodes.new('ShaderNodeNewGeometry')
+        noise = nodes.new('ShaderNodeTexNoise')
+        noise.inputs['Scale'].default_value = .12
+        noise.inputs['Detail'].default_value = 2
+        links.new(position.outputs['Position'], noise.inputs['Vector'])
+        selection = nodes.new('ShaderNodeValToRGB')
+        selection.color_ramp.elements[0].position = .43
+        selection.color_ramp.elements[1].position = .57
+        links.new(noise.outputs['Fac'], selection.inputs[0])
         for tex in images:
             if not tex.inputs['Vector'].is_linked:
                 continue
@@ -77,11 +86,12 @@ else:
             other.extension = tex.extension; other.interpolation = tex.interpolation
             links.new(add.outputs[0], other.inputs['Vector'])
             consumers = list(tex.outputs['Color'].links)
-            mix = nodes.new('ShaderNodeMixRGB'); mix.inputs[0].default_value = .18
+            mix = nodes.new('ShaderNodeMixRGB')
+            links.new(selection.outputs[0], mix.inputs[0])
             links.new(tex.outputs['Color'], mix.inputs[1]); links.new(other.outputs['Color'], mix.inputs[2])
             for link in consumers:
                 links.new(mix.outputs[0], link.to_socket)
-        mat['R45_sampling'] = '82% original UV scan, 18% translated scan; coherent channel translation, no rotation'
+        mat['R45_sampling'] = 'World-space 8.33 m selection field, thresholds 0.43/0.57; coherent translated PBR samples; no rotation'
         for node in nodes:
             if node.type == 'NORMAL_MAP': node.inputs['Strength'].default_value = .55
 scene['R45_checkpoint'] = a.checkpoint
