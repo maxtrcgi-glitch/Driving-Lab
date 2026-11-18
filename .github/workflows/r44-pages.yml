@@ -65,6 +65,8 @@ jobs:
               assert path.is_file(), path
               seen.add(path)
               source = path.read_text()
+              source = re.sub(r"/\*[\s\S]*?\*/", "", source)
+              source = re.sub(r"(?m)^\s*//.*$", "", source)
               refs = re.findall(r"""(?:\b(?:import|export)\s+(?:[^;]*?\s+from\s+)?|\bimport\s*\()\s*['"]([^'"]+)['"]""", source)
               for ref in refs:
                   target = path.parent / ref if ref.startswith(".") else out / imports[ref]
